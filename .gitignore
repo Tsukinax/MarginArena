@@ -24,3 +24,6 @@ infra/evolus/.plan/
 
 # Session handoff for the next Claude session (the user @-mentions it; not part of the product)
 handoff.md
+
+# The web app build (npm --prefix web run build; the Dockerfile builds its own)
+web/dist/

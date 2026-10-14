@@ -25,7 +25,7 @@ export default function App() {
   const done = useMemo(() => events.find((e) => e.type === 'run_done'), [events])
   const results: SkuResult[] = done && done.type === 'run_done' ? done.results : []
 
-  const start = async () => {
+  const start = async (recorded: boolean) => {
     abort.current?.abort()
     abort.current = new AbortController()
     setEvents([])
@@ -33,7 +33,7 @@ export default function App() {
     setPhase('running')
     setStep(1)
     try {
-      await runArena({}, (e) => {
+      await runArena(recorded ? { recorded: true } : {}, (e) => {
         setEvents((prev) => [...prev, e])
         if (e.type === 'error') setError(e.message)
       }, abort.current.signal)

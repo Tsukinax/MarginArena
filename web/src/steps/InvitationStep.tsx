@@ -1,6 +1,6 @@
 import { baht, pct, type Shop } from '../api'
 
-type Props = { shop: Shop | null; route: string | null; onStart: () => void }
+type Props = { shop: Shop | null; route: string | null; onStart: (recorded: boolean) => void }
 
 export default function InvitationStep({ shop, route, onStart }: Props) {
   if (!shop) return <p className="muted">Loading the sample invitation…</p>
@@ -100,15 +100,19 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
       </table>
 
       <p className="small">{shop.label}</p>
-      <button type="button" className="primary" onClick={onStart}>
-        Check {count === shop.invited.length ? `these ${count}` : `${count} of these`} products
-      </button>
-      {fallback && (
-        <p className="small">
-          Running on AMD Token Factory: the Arena checks {count} of the {shop.invited.length} products live, to stay
-          within its shared rate limit.
-        </p>
-      )}
+      <div className="start-actions">
+        <button type="button" className="primary" onClick={() => onStart(true)}>
+          Watch all {shop.invited.length} products (recorded run)
+        </button>
+        <button type="button" className="secondary" onClick={() => onStart(false)}>
+          Run {count === shop.invited.length ? `all ${count}` : count} live
+        </button>
+      </div>
+      <p className="small">
+        The recorded run is a real Arena on AMD Token Factory, replayed in about 20 seconds.
+        {fallback &&
+          ` A live run checks ${count} of the ${shop.invited.length} products, to stay within Token Factory's shared rate limit, and takes 1–2 minutes.`}
+      </p>
     </section>
   )
 }

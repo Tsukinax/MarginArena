@@ -1,0 +1,6 @@
+services:
+  marginarena:
+    build: .
+    env_file: .env
+    ports:
+      - "8008:8008"

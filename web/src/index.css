@@ -238,6 +238,27 @@ button:disabled {
   background: #9aa1ad;
 }
 
+.secondary {
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  padding: 11px 19px;
+  font-weight: 600;
+}
+
+.start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.start-actions .primary {
+  margin-top: 0;
+}
+
 /* Step 1 */
 .invite-grid {
   display: grid;

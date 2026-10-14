@@ -9,14 +9,16 @@ import json
 import os
 import secrets
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 from typing import Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from marginarena.arena import run_arena
+from marginarena.arena import Emit, run_arena
 from marginarena.explainer import Language, explain
 from marginarena.llm import LLMClient, LLMSettings, first_healthy
 from marginarena.sample import describe_shop, load_shop
@@ -26,6 +28,10 @@ FALLBACK_CAPS = {"skus": 4, "rounds": 2, "rivals": 2, "strategists": 1}
 # Signs each decided SKU when RESULT_SIGNING_KEY is unset. It lives as long as this process, so a deploy that runs
 # several processes must set RESULT_SIGNING_KEY.
 PROCESS_KEY = secrets.token_bytes(32)
+# The default demo: a full 12-SKU run recorded on Token Factory (backend/scripts/record_arena.py), replayed in about
+# REPLAY_SECONDS whatever it took live.
+RECORDED_RUN = Path(__file__).resolve().parents[3] / "evidence" / "runs" / "token-factory-sample-12sku.sse"
+REPLAY_SECONDS = 20
 
 
 class ArenaRequest(BaseModel):
@@ -35,6 +41,8 @@ class ArenaRequest(BaseModel):
     rounds: int = Field(default=3, ge=1, le=5)
     rivals: int = Field(default=6, ge=1, le=6)
     strategists: int = Field(default=3, ge=0, le=3)
+    recorded: bool = False
+    """Replay the recorded run, labelled "recorded", instead of calling the model."""
 
 
 class ExplainRequest(BaseModel):
@@ -48,8 +56,13 @@ def create_app(
     llm_transport: httpx.AsyncBaseTransport | None = None,
     sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
     routes: tuple[LLMSettings, ...] | None = None,
+    web_dist: Path | None = None,
 ) -> FastAPI:
-    """`llm_settings` forces one route; otherwise the first healthy of `routes` (default: from the environment)."""
+    """`llm_settings` forces one route; otherwise the first healthy of `routes` (default: from the environment).
+
+    `web_dist` (default: the WEB_DIST environment variable) is the built web app, served at / so one container
+    runs everything; without it only /api is served, as in development where Vite serves the web app.
+    """
     app = FastAPI(title="MarginArena")
     key = os.environ.get("RESULT_SIGNING_KEY", "").encode() or PROCESS_KEY
 
@@ -90,14 +103,19 @@ def create_app(
                     result["signature"] = _signature(result, key)
             await queue.put(event)
 
-        async def produce() -> None:
+        async def live() -> None:
             llm = LLMClient(s, transport=llm_transport, sleep=sleep)
             try:
                 await run_arena(shop, skus, rounds, rivals, strategists, llm, emit)
+            finally:
+                await llm.aclose()
+
+        async def produce() -> None:
+            try:
+                await (_replay(RECORDED_RUN, emit, sleep) if request.recorded else live())
             except Exception as error:  # surface the failure to the client, then end the stream
                 await queue.put({"type": "error", "message": f"{type(error).__name__}: {error}"})
             finally:
-                await llm.aclose()
                 await queue.put(None)
 
         async def stream():
@@ -122,7 +140,27 @@ def create_app(
             await llm.aclose()
         return {**explanation, "route": s.route, "model": s.model}
 
+    web = web_dist or os.environ.get("WEB_DIST")
+    if web:  # mounted last, so every /api route above still wins
+        app.mount("/", StaticFiles(directory=web, html=True), name="web")
     return app
+
+
+async def _replay(path: Path, emit: Emit, sleep: Callable[[float], Awaitable[None]]) -> None:
+    """Emits a recorded run's events in order, keeping their rhythm but finishing in about REPLAY_SECONDS."""
+    timed: list[tuple[float, dict]] = []
+    at = 0.0
+    for line in path.read_text().splitlines():
+        if line.startswith(": t="):  # the recorder's seconds since the start
+            at = float(line[4:])
+        elif line.startswith("data: "):
+            timed.append((at, json.loads(line[6:])))
+    scale = min(1.0, REPLAY_SECONDS / max(timed[-1][0], 1e-9))
+    previous = 0.0
+    for at, event in timed:
+        await sleep((at - previous) * scale)
+        previous = at
+        await emit(event)
 
 
 def _signature(result: dict, key: bytes) -> str:

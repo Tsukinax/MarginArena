@@ -55,7 +55,9 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
           <span className="sb-logo">Arena</span>
           <span className="sb-sub">
             {started && started.type === 'run_started'
-              ? `${started.model} on ${started.route === 'mi300x' ? 'AMD Instinct MI300X' : 'AMD Token Factory'}`
+              ? `${started.model} on ${started.route === 'mi300x' ? 'AMD Instinct MI300X' : 'AMD Token Factory'}${
+                  started.recorded_at ? ` · recorded ${recordedDate(started.recorded_at)}, replayed` : ''
+                }`
               : 'Connecting…'}
           </span>
         </div>
@@ -229,10 +231,15 @@ function moveText(m: Extract<ArenaEvent, { type: 'rival_move' }>): string {
   return parts.join(' + ')
 }
 
+const recordedDate = (iso: string): string =>
+  new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+
 function commentary(e: ArenaEvent): string | null {
   switch (e.type) {
     case 'run_started':
-      return `Arena started on ${e.route === 'mi300x' ? 'AMD Instinct MI300X' : 'AMD Token Factory'} with ${e.skus.length} products.`
+      return `Arena started on ${e.route === 'mi300x' ? 'AMD Instinct MI300X' : 'AMD Token Factory'} with ${e.skus.length} products${
+        e.recorded_at ? `, recorded ${recordedDate(e.recorded_at)} and replayed now` : ''
+      }.`
     case 'idea':
       return `${e.sku}: ${e.strategist} suggests ${e.gift ? `a ${e.gift} gift` : e.use_voucher ? 'a shop voucher' : 'a plain cut'}.`
     case 'rival_move':

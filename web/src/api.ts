@@ -114,6 +114,8 @@ export type ArenaEvent =
       rivals: number
       strategists: number
       elasticity: string
+      /** Set when the events replay a recorded run: when it was recorded (ISO 8601). */
+      recorded_at?: string
     }
   | { type: 'idea'; sku: string; strategist: string; use_voucher: boolean; gift: string | null; why: string }
   | { type: 'round_started'; sku: string; round: number; leader: string }
@@ -143,7 +145,14 @@ export type ArenaEvent =
   | { type: 'run_done'; results: SkuResult[]; margin_protected: string; telemetry: Telemetry }
   | { type: 'error'; message: string }
 
-export type ArenaRequest = { skus?: string[]; rounds?: number; rivals?: number; strategists?: number }
+export type ArenaRequest = {
+  skus?: string[]
+  rounds?: number
+  rivals?: number
+  strategists?: number
+  /** Replay the recorded 12-product run instead of calling the model. */
+  recorded?: boolean
+}
 
 export type Language = 'en' | 'th'
 

@@ -110,6 +110,18 @@ async def test_a_rival_move_turns_the_sunscreen_approve_into_a_revise():
     assert Decimal(decided["red_team_gain"]) > 0
 
 
+async def test_the_recorded_run_replays_every_product_signed_and_labelled_without_the_model():
+    # The default demo: a full 12-SKU run recorded on Token Factory, replayed in seconds and labelled as recorded.
+    server = FakeModelServer()
+
+    events = await run(server, recorded=True)
+
+    assert events[0]["type"] == "run_started" and events[0]["recorded_at"]
+    assert len(events[-1]["results"]) == 12
+    assert all(r["signature"] for r in events[-1]["results"])
+    assert server.requests == []
+
+
 async def test_model_output_that_is_not_json_is_rejected_and_counted():
     events = await run(FakeModelServer(bad_json=True))
 
@@ -189,6 +201,18 @@ async def test_evidence_links_write_percentages_as_plain_numbers():
     texts = " ".join(link["text"] for link in result(events)["evidence"])
     assert "at least 20% off" in texts
     assert "valued at 30% of its retail price" in texts
+
+
+async def test_one_container_serves_the_web_app_and_the_api(tmp_path):
+    (tmp_path / "index.html").write_text("<title>MarginArena</title>")
+    app = create_app(llm_settings=SETTINGS, web_dist=tmp_path)
+
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        page = await client.get("/")
+        health = await client.get("/api/health")
+
+    assert "<title>MarginArena</title>" in page.text
+    assert health.json() == {"route": "token-factory", "model": "Gemma-4-31B-IT"}
 
 
 GPU = LLMSettings(route="mi300x", base_url="http://gpu.test/v1", api_key="k", model="google/gemma-4-31B-it")
