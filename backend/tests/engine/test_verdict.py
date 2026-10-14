@@ -2,8 +2,9 @@
 
 A Promo Plan is eligible only if it meets the invited discount, keeps the Margin Floor, and its
 worst-case Campaign profit over every Scenario is at least the worst case of not joining under the
-same Scenarios (ADR 0004). The best eligible plan by expected profit (mean over Counter-moves at the
-point elasticity) wins. Expected numbers were worked by hand (Shopee TH Non-Mall PRIME fees, k = 1).
+same Scenarios (ADR 0004). The eligible plan with the best worst-case profit wins (maximin, Q52); expected
+profit (mean over Counter-moves at the point elasticity) only breaks ties. Expected numbers were worked
+by hand (Shopee TH Non-Mall PRIME fees, k = 1).
 """
 
 from decimal import Decimal
@@ -115,3 +116,19 @@ def test_plan_must_survive_the_weak_end_of_the_elasticity_band():
     assert with_band.verdict == "escalate"
     assert with_band.as_invited.worst_total == Decimal("1974.32")
     assert "earns less than not joining" in with_band.as_invited.failed_checks
+
+
+def test_the_plan_with_the_best_worst_case_wins_even_if_another_expects_more():
+    # Holder vs a rival at ฿72. 15% off expects 9,022.72 but falls to 8,257.40 if the rival undercuts;
+    # 30% off (฿70, never undercut) earns 9,011.70 either way. Maximin picks 30%, a gain of 754.30 (> 5%).
+    deep_72 = CounterMove(rival="Deep undercutter", rival_price_cut=Decimal("0.28"))
+
+    result = evaluate_sku(
+        sku("20", "-1.2"), cut("15"), [cut("30")], (HOLDER, deep_72), SHOPEE, terms("2", "0.15"), floor("0.10")
+    )
+
+    assert result.verdict == "revise"
+    assert result.chosen.plan == cut("30")
+    assert result.chosen.worst_total == Decimal("9011.70")
+    assert result.as_invited.expected_total == Decimal("9022.72")
+    assert result.as_invited.worst_total == Decimal("8257.40")

@@ -110,7 +110,7 @@ The route is chosen per run by a health check and recorded on every result.
   - price cut;
   - shop voucher with a minimum spend;
   - multi-buy discount on the same SKU;
-  - gift with purchase (its cost counted; the buyer's perceived value is an explicit, overridable assumption);
+  - gift with purchase (its cost counted; the buyer's perceived value is an explicit, overridable assumption, defaulting to 30% of the gift's retail price (Q53), with its sensitivity shown);
   - per-buyer quantity limit.
 
   Each mechanic has its own formula for effective price and unit cost. The MUST minimum is price cut, voucher with minimum spend, and gift.
@@ -125,9 +125,9 @@ The route is chosen per run by a health check and recorded on every result.
   - its worst-case Campaign profit is at least the worst case of not joining under the same Scenarios;
   - it respects every Brand Price Rule.
 
-  Among eligible plans, the one with the highest expected profit wins.
+  Among eligible plans, the one with the best worst-case profit wins (maximin, Q52). Expected profit only breaks ties.
 - **Verdict:**
-  - **Approve** when joining as invited is eligible and within 5% of the best plan's expected profit.
+  - **Approve** when joining as invited is eligible and its worst case is within 5% of the best plan's worst case.
   - **Revise** when a better eligible plan exists.
   - **Escalate** when no plan is eligible, when the elasticity band is too wide to separate plans, or when a Brand Price Rule is ambiguous.
 - **Margin Protected** = the worst-case profit of following the Verdicts minus the worst-case profit of joining every SKU as invited.

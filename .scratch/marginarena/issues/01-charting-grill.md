@@ -150,3 +150,7 @@ Round 12:
   - Token Factory is used for sample data only.
   - A recorded MI300X run backs the sample shop.
   - Proof 6 becomes "red-team value".
+- **Q52 (supersedes part of Q17)** – Selection is **maximin**: the eligible plan with the best worst-case profit wins, and expected profit only breaks ties. Approve compares worst cases.
+  - Evidence: in the live Token Factory run, picking by expected profit chose a plan ฿88 worse in the worst case than the engine-only plan. That contradicts Margin Protected (a worst-case metric) and could make proof 6 negative.
+- **Q53** – The default gift perceived value drops from 50% to **30%** of retail. It is shown and overridable, with its sensitivity in the UI.
+  - Evidence: at 50%, the live run chose "add a mini gift" on every Revise.

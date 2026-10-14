@@ -1,0 +1,72 @@
+data: {"type": "run_started", "route": "token-factory", "model": "Gemma-4-31B-IT", "shop": "Glow Lab BKK", "label": "Fictional sample shop for the demo. Catalogue costs, stock, baselines, the brand agreement and the Rival Snapshot are invented. Fees are Shopee Thailand Non-Mall PRIME rates effective 4 Aug 2026; elasticity is the FreshRetailNet-50K pooled estimate.", "invitation": {"marketplace": "Shopee Thailand", "campaign": "11.11 Big Sale", "slot": "Shocking Sale, 11 Nov 00:00 to 23:59", "registration_closes": "7 Nov 2026"}, "skus": ["HB-30", "NT-200", "VC-30"], "rounds": 2, "rivals": 2, "strategists": 1, "elasticity": "FreshRetailNet-50K (Dingdong Ltd.), CC BY 4.0, pooled -1.49 (band -1.977 to -0.771)"}
+
+data: {"type": "idea", "sku": "HB-30", "strategist": "Margin keeper", "use_voucher": false, "gift": "Gentle Amino Cleanser 30 ml (mini)", "why": "Minimum required discount is applied to maintain margin, with a low-cost mini cleanser to drive conversion."}
+
+data: {"type": "idea", "sku": "HB-30", "strategist": "Margin keeper", "use_voucher": true, "gift": null, "why": "Utilizes shop vouchers to reach the campaign threshold while keeping the headline discount at the absolute minimum allowed."}
+
+data: {"type": "round_started", "sku": "HB-30", "round": 1, "leader": "฿88.50 off + gift: Gentle Amino Cleanser 30 ml (mini)"}
+
+data: {"type": "idea", "sku": "NT-200", "strategist": "Margin keeper", "use_voucher": false, "gift": null, "why": "Apply only the minimum required discount to maximize margin without additional costs."}
+
+data: {"type": "idea", "sku": "NT-200", "strategist": "Margin keeper", "use_voucher": true, "gift": null, "why": "Use a targeted voucher to limit the discount to specific buyer segments rather than a store-wide price drop."}
+
+data: {"type": "idea", "sku": "NT-200", "strategist": "Margin keeper", "use_voucher": false, "gift": "Gentle Amino Cleanser 30 ml (mini)", "why": "Offer a low-cost mini cleanser to maintain a higher perceived value while protecting the unit margin."}
+
+data: {"type": "round_started", "sku": "NT-200", "round": 1, "leader": "฿58.50 off + gift: Gentle Amino Cleanser 30 ml (mini)"}
+
+data: {"type": "idea", "sku": "VC-30", "strategist": "Margin keeper", "use_voucher": true, "gift": null, "why": "Using a voucher allows us to meet the campaign minimum while keeping the headline discount within the 20% brand limit."}
+
+data: {"type": "idea", "sku": "VC-30", "strategist": "Margin keeper", "use_voucher": true, "gift": "Gentle Amino Cleanser 30 ml (mini)", "why": "Adding a low-cost mini cleanser provides perceived value to the customer without significantly eroding the unit margin."}
+
+data: {"type": "round_started", "sku": "VC-30", "round": 1, "leader": "฿118.00 off"}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 1, "rival": "Price matcher", "headline_cut_pct": 7.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "293.87", "why": "Matching the competitor's price of 331.50 through a headline discount and adding free shipping to increase overall value perception."}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 1, "rival": "Undercutter", "headline_cut_pct": 8.0, "voucher_baht": 40.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "250.28", "why": "Undercutting the headline price to 305 THB and adding a voucher makes my price significantly lower than theirs to lure price-sensitive 11.11 shoppers."}
+
+data: {"type": "leader", "sku": "NT-200", "round": 1, "verdict": "revise", "plan": "฿58.50 off + gift: Gentle Amino Cleanser 30 ml (mini)", "changed": false, "telemetry": {"calls_ok": 5, "calls_invalid": 0, "calls_failed": 0, "retries": 0, "in_flight": 3, "completion_tokens": 473, "tokens_per_second": 7.7, "elapsed_seconds": 61.22}}
+
+data: {"type": "round_started", "sku": "NT-200", "round": 2, "leader": "฿58.50 off + gift: Gentle Amino Cleanser 30 ml (mini)"}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 1, "rival": "Undercutter", "headline_cut_pct": 5.0, "voucher_baht": 50.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "431.55", "why": "I will drop my shelf price below 500 and use a voucher to ensure the final checkout price is significantly lower than theirs."}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 1, "rival": "Price matcher", "headline_cut_pct": 9.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "459.59", "why": "Matching the competitor's price of 501.50 exactly while adding free shipping to create a better perceived value."}
+
+data: {"type": "leader", "sku": "HB-30", "round": 1, "verdict": "revise", "plan": "฿94.40 off + gift: Gentle Amino Cleanser 30 ml (mini)", "changed": true, "telemetry": {"calls_ok": 7, "calls_invalid": 0, "calls_failed": 0, "retries": 0, "in_flight": 1, "completion_tokens": 629, "tokens_per_second": 10.2, "elapsed_seconds": 61.78}}
+
+data: {"type": "round_started", "sku": "HB-30", "round": 2, "leader": "฿94.40 off + gift: Gentle Amino Cleanser 30 ml (mini)"}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 1, "rival": "Undercutter", "headline_cut_pct": 21.0, "voucher_baht": 50.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "376.10", "why": "Undercutting the shelf price to 467 THB and adding a voucher ensures the final price is significantly lower than the competitor's 472 THB."}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 1, "rival": "Price matcher", "headline_cut_pct": 20.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "432.00", "why": "Matching the target price of 472 THB exactly while adding free shipping to provide higher perceived value."}
+
+data: {"type": "leader", "sku": "VC-30", "round": 1, "verdict": "escalate", "plan": null, "changed": false, "telemetry": {"calls_ok": 9, "calls_invalid": 0, "calls_failed": 0, "retries": 0, "in_flight": 1, "completion_tokens": 793, "tokens_per_second": 11.8, "elapsed_seconds": 67.4}}
+
+data: {"type": "round_started", "sku": "VC-30", "round": 2, "leader": "฿118.00 off"}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 2, "rival": "Undercutter", "headline_cut_pct": 10.0, "voucher_baht": 30.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "253.10", "why": "I will undercut the shelf price to be the cheapest visual option and add free shipping to remove all purchase friction."}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 2, "rival": "Price matcher", "headline_cut_pct": 7.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 80.0, "effective_rival_price": "213.87", "why": "Matching the competitor's final price of ฿331.50 while adding free shipping and a higher-value gift to steal the conversion."}
+
+data: {"type": "leader", "sku": "NT-200", "round": 2, "verdict": "revise", "plan": "฿74.10 off + gift: Gentle Amino Cleanser 30 ml (mini)", "changed": true, "telemetry": {"calls_ok": 11, "calls_invalid": 0, "calls_failed": 0, "retries": 0, "in_flight": 1, "completion_tokens": 951, "tokens_per_second": 12.9, "elapsed_seconds": 73.67}}
+
+data: {"type": "sku_decided", "sku": "NT-200", "name": "Niacinamide 10% Toner 200 ml", "verdict": "revise", "invited_plan": "฿58.50 off", "invited_failed_checks": [], "invited_worst_total": "35748.45", "invited_expected_total": "52050.54", "chosen_plan": "฿74.10 off + gift: Gentle Amino Cleanser 30 ml (mini)", "chosen_worst_total": "39033.10", "chosen_expected_total": "61123.85", "chosen_worst_margin": "0.3385", "dont_join_total": "13864.68", "protected": "3284.65", "generic_plan": "฿58.50 off + gift: Gentle Amino Cleanser 30 ml (mini)", "generic_worst_total_all_scenarios": "39120.89", "scenarios": 7, "rounds_played": 2, "plans_searched": 183}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 2, "rival": "Undercutter", "headline_cut_pct": 12.0, "voucher_baht": 40.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "403.12", "why": "Cutting the shelf price to ฿435 and adding free shipping makes the entry price significantly lower than their ฿495.60 to steal the click."}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 2, "rival": "Price matcher", "headline_cut_pct": 10.0, "voucher_baht": 50.0, "free_shipping_baht": 0, "gift_value_baht": 0, "effective_rival_price": "444.10", "why": "Matching the competitor's final price of 495.60 while offering a cleaner, more direct discount structure."}
+
+data: {"type": "leader", "sku": "HB-30", "round": 2, "verdict": "revise", "plan": "฿100.30 off + gift: Gentle Amino Cleanser 30 ml (mini)", "changed": true, "telemetry": {"calls_ok": 13, "calls_invalid": 0, "calls_failed": 0, "retries": 0, "in_flight": 0, "completion_tokens": 1094, "tokens_per_second": 14.2, "elapsed_seconds": 76.79}}
+
+data: {"type": "sku_decided", "sku": "HB-30", "name": "Hydra Barrier Serum 30 ml", "verdict": "revise", "invited_plan": "฿88.50 off", "invited_failed_checks": [], "invited_worst_total": "40159.50", "invited_expected_total": "50206.37", "chosen_plan": "฿100.30 off + gift: Gentle Amino Cleanser 30 ml (mini)", "chosen_worst_total": "41843.67", "chosen_expected_total": "55476.53", "chosen_worst_margin": "0.3377", "dont_join_total": "15847.19", "protected": "1684.17", "generic_plan": "฿88.50 off + gift: Gentle Amino Cleanser 30 ml (mini)", "generic_worst_total_all_scenarios": "42083.80", "scenarios": 7, "rounds_played": 2, "plans_searched": 43}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 2, "rival": "Undercutter", "headline_cut_pct": 15.0, "voucher_baht": 50.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "411.50", "why": "I will drop my headline price below ฿400 and add a voucher to make the final price significantly lower than their ฿472 offer."}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 2, "rival": "Price matcher", "headline_cut_pct": 20.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 80.0, "effective_rival_price": "352.00", "why": "Matching the target price of 472 baht exactly while adding free shipping and a high-value gift to steal the conversion."}
+
+data: {"type": "leader", "sku": "VC-30", "round": 2, "verdict": "escalate", "plan": null, "changed": false, "telemetry": {"calls_ok": 15, "calls_invalid": 0, "calls_failed": 0, "retries": 1, "in_flight": 0, "completion_tokens": 1258, "tokens_per_second": 14.6, "elapsed_seconds": 86.41}}
+
+data: {"type": "sku_decided", "sku": "VC-30", "name": "Vitamin C Bright Serum 30 ml", "verdict": "escalate", "invited_plan": "฿118.00 off", "invited_failed_checks": ["below the Margin Floor"], "invited_worst_total": "7012.74", "invited_expected_total": "9871.04", "chosen_plan": null, "chosen_worst_total": "5865.13", "chosen_expected_total": null, "chosen_worst_margin": null, "dont_join_total": "5865.13", "protected": "-1147.61", "generic_plan": "฿118.00 off", "generic_worst_total_all_scenarios": "7012.74", "scenarios": 7, "rounds_played": 2, "plans_searched": 13}
+
+data: {"type": "run_done", "results": [{"sku": "HB-30", "name": "Hydra Barrier Serum 30 ml", "verdict": "revise", "invited_plan": "฿88.50 off", "invited_failed_checks": [], "invited_worst_total": "40159.50", "invited_expected_total": "50206.37", "chosen_plan": "฿100.30 off + gift: Gentle Amino Cleanser 30 ml (mini)", "chosen_worst_total": "41843.67", "chosen_expected_total": "55476.53", "chosen_worst_margin": "0.3377", "dont_join_total": "15847.19", "protected": "1684.17", "generic_plan": "฿88.50 off + gift: Gentle Amino Cleanser 30 ml (mini)", "generic_worst_total_all_scenarios": "42083.80", "scenarios": 7, "rounds_played": 2, "plans_searched": 43}, {"sku": "NT-200", "name": "Niacinamide 10% Toner 200 ml", "verdict": "revise", "invited_plan": "฿58.50 off", "invited_failed_checks": [], "invited_worst_total": "35748.45", "invited_expected_total": "52050.54", "chosen_plan": "฿74.10 off + gift: Gentle Amino Cleanser 30 ml (mini)", "chosen_worst_total": "39033.10", "chosen_expected_total": "61123.85", "chosen_worst_margin": "0.3385", "dont_join_total": "13864.68", "protected": "3284.65", "generic_plan": "฿58.50 off + gift: Gentle Amino Cleanser 30 ml (mini)", "generic_worst_total_all_scenarios": "39120.89", "scenarios": 7, "rounds_played": 2, "plans_searched": 183}, {"sku": "VC-30", "name": "Vitamin C Bright Serum 30 ml", "verdict": "escalate", "invited_plan": "฿118.00 off", "invited_failed_checks": ["below the Margin Floor"], "invited_worst_total": "7012.74", "invited_expected_total": "9871.04", "chosen_plan": null, "chosen_worst_total": "5865.13", "chosen_expected_total": null, "chosen_worst_margin": null, "dont_join_total": "5865.13", "protected": "-1147.61", "generic_plan": "฿118.00 off", "generic_worst_total_all_scenarios": "7012.74", "scenarios": 7, "rounds_played": 2, "plans_searched": 13}], "margin_protected": "3821.21", "telemetry": {"calls_ok": 15, "calls_invalid": 0, "calls_failed": 0, "retries": 1, "in_flight": 0, "completion_tokens": 1258, "tokens_per_second": 14.6, "elapsed_seconds": 86.41}}
+

@@ -168,7 +168,7 @@ class SellerSettings:
     margin_floor: Decimal
     brand_rules: tuple[BrandPriceRule, ...] = ()
     approve_tolerance: Decimal = Decimal("0.05")
-    """Joining as invited is approved when the best plan earns at most this much more (relative)."""
+    """Joining as invited is approved when the best plan's worst case is at most this much better (relative)."""
 
 
 @dataclass(frozen=True)

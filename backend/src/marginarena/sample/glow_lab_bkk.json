@@ -7,7 +7,8 @@
     "traffic_lift": "2.5",
     "traffic_lift_source": "Lazada reported ~3.5x GMV in its March 2026 Birthday Campaign; dividing out the price effect of an average 20% cut at elasticity -1.49 (x1.39) leaves ~2.5x traffic.",
     "cross_price_sensitivity": "1.0",
-    "gift_value_ratio": "0.5"
+    "gift_value_ratio": "0.3",
+    "gift_value_ratio_note": "Conservative assumption (Q53): buyers value a free gift at 30% of its retail price, treated like a price cut of that size. No data supports a higher figure; the Seller can override it."
   },
   "invitation": {
     "marketplace": "Shopee Thailand",

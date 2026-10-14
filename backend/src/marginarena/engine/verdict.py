@@ -66,12 +66,13 @@ def evaluate_sku(
     invited = evaluate(as_invited)
     others = tuple(evaluate(p) for p in candidates)
     eligible = [e for e in (invited, *others) if e.eligible]
-    best = max(eligible, key=lambda e: e.expected_total, default=None)
+    # Maximin (Q52): the plan whose worst case is best wins; expected profit only breaks ties.
+    best = max(eligible, key=lambda e: (e.worst_total, e.expected_total), default=None)
 
     if best is None:
         verdict, chosen = "escalate", None
-    elif invited.eligible and best.expected_total - invited.expected_total <= settings.approve_tolerance * abs(
-        invited.expected_total
+    elif invited.eligible and best.worst_total - invited.worst_total <= settings.approve_tolerance * abs(
+        invited.worst_total
     ):
         verdict, chosen = "approve", invited
     else:
