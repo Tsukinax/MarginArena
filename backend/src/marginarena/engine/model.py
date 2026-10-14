@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 ZERO = Decimal("0")
 
@@ -81,3 +81,13 @@ class UnitEconomics:
     """What the Seller is credited after its own vouchers; the base for marketplace fees."""
     fees: FeeBreakdown
     payout: Decimal
+    unit_cost: Decimal
+
+    @property
+    def unit_profit(self) -> Decimal:
+        return self.payout - self.unit_cost
+
+    @property
+    def margin(self) -> Decimal:
+        """Unit profit as a share of the selling price: the measure the Margin Floor uses."""
+        return (self.unit_profit / self.selling_price).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
