@@ -31,7 +31,7 @@ from marginarena.engine import (
     rival_effective_price,
 )
 from marginarena.llm import LLMClient
-from marginarena.sample import InvitedSku, Shop
+from marginarena.sample import ElasticityOverride, InvitedSku, Shop
 
 Emit = Callable[[dict], Awaitable[None]]
 SKIP_LABEL = "Skip: don't join the Campaign with this product"
@@ -108,10 +108,12 @@ async def _sku_arena(
 ) -> dict:
     sku = item.sku
     snapshot = shop.rival_snapshot.get(sku.id)
+    override = shop.elasticity_overrides.get(sku.id)
     terms = replace(
         shop.terms,
         required_discount=item.required_discount,
         rival_reference_price=snapshot.reference_price if snapshot else None,
+        elasticity_band=override.band if override else shop.terms.elasticity_band,
     )
     rules = tuple(r for r in shop.brand_rules if r.binds(sku))
     settings = SellerSettings(margin_floor=shop.margin_floor, brand_rules=rules)
@@ -201,7 +203,7 @@ async def _sku_arena(
             }
             for move, inv, chosen_outcome in zip(scenarios, verdict.as_invited.outcomes, shown.outcomes, strict=True)
         ],
-        "evidence": _evidence(shop, item, rules, snapshot),
+        "evidence": _evidence(shop, item, rules, snapshot, override),
         "rounds_played": rounds_played,
         "plans_searched": len(plans) + 1,
     }
@@ -342,7 +344,7 @@ def _waterfall(plan: PromoPlan, unit, sku) -> dict:
     }
 
 
-def _evidence(shop: Shop, item: InvitedSku, rules, snapshot) -> list[dict]:
+def _evidence(shop: Shop, item: InvitedSku, rules, snapshot, override: ElasticityOverride | None) -> list[dict]:
     """Evidence Links: where each input behind this SKU's numbers came from."""
     p = shop.profile
     links = [
@@ -358,7 +360,9 @@ def _evidence(shop: Shop, item: InvitedSku, rules, snapshot) -> list[dict]:
             f"{_pct(p.programme_fee_rate)} and ฿{p.fixed_fee_per_order} per order, plus {_pct(p.vat_rate)} VAT.",
             "source": f"Marketplace Profile {p.id}, effective {p.effective_from}",
         },
-        {"kind": "elasticity", "text": shop.elasticity_source, "source": "evidence/elasticity.md"},
+        {"kind": "elasticity", "text": override.text, "source": override.source}
+        if override
+        else {"kind": "elasticity", "text": shop.elasticity_source, "source": "evidence/elasticity.md"},
         {
             "kind": "rival_snapshot",
             "text": f"{snapshot.rival} at ฿{snapshot.reference_price}."

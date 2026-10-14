@@ -55,6 +55,13 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
             <li>Buyers value a free gift at {pct(shop.assumptions.gift_value_ratio)} of its retail price</li>
             <li>When a rival ends up cheaper, you keep (rival ÷ your price)^{shop.assumptions.cross_price_sensitivity} of buyers</li>
             <li>Price response: {shop.assumptions.elasticity}</li>
+            {shop.invited
+              .filter((s) => shop.elasticity_overrides[s.id])
+              .map((s) => (
+                <li key={s.id}>
+                  {s.name}: {shop.elasticity_overrides[s.id].text} Source: {shop.elasticity_overrides[s.id].source}.
+                </li>
+              ))}
           </ul>
           {shop.brand_rules.map((r) => (
             <p key={r.clause} className="clause">
@@ -78,7 +85,10 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
         <tbody>
           {shop.invited.map((s) => (
             <tr key={s.id}>
-              <th scope="row">{s.name}</th>
+              <th scope="row">
+                {s.name}
+                {shop.elasticity_overrides[s.id] && <span className="override-flag">Seller override</span>}
+              </th>
               <td>{s.brand}</td>
               <td className="num">{baht(s.list_price)}</td>
               <td className="num">{baht(s.cost)}</td>

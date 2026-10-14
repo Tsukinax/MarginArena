@@ -322,6 +322,13 @@ button:disabled {
   font-weight: 500;
 }
 
+.override-flag {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber);
+}
+
 /* Step 2: the Arena */
 .arena {
   margin: -44px -52px -80px;

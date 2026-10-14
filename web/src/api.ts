@@ -29,6 +29,8 @@ export type Shop = {
   invited: InvitedSku[]
   brand_rules: { clause: string; brand: string; text: string }[]
   rival_snapshot: Record<string, { rival: string; reference_price: string }>
+  /** Per-SKU elasticities the Seller set in place of the pooled fit, each with its own band and label (Q56). */
+  elasticity_overrides: Record<string, { elasticity: string; band: [string, string]; text: string; source: string }>
 }
 
 export type Telemetry = {

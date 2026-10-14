@@ -19,6 +19,17 @@ class RivalSnapshotEntry:
 
 
 @dataclass(frozen=True)
+class ElasticityOverride:
+    """A Seller's own elasticity for one SKU, with its own band, in place of the pooled fit (Q56)."""
+
+    elasticity: Decimal
+    band: tuple[Decimal, Decimal]
+    text: str
+    """The label shown wherever this elasticity appears."""
+    source: str
+
+
+@dataclass(frozen=True)
 class InvitedSku:
     sku: Sku
     required_discount: Decimal
@@ -42,6 +53,7 @@ class Shop:
     brand_rule_texts: dict[str, str]
     rival_snapshot: dict[str, RivalSnapshotEntry]
     elasticity_source: str
+    elasticity_overrides: dict[str, ElasticityOverride]
     fallback_demo_skus: tuple[str, ...] = ()
 
 
@@ -54,6 +66,7 @@ def load_shop(shop_id: str) -> Shop:
     fit = _elasticity()
     pooled = Decimal(str(fit["pooled"]["elasticity"]))
     low, high = (Decimal(str(x)) for x in fit["band_p10_p90"])
+    overrides = {sku_id: _override(o) for sku_id, o in raw.get("elasticity_overrides", {}).items()}
     catalogue = {
         row["id"]: Sku(
             id=row["id"],
@@ -63,7 +76,7 @@ def load_shop(shop_id: str) -> Shop:
             cost=Decimal(row["cost"]),
             stock=row["stock"],
             baseline_units=row["baseline_units"],
-            elasticity=pooled,
+            elasticity=overrides[row["id"]].elasticity if row["id"] in overrides else pooled,
         )
         for row in raw["catalogue"]
     }
@@ -104,7 +117,18 @@ def load_shop(shop_id: str) -> Shop:
             for sku_id, v in raw["rival_snapshot"].items()
         },
         elasticity_source=f"{fit['source']}, pooled {pooled} (band {low} to {high})",
+        elasticity_overrides=overrides,
         fallback_demo_skus=tuple(raw.get("fallback_demo_skus", ())),
+    )
+
+
+def _override(raw: dict) -> ElasticityOverride:
+    low, high = (Decimal(x) for x in raw["band"])
+    return ElasticityOverride(
+        elasticity=Decimal(raw["elasticity"]),
+        band=(low, high),
+        text=f"Sample Seller override: elasticity {raw['elasticity']}, band {low} to {high}. {raw['note']}",
+        source=raw["source"],
     )
 
 
@@ -150,5 +174,9 @@ def describe_shop(shop: Shop) -> dict:
         ],
         "rival_snapshot": {
             k: {"rival": v.rival, "reference_price": str(v.reference_price)} for k, v in shop.rival_snapshot.items()
+        },
+        "elasticity_overrides": {
+            k: {"elasticity": str(o.elasticity), "band": [str(x) for x in o.band], "text": o.text, "source": o.source}
+            for k, o in shop.elasticity_overrides.items()
         },
     }

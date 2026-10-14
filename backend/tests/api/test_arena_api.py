@@ -93,6 +93,23 @@ async def test_a_counter_move_the_rivals_find_shows_how_far_it_cuts_the_worst_ca
     assert Decimal(result(deep)["red_team_cut"]) > 0
 
 
+async def test_a_rival_move_turns_the_sunscreen_approve_into_a_revise():
+    # Q56: SS-50 carries a labelled Seller override (elasticity -2.62, band -3.48 to -1.36). Against the generic
+    # hold, match and undercut moves the invited cut holds; a Counter-move Gemma really proposed in a recorded run
+    # (15% off, a ฿50 voucher and ฿40 free shipping) makes a deeper offer the better plan.
+    undercut = {"headline_cut_pct": 15, "voucher_baht": 50, "free_shipping_baht": 40, "why": "undercut and stack"}
+
+    events = await run(FakeModelServer(moves=[undercut]), skus=["SS-50"])
+
+    first_leader = next(e for e in events if e["type"] == "round_started")["leader"]
+    decided = result(events)
+    assert first_leader == decided["generic_plan"] == decided["invited_plan"] == "฿90.00 off"
+    assert next(e for e in events if e["type"] == "leader")["changed"] is True
+    assert (decided["verdict"], decided["skip"]) == ("revise", False)
+    assert Decimal(decided["chosen_worst_total"]) > Decimal(decided["invited_worst_total"])
+    assert Decimal(decided["red_team_gain"]) > 0
+
+
 async def test_model_output_that_is_not_json_is_rejected_and_counted():
     events = await run(FakeModelServer(bad_json=True))
 
@@ -146,6 +163,24 @@ async def test_decided_sku_explains_its_numbers_with_a_waterfall_scenarios_and_e
     assert len(decided["scenario_grid"]) == decided["scenarios"]
     kinds = {link["kind"] for link in decided["evidence"]}
     assert {"invitation", "fees", "elasticity", "rival_snapshot"} <= kinds
+
+
+async def test_the_sunscreen_elasticity_is_labelled_as_a_seller_override_with_its_source():
+    # Q51: a per-SKU value is shown as the Seller's, with its source. Every other product keeps the pooled fit.
+    shop = (await get("/api/shops/glow-lab-bkk")).json()
+    sunscreen = await run(FakeModelServer(), skus=["SS-50"])
+    toner = await run(FakeModelServer(), skus=["NT-200"])
+
+    def elasticity_link(events: list[dict]) -> dict:
+        return next(link for link in result(events)["evidence"] if link["kind"] == "elasticity")
+
+    override = shop["elasticity_overrides"]["SS-50"]
+    assert list(shop["elasticity_overrides"]) == ["SS-50"]
+    assert (override["elasticity"], override["band"]) == ("-2.62", ["-3.48", "-1.36"])
+    assert elasticity_link(sunscreen)["text"] == override["text"]
+    assert override["text"].startswith("Sample Seller override: elasticity -2.62, band -3.48 to -1.36.")
+    assert elasticity_link(sunscreen)["source"].startswith("Bijmolt, Van Heerde and Pieters (2005)")
+    assert elasticity_link(toner)["text"].startswith("FreshRetailNet-50K")
 
 
 async def test_evidence_links_write_percentages_as_plain_numbers():

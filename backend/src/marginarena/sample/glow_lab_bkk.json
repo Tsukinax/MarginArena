@@ -1,5 +1,5 @@
 {
-  "label": "Fictional sample shop for the demo. Catalogue costs, stock, baselines, the brand agreement and the Rival Snapshot are invented. Fees are Shopee Thailand Non-Mall PRIME rates effective 4 Aug 2026; elasticity is the FreshRetailNet-50K pooled estimate.",
+  "label": "Fictional sample shop for the demo. Catalogue costs, stock, baselines, the brand agreement and the Rival Snapshot are invented. Fees are Shopee Thailand Non-Mall PRIME rates effective 4 Aug 2026; elasticity is the FreshRetailNet-50K pooled estimate, except for SS-50, which carries a labelled sample Seller override.",
   "shop": "Glow Lab BKK",
   "profile": "shopee-th-nonmall-prime-fmcg",
   "margin_floor": "0.10",
@@ -51,6 +51,11 @@
     {"brand": "HydraLab", "clause": "HydraLab reseller agreement, clause 4.2", "max_price_cut": "0.20", "vouchers_allowed": true, "gifts_allowed": true,
      "text": "4.2 The Reseller shall not advertise HydraLab products at a headline discount greater than twenty percent (20%) off the recommended retail price. Shop vouchers and gifts with purchase are permitted."}
   ],
+  "elasticity_overrides": {
+    "SS-50": {"elasticity": "-2.62", "band": ["-3.48", "-1.36"],
+              "note": "Many lookalike listings compete with this sunscreen, so the sample Seller uses the published mean elasticity instead of the pooled fit. The band is our construction: the fitted band's relative width.",
+              "source": "Bijmolt, Van Heerde and Pieters (2005), Journal of Marketing Research 42(2): the mean of 1,851 published price elasticities"}
+  },
   "rival_snapshot": {
     "NT-200": {"rival": "Lookalike niacinamide toner, 200 ml", "reference_price": "359"},
     "SS-50": {"rival": "Lookalike SPF50+ sunscreen, 50 ml", "reference_price": "420"},
