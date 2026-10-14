@@ -160,7 +160,8 @@ async def _sku_arena(
             break
 
     # Proof 6 (red-team value): how the engine-only plan fares against every Scenario found.
-    generic_plan = (generic_verdict.chosen or generic_verdict.as_invited).plan
+    generic_before = generic_verdict.chosen or generic_verdict.as_invited
+    generic_plan = generic_before.plan
     generic_under_all = evaluate_sku(sku, generic_plan, [], scenarios, shop.profile, terms, settings).as_invited
     chosen = verdict.chosen
     shown = chosen or verdict.as_invited
@@ -184,7 +185,10 @@ async def _sku_arena(
         # Escalate hands the decision to a person: no Margin Protected and no red-team gain are claimed.
         "protected": str(kept - verdict.as_invited.worst_total) if kept is not None else "0",
         "generic_plan": _label(generic_plan),
+        "generic_worst_total": str(generic_before.worst_total),
         "generic_worst_total_all_scenarios": str(generic_under_all.worst_total),
+        # How much the Counter-moves the AI Rivals found lower that plan's worst case.
+        "red_team_cut": str(generic_before.worst_total - generic_under_all.worst_total),
         "red_team_gain": str(chosen.worst_total - generic_under_all.worst_total) if chosen else None,
         "scenarios": len(scenarios),
         "waterfall": _waterfall(shown.plan, shown.outcomes[0].unit, sku),

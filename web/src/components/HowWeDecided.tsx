@@ -112,13 +112,21 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
             ))}
           </tbody>
         </table>
-        {r.red_team_gain !== null && (
-          <p className="small">
-            Red-team value: the plan picked before the AI rivals joined would keep{' '}
-            {baht(r.generic_worst_total_all_scenarios)} in the worst case against these moves; this plan keeps{' '}
-            {baht(r.chosen_worst_total)}.
-          </p>
-        )}
+        <p className="small">
+          {Number(r.red_team_cut) > 0 ? (
+            <>
+              What the AI Rivals found: against the generic hold, match and undercut moves, the plan chosen first kept{' '}
+              {baht(r.generic_worst_total)} in the worst case. The Counter-moves the Rivals found cut that to{' '}
+              {baht(r.generic_worst_total_all_scenarios)} ({baht(-Number(r.red_team_cut))}).
+              {hasPlan &&
+                (Number(r.red_team_gain) > 0
+                  ? ` MarginArena's plan keeps ${baht(r.chosen_worst_total)} against all of them.`
+                  : ' The plan still holds against them.')}
+            </>
+          ) : (
+            'The AI Rivals found no Counter-move worse than the generic hold, match and undercut moves.'
+          )}
+        </p>
 
         <h3>Where the numbers come from</h3>
         <ul className="evidence">

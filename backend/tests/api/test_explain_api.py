@@ -30,16 +30,20 @@ def answer(content: dict) -> httpx.Response:
     return httpx.Response(200, json={"choices": [{"message": message}], "usage": {"completion_tokens": 60}})
 
 
-def arena_model(request: httpx.Request) -> httpx.Response:
-    system = json.loads(request.content)["messages"][0]["content"]
-    if "Strategist" in system:
-        return answer({"ideas": [{"use_voucher": False, "gift_sku_id": None, "why": "keep it simple"}]})
-    return answer({"moves": [{"headline_cut_pct": 5, "why": "nudge below the shop"}]})
+def arena_model(rival_move: dict):
+    def handle(request: httpx.Request) -> httpx.Response:
+        system = json.loads(request.content)["messages"][0]["content"]
+        if "Strategist" in system:
+            return answer({"ideas": [{"use_voucher": False, "gift_sku_id": None, "why": "keep it simple"}]})
+        return answer({"moves": [rival_move]})
+
+    return handle
 
 
-async def decided(sku: str) -> dict:
+async def decided(sku: str, rival_move: dict | None = None) -> dict:
     """The Arena's result for one SKU, as the UI receives it."""
-    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(arena_model), sleep=no_sleep)
+    move = rival_move or {"headline_cut_pct": 5, "why": "nudge below the shop"}
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(arena_model(move)), sleep=no_sleep)
     payload = {"shop": "glow-lab-bkk", "skus": [sku], "rounds": 1, "rivals": 1, "strategists": 1}
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         async with client.stream("POST", "/api/arena", json=payload) as response:
@@ -85,6 +89,18 @@ async def test_a_draft_with_an_invented_figure_is_rejected_and_written_again():
 async def test_an_explanation_may_cite_the_sellers_margin_floor():
     result = await decided("VC-30")
     draft = "Escalate: กำไรต่อชิ้นถ้าเข้าร่วมตามคำเชิญต่ำกว่า Margin Floor 10% ที่คุณตั้งไว้"
+
+    response = await explain(result, "th", [draft])
+
+    assert response["source"] == "model"
+
+
+async def test_an_explanation_may_cite_how_far_the_rivals_counter_moves_cut_the_worst_case():
+    result = await decided("NT-200", {"headline_cut_pct": 35, "voucher_baht": 20, "why": "all in"})
+    draft = (
+        f"Approve: ก่อน AI Rivals เข้ามา กรณีแย่ที่สุดคือ ฿{result['generic_worst_total']} "
+        f"แต่ Counter-move ที่พวกเขาเจอทำให้ลดลง ฿{result['red_team_cut']}"
+    )
 
     response = await explain(result, "th", [draft])
 

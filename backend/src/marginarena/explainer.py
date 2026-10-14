@@ -130,11 +130,17 @@ def fact_sheet(r: dict) -> str:
         f"Tested against {r['scenarios']} Counter-moves over {r['rounds_played']} rounds; "
         f"{r['plans_searched']} Promo Plans searched."
     )
+    if Decimal(r["red_team_cut"]) > 0:
+        lines.append(
+            "What the AI Rivals found: against the generic Counter-moves (hold, match, undercut) the plan chosen "
+            f"first had a worst-case Campaign profit of {_money(r['generic_worst_total'])}; the Counter-moves the "
+            f"AI Rivals found lower it by {_money(r['red_team_cut'])} to "
+            f"{_money(r['generic_worst_total_all_scenarios'])}."
+        )
     if r["red_team_gain"] is not None and Decimal(r["red_team_gain"]) != 0:
         lines.append(
-            "Before the AI Rivals joined, the engine's plan would keep "
-            f"{_money(r['generic_worst_total_all_scenarios'])} in the worst case against these Counter-moves; "
-            f"this plan keeps {_money(r['chosen_worst_total'])}."
+            f"Against every Counter-move, MarginArena's plan keeps {_money(r['chosen_worst_total'])}, "
+            f"{_money(r['red_team_gain'])} more than the plan chosen first."
         )
     lines += [f"Source ({e['source']}): {e['text']}" for e in r["evidence"]]
     return "\n".join(lines)

@@ -76,7 +76,11 @@ export type SkuResult = {
   margin_floor: string
   protected: string
   generic_plan: string
+  /** Worst case of the plan chosen against the generic hold, match and undercut moves only. */
+  generic_worst_total: string
   generic_worst_total_all_scenarios: string
+  /** How much the Counter-moves the AI Rivals found lower that worst case (proof 6). */
+  red_team_cut: string
   red_team_gain: string | null
   scenarios: number
   rounds_played: number
