@@ -112,3 +112,7 @@ Round 9, where the user said "yes to all":
   - "TokenRouter was the ACT II champion".
 
   Only numbers we measure ourselves may appear in the deck, the video or the README.
+
+Round 10:
+- **Q42** – The glossary is renamed to `CONTEXT.md`, and `docs/agents/domain.md` points the project skills at it.
+- **Q43** – Option (a): the user records the voice-over in English from Claude's script, with a short Thai line plus English subtitles in the problem intro. **The video comes last**, after everything else is built.
