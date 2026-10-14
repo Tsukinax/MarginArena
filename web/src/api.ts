@@ -72,6 +72,8 @@ export type SkuResult = {
   chosen_expected_total: string | null
   chosen_worst_margin: string | null
   dont_join_total: string
+  /** This SKU's Margin Floor, as a fraction of the selling price. */
+  margin_floor: string
   protected: string
   generic_plan: string
   generic_worst_total_all_scenarios: string
@@ -127,6 +129,19 @@ export type ArenaEvent =
 
 export type ArenaRequest = { skus?: string[]; rounds?: number; rivals?: number; strategists?: number }
 
+export type Language = 'en' | 'th'
+
+export type Explanation = {
+  language: Language
+  text: string
+  /** 'model': the model's draft passed the number check. 'template': the numbers-only fallback. */
+  source: 'model' | 'template'
+  /** Drafts the backend threw away; `text` is null when the model didn't answer. */
+  rejected: { text: string | null; unsupported: string[] }[]
+  route: string
+  model: string
+}
+
 export async function getHealth(): Promise<{ route: string; model: string }> {
   const r = await fetch('/api/health')
   if (!r.ok) throw new Error(`The backend did not answer (${r.status}).`)
@@ -170,6 +185,17 @@ export async function runArena(
       if (data) onEvent(JSON.parse(data) as ArenaEvent)
     }
   }
+}
+
+/** Explains one decided SKU. The backend rejects any draft that cites a number the engine never produced. */
+export async function explainVerdict(result: SkuResult, language: Language): Promise<Explanation> {
+  const r = await fetch('/api/explain', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ result, language }),
+  })
+  if (!r.ok) throw new Error(`The explanation could not be written (${r.status}).`)
+  return r.json()
 }
 
 export const baht = (x: string | number | null | undefined): string => {

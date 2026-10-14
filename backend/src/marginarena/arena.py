@@ -180,6 +180,7 @@ async def _sku_arena(
         "chosen_worst_margin": str(chosen.worst_margin) if chosen else None,
         "dont_join_total": str(verdict.dont_join_total),
         "invited_worst_margin": str(verdict.as_invited.worst_margin),
+        "margin_floor": str(settings.margin_floor),
         # Escalate hands the decision to a person: no Margin Protected and no red-team gain are claimed.
         "protected": str(kept - verdict.as_invited.worst_total) if kept is not None else "0",
         "generic_plan": _label(generic_plan),

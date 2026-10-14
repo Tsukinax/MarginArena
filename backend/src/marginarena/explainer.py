@@ -102,13 +102,14 @@ def fact_sheet(r: dict) -> str:
     lines = [
         f"Product: {r['name']} ({r['sku']})",
         f"Verdict: {verdict}. {MEANINGS[verdict]}",
+        f"Margin Floor, the lowest margin per unit the Seller accepts: {_pct(r['margin_floor'])}.",
         f"Joining as invited ({r['invited_plan']}): worst-case Campaign profit {_money(r['invited_worst_total'])}, "
         f"expected {_money(r['invited_expected_total'])}, "
         f"worst-case margin per unit {_pct(r['invited_worst_margin'])}.",
     ]
     if r["invited_failed_checks"]:
         lines.append(f"Joining as invited fails these checks: {'; '.join(r['invited_failed_checks'])}.")
-    if r["chosen_plan"] and not r["skip"]:
+    if r["verdict"] == "revise" and not r["skip"]:
         lines.append(
             f"MarginArena's Promo Plan ({r['chosen_plan']}): worst-case Campaign profit "
             f"{_money(r['chosen_worst_total'])}, expected {_money(r['chosen_expected_total'])}, "
@@ -129,7 +130,7 @@ def fact_sheet(r: dict) -> str:
         f"Tested against {r['scenarios']} Counter-moves over {r['rounds_played']} rounds; "
         f"{r['plans_searched']} Promo Plans searched."
     )
-    if r.get("red_team_gain") is not None:
+    if r["red_team_gain"] is not None and Decimal(r["red_team_gain"]) != 0:
         lines.append(
             "Before the AI Rivals joined, the engine's plan would keep "
             f"{_money(r['generic_worst_total_all_scenarios'])} in the worst case against these Counter-moves; "
@@ -143,8 +144,9 @@ def _system(language: Language) -> str:
     return (
         "You explain one MarginArena Verdict to a small online Seller in Thailand. "
         f"Write in {WRITE_IN[language]}: 3 to 5 short sentences on what to do, why, and the hardest Counter-move "
-        "the plan was tested against. Use only numbers that appear in FACTS, written with digits. You may round a "
-        "number, but never add, subtract, multiply or estimate a new one. Keep these words in English: Approve, "
+        "the plan was tested against. Use only numbers that appear in FACTS, written with digits, and name what each "
+        "number measures with its label from FACTS. You may round a number, but never add, subtract, multiply or "
+        "estimate a new one. Keep these words in English: Approve, "
         "Revise, Skip, Escalate, Promo Plan, Margin Floor, Counter-move, Campaign. "
         'Reply with JSON only: {"explanation": "<your text>"}'
     )

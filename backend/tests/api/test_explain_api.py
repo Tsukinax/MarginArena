@@ -82,6 +82,15 @@ async def test_a_draft_with_an_invented_figure_is_rejected_and_written_again():
     assert response["rejected"] == [{"text": invented, "unsupported": ["98,765"]}]
 
 
+async def test_an_explanation_may_cite_the_sellers_margin_floor():
+    result = await decided("VC-30")
+    draft = "Escalate: กำไรต่อชิ้นถ้าเข้าร่วมตามคำเชิญต่ำกว่า Margin Floor 10% ที่คุณตั้งไว้"
+
+    response = await explain(result, "th", [draft])
+
+    assert response["source"] == "model"
+
+
 INVENTED = ["ขาดทุนถึง ฿98,765", "ขาดทุนราว ฿12,345"]
 
 
