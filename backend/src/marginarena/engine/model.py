@@ -50,7 +50,15 @@ class ShopVoucher:
     min_spend: Decimal = ZERO
 
 
-Mechanic = PriceCut | ShopVoucher
+@dataclass(frozen=True)
+class GiftWithPurchase:
+    """Promo Mechanic: a free gift. The Seller pays its cost; buyers value it at an assumed, overridable amount."""
+
+    cost: Decimal
+    perceived_value: Decimal
+
+
+Mechanic = PriceCut | ShopVoucher | GiftWithPurchase
 
 
 @dataclass(frozen=True)
