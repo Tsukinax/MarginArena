@@ -3,6 +3,7 @@
 Run from the repo root: uv run --project backend pytest infra/droplet -q
 """
 
+import pytest
 import json
 import threading
 
@@ -86,3 +87,12 @@ def test_out_of_range_numbers_are_reported_but_keep_the_json_valid():
     move = {"headline_cut_pct": 55, "voucher_baht": 0, "free_shipping_baht": 0, "gift_value_baht": 0, "why": "deep"}
     errors = gate.schema_errors({"moves": [move]}, gate.MOVES_SCHEMA)
     assert errors == ["range: $.moves[0].headline_cut_pct = 55 is outside [0, 40]"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["<|channel|>analysis", "x<|turn|>", "<|im_end|>", "<end_of_turn>", "<start_of_turn>model", "<|message|>hi"],
+)
+def test_any_chat_template_sentinel_in_the_content_counts_as_a_leak(content):
+    record, _ = gate.inspect_reply(200, reply(content, "stop"))
+    assert record["leaks"], f"{content!r} was not flagged"

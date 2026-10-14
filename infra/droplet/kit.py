@@ -201,7 +201,8 @@ def ssh_command(ip: str, key: Path, user: str = "root") -> list[str]:
 
 
 def forget_host_key(ip: str, key: Path) -> None:
-    """A rebuilt droplet may reuse an IP with a new host key; forget the old one before first contact."""
+    """Forget the pinned host key for an IP. Only on request (--reset-host-key), after the user confirms a
+    NEW droplet reuses that IP: a changed key must otherwise stop the connection (security review)."""
     known_hosts = key.with_name("marginarena_known_hosts")
     if known_hosts.exists():
         subprocess.run(["ssh-keygen", "-R", ip, "-f", str(known_hosts)], capture_output=True)
@@ -214,6 +215,12 @@ def wait_for_ssh(ssh: list[str], minutes: int = 10) -> None:
         if result.returncode == 0:
             return
         error = result.stderr.strip().splitlines()[-1] if result.stderr.strip() else "no answer"
+        if "REMOTE HOST IDENTIFICATION HAS CHANGED" in result.stderr or "Host key verification failed" in error:
+            sys.exit(
+                "This address answered with a different SSH host key than last time. If you just created a NEW "
+                "droplet that reuses this IP (check the droplet list in AMD Developer Cloud), run provision again "
+                "with --reset-host-key. Otherwise stop: something may be intercepting the connection."
+            )
         if "Permission denied" in error:
             sys.exit(
                 "The droplet refused the MarginArena SSH key: it was created without the `marginarena-droplet` "
@@ -417,7 +424,8 @@ def cmd_provision(args: argparse.Namespace) -> None:
         sys.exit("No SSH key yet. Run: python3 infra/droplet/kit.py prepare")
 
     print(f"Connecting to root@{ip} ...")
-    forget_host_key(ip, args.ssh_key)
+    if args.reset_host_key:
+        forget_host_key(ip, args.ssh_key)
     wait_for_ssh(ssh)
     upload(ssh, f"{REMOTE_DIR}/vllm.env", f"VLLM_API_KEY={api_key}\n")
     upload(ssh, f"{REMOTE_DIR}/bootstrap.sh", BOOTSTRAP.read_text())
@@ -594,6 +602,11 @@ def parser() -> argparse.ArgumentParser:
     s = sub.add_parser("provision", help="set the droplet up over SSH, then write VLLM_BASE_URL to .env")
     s.add_argument("ip", help="the droplet's public IPv4 address")
     s.add_argument("--with-qwen", action="store_true", help="also serve Qwen3.6-27B under /qwen/v1 (ticket 08)")
+    s.add_argument(
+        "--reset-host-key",
+        action="store_true",
+        help="forget this IP's pinned SSH host key; only after confirming a NEW droplet reuses the IP",
+    )
     s.add_argument("--domain", default=DEFAULT_DOMAIN, help="sslip.io, or nip.io if Let's Encrypt limits sslip.io")
     s.add_argument("--user", default="root")
     s.add_argument("--dry-run", action="store_true", help="print the steps, connect to nothing")

@@ -356,3 +356,34 @@ def test_the_gate_command_writes_judge_facing_evidence(tmp_path, monkeypatch):
     assert kit.pinned_versions()["VLLM_IMAGE"] in page and "vLLM 0.31.0" in page and facts["max_concurrency"] in page
     assert kit.pinned_versions()["GEMMA_REVISION"] in page and "max context 32768 tokens" in page
     assert f"python3 infra/droplet/kit.py --env-file {env} gate --out" in page
+
+
+@pytest.mark.skipif(shutil.which("ssh-keygen") is None, reason="needs ssh-keygen")
+def test_provision_keeps_a_pinned_host_key_unless_told_to_reset(tmp_path, monkeypatch):
+    # A changed host key must stop the connection, not be silently re-trusted (security review).
+    run_kit(tmp_path, "prepare")
+    forgotten: list[str] = []
+    monkeypatch.setattr(kit, "forget_host_key", lambda ip, key: forgotten.append(ip))
+
+    def stop(*args, **kwargs):
+        raise SystemExit("stop before connecting")
+
+    monkeypatch.setattr(kit, "wait_for_ssh", stop)
+
+    with pytest.raises(SystemExit):
+        run_kit(tmp_path, "provision", "164.92.10.5")
+    assert forgotten == []
+
+    with pytest.raises(SystemExit):
+        run_kit(tmp_path, "provision", "164.92.10.5", "--reset-host-key")
+    assert forgotten == ["164.92.10.5"]
+
+
+def test_a_changed_host_key_stops_with_advice(monkeypatch):
+    changed = subprocess.CompletedProcess(
+        [], 255, "", "@@@ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @@@\nHost key verification failed.\n"
+    )
+    monkeypatch.setattr(kit.subprocess, "run", lambda *a, **k: changed)
+
+    with pytest.raises(SystemExit, match="--reset-host-key"):
+        kit.wait_for_ssh(["ssh", "root@164.92.10.5"], minutes=1)

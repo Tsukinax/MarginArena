@@ -53,6 +53,7 @@ Why destroy rather than power off? A powered-off GPU droplet still bills $2.59 a
 
 ## If something goes wrong
 
+- **"This address answered with a different SSH host key":** the kit pins each droplet's host key. If you just created a new droplet that happens to reuse an old IP, confirm that in the droplet list, then Claude runs `kit.py provision <IP> --reset-host-key`. If you did not create a new droplet, stop and tell Claude: something may be intercepting the connection.
 - **"The droplet refused the MarginArena SSH key":** the droplet was created without the `marginarena-droplet` key ticked. Destroy it and create it again.
 - **Certificate errors right after `provision`:** Let's Encrypt is still issuing the certificate; Claude runs `check` again a minute later. If Let's Encrypt refuses sslip.io, Claude runs `kit.py provision <IP> --domain nip.io`.
 - **Ports 80/443 busy:** the image started Jupyter. The script stops it; if it can't, it prints what holds the port.

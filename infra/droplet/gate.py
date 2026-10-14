@@ -5,7 +5,8 @@ The test and its pass rules are research §2.5 (.scratch/marginarena/research/mo
 1. Fifty single-turn prompts with the Campaign Desk tools and tool_choice "auto", sent one at a
    time and then 16 at a time. Each run passes when at least 98% of replies carry tool calls whose
    arguments parse and fit the tool's schema, no reply ends with finish_reason "tool_calls" and an
-   empty tool_calls list, and no <|channel>, <turn|> or <pad> leaks into the content.
+   empty tool_calls list, and no chat-template sentinel (such as <|channel>, <turn|> or <pad>) leaks
+   into the content.
 2. Ten multi-turn loops (tool call, tool result, final answer). All must complete.
 3. Not run: tool_choice "required" or a named tool. The gemma4 parser does not enforce them (§2.3),
    so MarginArena only sends "auto".
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -31,8 +33,13 @@ SAMPLING = {"temperature": 1.0, "top_p": 0.95}  # Google's recommended sampling 
 TOOL_MAX_TOKENS = 512
 ARENA_MAX_TOKENS = 400
 VALID_CALL_RATE = 0.98
-LEAK_TOKENS = ("<|channel>", "<channel|>", "<|turn>", "<turn|>", "<pad>")  # research §2.3
-LEAK_TOKENS += ("<|tool_call>", "<tool_call|>", "<tool_call>", "</tool_call>", "<|im_end|>")  # unparsed tool calls
+# Any chat-template sentinel in the content means the parser let template text through (research §2.3):
+# piped forms such as <|channel>, <channel|>, <|turn|>, <|im_end|>, <|message|>, and bare Gemma or
+# tool-call tags such as <pad>, <end_of_turn>, <tool_call>. A pattern, so variants are not missed.
+LEAK_PATTERN = re.compile(
+    r"<\|[A-Za-z_]{1,32}\|?>|<[A-Za-z_]{1,32}\|>"
+    r"|</?(?:pad|bos|eos|start_of_turn|end_of_turn|tool_call|tool_response)>"
+)
 
 Request = Callable[..., "tuple[int, bytes]"]
 
@@ -187,7 +194,7 @@ def inspect_reply(status: int, raw: bytes) -> tuple[dict, dict]:
     record["finish_reason"] = choice.get("finish_reason")
     record["completion_tokens"] = int((data.get("usage") or {}).get("completion_tokens") or 0)
     record["empty_tool_calls"] = record["finish_reason"] == "tool_calls" and not calls
-    record["leaks"] = [token for token in LEAK_TOKENS if token in content]
+    record["leaks"] = list(dict.fromkeys(LEAK_PATTERN.findall(content)))
     if content:
         record["content"] = content[:300]
     for call in calls:
