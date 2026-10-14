@@ -100,6 +100,8 @@ Throughout, an AMD Evidence panel shows what ran on the AMD Instinct MI300X (Gem
 
 The route is chosen per run by a health check and recorded on every result.
 
+**15 Oct, Q57 ([ADR 0005](../../docs/adr/0005-token-factory-is-the-only-inference-route.md)):** the submission runs on Token Factory only. The organisers confirmed that Token Factory counts as the AMD component and that Gemma through it counts for the Google prize. Everything below that depends on our own MI300X (the droplet, GPU hours, MI300X benchmarks, the recorded MI300X run) is optional and not planned.
+
 **Engine (deep module, deterministic, no I/O).** It is the only source of numbers ([ADR 0001](../../docs/adr/0001-numbers-come-only-from-the-engine.md)). It takes a SKU, a Marketplace Profile, a Promo Plan, a Counter-move, the Seller settings and the Brand Price Rules, and returns the unit economics, demand, Campaign profit, checks and Evidence Links. A wrapper evaluates a whole invitation and returns the Verdicts and Margin Protected.
 - **Marketplace Profile:**
   - commission, payment fee and programme fee rates, plus the per-order fixed fee (and when it is waived);

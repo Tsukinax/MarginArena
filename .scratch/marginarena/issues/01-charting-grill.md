@@ -163,4 +163,11 @@ Round 14 (15 Oct, with the user):
   - Every decided SKU shows what the Rivals found: the worst case of the plan chosen against the generic hold, match and undercut moves, and how far the Counter-moves the Rivals found cut it (`red_team_cut`, commit 488948c). This part is built.
   - SS-50 (sunscreen, a lookalike-heavy product) gets a labelled Seller override: the literature mean elasticity −2.62 with its own band at the fitted band's relative width (−3.48 to −1.36). Q51 already allows labelled per-SKU values. With it, five of six recorded Counter-moves each turn SS-50's Approve into a Revise. k stays 1.0, and the other SKUs keep the pooled fit and its band. Built in commit 2fc31df.
   - The Token Factory fallback set grows to four SKUs (NT-200, SS-50, VC-30, SM-10) so it can show this. The user chose it on 15 Oct, accepting about a third more time per run.
-- The next question is Q57.
+
+Round 15 (15 Oct, with the user):
+- **Q57** – Token Factory is the only inference route: no $100 credit and no droplet ([ADR 0005](../../../docs/adr/0005-token-factory-is-the-only-inference-route.md), superseding ADR 0002).
+  - Evidence, from the user's Discord screenshots: lablab's announcement (13 Oct) that ACT III is hosted on Token Factory with no card and no need for the $100 credit, and an AMD mentor's answers (14 Oct) that the Token Factory API counts as a meaningful AMD component and Gemma through it counts for the Google prize.
+  - The credit needs days of approval, so the user chose not to request it.
+  - Consequences: no GPU session; AMD evidence comes from recorded Token Factory runs; the UI's claim about checking all 12 SKUs on our own MI300X goes.
+  - Open: whether the Evolus track accepts Token Factory for its main agent (its lablab wording asks for our own vLLM on AMD Developer Cloud). The user asks in Discord. Until then the Evolus agent is built on Token Factory under "Your models" (alias `tf-gemma`).
+- The next question is Q58.
