@@ -1,0 +1,422 @@
+{
+ "measured_at": "2026-10-14T16:12:57+00:00",
+ "route": "token-factory",
+ "model": "Gemma-4-31B-IT",
+ "arena_seconds": 117.5,
+ "results": [
+  {
+   "sku": "NT-200",
+   "name": "Niacinamide 10% Toner 200 ml",
+   "verdict": "approve",
+   "skip": false,
+   "invited_plan": "฿58.50 off",
+   "invited_failed_checks": [],
+   "invited_worst_total": "45421.56",
+   "invited_expected_total": "55254.89",
+   "chosen_plan": "฿58.50 off",
+   "chosen_worst_total": "45421.56",
+   "chosen_expected_total": "55254.89",
+   "chosen_worst_margin": "0.4229",
+   "dont_join_total": "17695.71",
+   "invited_worst_margin": "0.4229",
+   "margin_floor": "0.10",
+   "protected": "0.00",
+   "generic_plan": "฿58.50 off",
+   "generic_worst_total_all_scenarios": "45421.56",
+   "red_team_gain": "0.00",
+   "scenarios": 7,
+   "waterfall": {
+    "plan": "฿58.50 off",
+    "list_price": "390",
+    "selling_price": "331.50",
+    "voucher": "0.00",
+    "seller_net": "331.50",
+    "fees": {
+     "commission": "53.21",
+     "payment": "10.65",
+     "programme": "28.38",
+     "fixed": "1.07",
+     "total": "93.31"
+    },
+    "unit_cost": "98",
+    "profit": "140.19",
+    "margin": "0.4229"
+   },
+   "scenario_grid": [
+    {
+     "rival": "Holder",
+     "effective_rival_price": "359.00",
+     "invited_total": "62384.55",
+     "shown_total": "62384.55"
+    },
+    {
+     "rival": "Matcher",
+     "effective_rival_price": "305.15",
+     "invited_total": "57477.90",
+     "shown_total": "57477.90"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "287.20",
+     "invited_total": "54113.34",
+     "shown_total": "54113.34"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "271.05",
+     "invited_total": "51029.16",
+     "shown_total": "51029.16"
+    },
+    {
+     "rival": "Price matcher",
+     "effective_rival_price": "293.87",
+     "invited_total": "55375.05",
+     "shown_total": "55375.05"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "271.05",
+     "invited_total": "51029.16",
+     "shown_total": "51029.16"
+    },
+    {
+     "rival": "Price matcher",
+     "effective_rival_price": "293.87",
+     "invited_total": "55375.05",
+     "shown_total": "55375.05"
+    }
+   ],
+   "evidence": [
+    {
+     "kind": "invitation",
+     "text": "11.11 Big Sale asks for at least 15% off Niacinamide 10% Toner 200 ml.",
+     "source": "Campaign Invitation, Shopee Thailand (sample)"
+    },
+    {
+     "kind": "fees",
+     "text": "Commission 15%, payment 3%, programme 8% and ฿1.00 per order, plus 7% VAT.",
+     "source": "Marketplace Profile shopee-th-nonmall-prime-fmcg, effective 2026-08-04"
+    },
+    {
+     "kind": "elasticity",
+     "text": "FreshRetailNet-50K (Dingdong Ltd.), CC BY 4.0, pooled -1.49 (band -1.977 to -0.771)",
+     "source": "evidence/elasticity.md"
+    },
+    {
+     "kind": "rival_snapshot",
+     "text": "Lookalike niacinamide toner, 200 ml at ฿359.",
+     "source": "Rival Snapshot (sample)"
+    },
+    {
+     "kind": "assumption",
+     "text": "Campaign traffic x2.5; rival sensitivity 1.0; a gift is valued at 30% of its retail price.",
+     "source": "Sample-shop assumptions (overridable)"
+    }
+   ],
+   "rounds_played": 2,
+   "plans_searched": 183
+  },
+  {
+   "sku": "VC-30",
+   "name": "Vitamin C Bright Serum 30 ml",
+   "verdict": "escalate",
+   "skip": false,
+   "invited_plan": "฿118.00 off",
+   "invited_failed_checks": [
+    "below the Margin Floor"
+   ],
+   "invited_worst_total": "5586.42",
+   "invited_expected_total": "9548.42",
+   "chosen_plan": null,
+   "chosen_worst_total": null,
+   "chosen_expected_total": null,
+   "chosen_worst_margin": null,
+   "dont_join_total": "4742.02",
+   "invited_worst_margin": "0.0839",
+   "margin_floor": "0.10",
+   "protected": "0",
+   "generic_plan": "฿118.00 off",
+   "generic_worst_total_all_scenarios": "5586.42",
+   "red_team_gain": null,
+   "scenarios": 7,
+   "waterfall": {
+    "plan": "฿118.00 off",
+    "list_price": "590",
+    "selling_price": "472.00",
+    "voucher": "0.00",
+    "seller_net": "472.00",
+    "fees": {
+     "commission": "75.76",
+     "payment": "15.15",
+     "programme": "40.40",
+     "fixed": "1.07",
+     "total": "132.38"
+    },
+    "unit_cost": "300",
+    "profit": "39.62",
+    "margin": "0.0839"
+   },
+   "scenario_grid": [
+    {
+     "rival": "Holder",
+     "effective_rival_price": "590.00",
+     "invited_total": "11014.36",
+     "shown_total": "11014.36"
+    },
+    {
+     "rival": "Matcher",
+     "effective_rival_price": "472.00",
+     "invited_total": "11014.36",
+     "shown_total": "11014.36"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "442.50",
+     "invited_total": "10340.82",
+     "shown_total": "10340.82"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "370.20",
+     "invited_total": "8637.16",
+     "shown_total": "8637.16"
+    },
+    {
+     "rival": "Price matcher",
+     "effective_rival_price": "432.00",
+     "invited_total": "10103.10",
+     "shown_total": "10103.10"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "282.00",
+     "invited_total": "6576.92",
+     "shown_total": "6576.92"
+    },
+    {
+     "rival": "Price matcher",
+     "effective_rival_price": "392.00",
+     "invited_total": "9152.22",
+     "shown_total": "9152.22"
+    }
+   ],
+   "evidence": [
+    {
+     "kind": "invitation",
+     "text": "11.11 Big Sale asks for at least 20% off Vitamin C Bright Serum 30 ml.",
+     "source": "Campaign Invitation, Shopee Thailand (sample)"
+    },
+    {
+     "kind": "fees",
+     "text": "Commission 15%, payment 3%, programme 8% and ฿1.00 per order, plus 7% VAT.",
+     "source": "Marketplace Profile shopee-th-nonmall-prime-fmcg, effective 2026-08-04"
+    },
+    {
+     "kind": "elasticity",
+     "text": "FreshRetailNet-50K (Dingdong Ltd.), CC BY 4.0, pooled -1.49 (band -1.977 to -0.771)",
+     "source": "evidence/elasticity.md"
+    },
+    {
+     "kind": "rival_snapshot",
+     "text": "No Rival Snapshot for this product: the rival's price is assumed equal to your list price.",
+     "source": "Assumption"
+    },
+    {
+     "kind": "assumption",
+     "text": "Campaign traffic x2.5; rival sensitivity 1.0; a gift is valued at 30% of its retail price.",
+     "source": "Sample-shop assumptions (overridable)"
+    },
+    {
+     "kind": "brand_rule",
+     "text": "4.2 The Reseller shall not advertise HydraLab products at a headline discount greater than twenty percent (20%) off the recommended retail price. Shop vouchers and gifts with purchase are permitted.",
+     "source": "HydraLab reseller agreement, clause 4.2"
+    }
+   ],
+   "rounds_played": 2,
+   "plans_searched": 8
+  },
+  {
+   "sku": "SM-10",
+   "name": "Hyaluronic Sheet Mask x10",
+   "verdict": "revise",
+   "skip": true,
+   "invited_plan": "฿79.80 off",
+   "invited_failed_checks": [
+    "below the Margin Floor",
+    "earns less than not joining"
+   ],
+   "invited_worst_total": "2276.88",
+   "invited_expected_total": "3553.41",
+   "chosen_plan": "Skip: don't join the Campaign with this product",
+   "chosen_worst_total": "3092.99",
+   "chosen_expected_total": null,
+   "chosen_worst_margin": null,
+   "dont_join_total": "3092.99",
+   "invited_worst_margin": "0.0449",
+   "margin_floor": "0.10",
+   "protected": "816.11",
+   "generic_plan": "฿79.80 off",
+   "generic_worst_total_all_scenarios": "2276.88",
+   "red_team_gain": null,
+   "scenarios": 7,
+   "waterfall": {
+    "plan": "฿79.80 off",
+    "list_price": "399",
+    "selling_price": "319.20",
+    "voucher": "0.00",
+    "seller_net": "319.20",
+    "fees": {
+     "commission": "51.23",
+     "payment": "10.25",
+     "programme": "27.33",
+     "fixed": "1.07",
+     "total": "89.88"
+    },
+    "unit_cost": "215",
+    "profit": "14.32",
+    "margin": "0.0449"
+   },
+   "scenario_grid": [
+    {
+     "rival": "Holder",
+     "effective_rival_price": "399.00",
+     "invited_total": "3737.52",
+     "shown_total": "3737.52"
+    },
+    {
+     "rival": "Matcher",
+     "effective_rival_price": "319.20",
+     "invited_total": "3737.52",
+     "shown_total": "3737.52"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "299.25",
+     "invited_total": "3508.40",
+     "shown_total": "3508.40"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "319.05",
+     "invited_total": "3737.52",
+     "shown_total": "3737.52"
+    },
+    {
+     "rival": "Price matcher",
+     "effective_rival_price": "319.20",
+     "invited_total": "3737.52",
+     "shown_total": "3737.52"
+    },
+    {
+     "rival": "Undercutter",
+     "effective_rival_price": "319.05",
+     "invited_total": "3737.52",
+     "shown_total": "3737.52"
+    },
+    {
+     "rival": "Price matcher",
+     "effective_rival_price": "229.20",
+     "invited_total": "2677.84",
+     "shown_total": "2677.84"
+    }
+   ],
+   "evidence": [
+    {
+     "kind": "invitation",
+     "text": "11.11 Big Sale asks for at least 20% off Hyaluronic Sheet Mask x10.",
+     "source": "Campaign Invitation, Shopee Thailand (sample)"
+    },
+    {
+     "kind": "fees",
+     "text": "Commission 15%, payment 3%, programme 8% and ฿1.00 per order, plus 7% VAT.",
+     "source": "Marketplace Profile shopee-th-nonmall-prime-fmcg, effective 2026-08-04"
+    },
+    {
+     "kind": "elasticity",
+     "text": "FreshRetailNet-50K (Dingdong Ltd.), CC BY 4.0, pooled -1.49 (band -1.977 to -0.771)",
+     "source": "evidence/elasticity.md"
+    },
+    {
+     "kind": "rival_snapshot",
+     "text": "No Rival Snapshot for this product: the rival's price is assumed equal to your list price.",
+     "source": "Assumption"
+    },
+    {
+     "kind": "assumption",
+     "text": "Campaign traffic x2.5; rival sensitivity 1.0; a gift is valued at 30% of its retail price.",
+     "source": "Sample-shop assumptions (overridable)"
+    }
+   ],
+   "rounds_played": 2,
+   "plans_searched": 183
+  }
+ ],
+ "explanations": [
+  {
+   "language": "th",
+   "text": "แนะนำให้ Approve เพื่อเข้าร่วม Campaign ตามที่ได้รับเชิญครับ เพราะจะช่วยให้กำไรในกรณีที่แย่ที่สุดสูงถึง 45,421.56 บาท ซึ่งดีกว่าการไม่เข้าร่วม แผนนี้ผ่านการทดสอบกับ 183 Promo Plans และรับมือกับ Counter-move ที่ยากที่สุดคือ Undercutter ที่ลดราคาเหลือ 271.05 บาท โดยที่ร้านยังคงมี Margin Floor ต่ำสุดที่ 10.0% และได้กำไรต่อชิ้น 42.3% ของราคาขายครับ",
+   "source": "model",
+   "rejected": [],
+   "route": "token-factory",
+   "model": "Gemma-4-31B-IT",
+   "sku": "NT-200",
+   "verdict": "approve",
+   "seconds": 11.8
+  },
+  {
+   "language": "en",
+   "text": "Approve the Promo Plan to join the Campaign. This is better because your worst-case profit is 45,421.56 Thai Baht, compared to 17,695.71 Thai Baht if you do not join. The plan was tested against an Undercutter Counter-move with a rival price of 271.05 Thai Baht.",
+   "source": "model",
+   "rejected": [],
+   "route": "token-factory",
+   "model": "Gemma-4-31B-IT",
+   "sku": "NT-200",
+   "verdict": "approve",
+   "seconds": 5.3
+  },
+  {
+   "language": "th",
+   "text": "คุณควร Escalate เพื่อตัดสินใจเลือก Promo Plan เอง เพราะไม่มีแผนไหนผ่านทุกเกณฑ์ โดยเฉพาะการเข้าร่วม Campaign ที่ทำให้กำไรต่อหน่วยเหลือ 8.4% ซึ่งต่ำกว่า Margin Floor ที่ 10.0% แผนนี้ถูกทดสอบกับ Counter-move ที่ยากที่สุดคือ Undercutter ซึ่งคู่แข่งตั้งราคา 282.00 บาท",
+   "source": "model",
+   "rejected": [],
+   "route": "token-factory",
+   "model": "Gemma-4-31B-IT",
+   "sku": "VC-30",
+   "verdict": "escalate",
+   "seconds": 7.3
+  },
+  {
+   "language": "en",
+   "text": "You must Escalate this decision because no Promo Plan meets your 10.0% Margin Floor. Joining the Campaign results in a worst-case margin per unit of 8.4%. This plan was tested against an Undercutter Counter-move with a rival price of 282.00 Thai Baht.",
+   "source": "model",
+   "rejected": [],
+   "route": "token-factory",
+   "model": "Gemma-4-31B-IT",
+   "sku": "VC-30",
+   "verdict": "escalate",
+   "seconds": 3.7
+  },
+  {
+   "language": "th",
+   "text": "แนะนำให้ Skip การเข้าร่วม Campaign นี้สำหรับสินค้าตัวนี้ครับ เพราะจะทำให้ได้กำไรต่อชิ้นเพียง 4.5% ซึ่งต่ำกว่า Margin Floor ที่คุณตั้งไว้ 10.0% และได้กำไรน้อยกว่าการไม่เข้าร่วมด้วย โดยแผนนี้ผ่านการทดสอบกับ Counter-move ที่ยากที่สุดคือ Price matcher ที่คู่แข่งลดราคาเหลือ 229.20 บาท",
+   "source": "model",
+   "rejected": [],
+   "route": "token-factory",
+   "model": "Gemma-4-31B-IT",
+   "sku": "SM-10",
+   "verdict": "skip",
+   "seconds": 5.1
+  },
+  {
+   "language": "en",
+   "text": "You should Skip this Campaign for your Hyaluronic Sheet Mask x10. Joining as invited would lead to a worst-case margin per unit of 4.5%, which is below your 10.0% Margin Floor. This plan was tested against a Price matcher Counter-move where a rival price was 229.20 Thai Baht.",
+   "source": "model",
+   "rejected": [],
+   "route": "token-factory",
+   "model": "Gemma-4-31B-IT",
+   "sku": "SM-10",
+   "verdict": "skip",
+   "seconds": 3.3
+  }
+ ]
+}
