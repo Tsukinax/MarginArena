@@ -13,6 +13,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from marginarena.arena import run_arena
+from marginarena.explainer import Language, explain
 from marginarena.llm import LLMClient, LLMSettings, first_healthy
 from marginarena.sample import describe_shop, load_shop
 
@@ -27,6 +28,12 @@ class ArenaRequest(BaseModel):
     rounds: int = Field(default=3, ge=1, le=5)
     rivals: int = Field(default=6, ge=1, le=6)
     strategists: int = Field(default=3, ge=0, le=3)
+
+
+class ExplainRequest(BaseModel):
+    result: dict
+    """One decided SKU, exactly as the Arena returned it."""
+    language: Language = "th"
 
 
 def create_app(
@@ -83,5 +90,15 @@ def create_app(
             await task
 
         return StreamingResponse(stream(), media_type="text/event-stream")
+
+    @app.post("/api/explain")
+    async def explain_verdict(request: ExplainRequest) -> dict:
+        s = await settings()
+        llm = LLMClient(s, transport=llm_transport, sleep=sleep)
+        try:
+            explanation = await explain(request.result, request.language, llm)
+        finally:
+            await llm.aclose()
+        return {**explanation, "route": s.route, "model": s.model}
 
     return app
