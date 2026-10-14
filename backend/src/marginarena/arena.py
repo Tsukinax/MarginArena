@@ -394,4 +394,4 @@ def _decimal(x: float) -> Decimal:
 
 
 def _pct(x: Decimal) -> str:
-    return f"{(x * 100).normalize()}%"
+    return f"{(x * 100).normalize():f}%"  # ":f" keeps 20 from printing as 2E+1

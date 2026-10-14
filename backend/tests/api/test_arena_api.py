@@ -139,6 +139,14 @@ async def test_decided_sku_explains_its_numbers_with_a_waterfall_scenarios_and_e
     assert {"invitation", "fees", "elasticity", "rival_snapshot"} <= kinds
 
 
+async def test_evidence_links_write_percentages_as_plain_numbers():
+    events = await run(FakeModelServer(), skus=["VC-30"])
+
+    texts = " ".join(link["text"] for link in result(events)["evidence"])
+    assert "at least 20% off" in texts
+    assert "valued at 30% of its retail price" in texts
+
+
 GPU = LLMSettings(route="mi300x", base_url="http://gpu.test/v1", api_key="k", model="google/gemma-4-31B-it")
 
 
