@@ -57,6 +57,7 @@ class GiftWithPurchase:
 
     cost: Decimal
     perceived_value: Decimal
+    name: str = ""
 
 
 Mechanic = PriceCut | ShopVoucher | GiftWithPurchase

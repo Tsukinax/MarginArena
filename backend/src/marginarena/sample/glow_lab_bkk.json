@@ -1,0 +1,57 @@
+{
+  "label": "Fictional sample shop for the demo. Catalogue costs, stock, baselines, the brand agreement and the Rival Snapshot are invented. Fees are Shopee Thailand Non-Mall PRIME rates effective 4 Aug 2026; elasticity is the FreshRetailNet-50K pooled estimate.",
+  "shop": "Glow Lab BKK",
+  "profile": "shopee-th-nonmall-prime-fmcg",
+  "margin_floor": "0.10",
+  "assumptions": {
+    "traffic_lift": "2.5",
+    "traffic_lift_source": "Lazada reported ~3.5x GMV in its March 2026 Birthday Campaign; dividing out the price effect of an average 20% cut at elasticity -1.49 (x1.39) leaves ~2.5x traffic.",
+    "cross_price_sensitivity": "1.0",
+    "gift_value_ratio": "0.5"
+  },
+  "invitation": {
+    "marketplace": "Shopee Thailand",
+    "campaign": "11.11 Big Sale",
+    "slot": "Shocking Sale, 11 Nov 00:00 to 23:59",
+    "registration_closes": "7 Nov 2026",
+    "items": [
+      {"sku": "HB-30", "required_discount": "0.15"},
+      {"sku": "NT-200", "required_discount": "0.15"},
+      {"sku": "SS-50", "required_discount": "0.20"},
+      {"sku": "CN-50", "required_discount": "0.15"},
+      {"sku": "VC-30", "required_discount": "0.20"},
+      {"sku": "AC-150", "required_discount": "0.15"},
+      {"sku": "RN-30", "required_discount": "0.25"},
+      {"sku": "CG-80", "required_discount": "0.15"},
+      {"sku": "LM-15", "required_discount": "0.20"},
+      {"sku": "SM-10", "required_discount": "0.20"},
+      {"sku": "CM-100", "required_discount": "0.15"},
+      {"sku": "TK-4", "required_discount": "0.25"}
+    ]
+  },
+  "catalogue": [
+    {"id": "HB-30", "name": "Hydra Barrier Serum 30 ml", "brand": "HydraLab", "list_price": "590", "cost": "165", "stock": 420, "baseline_units": 90},
+    {"id": "NT-200", "name": "Niacinamide 10% Toner 200 ml", "brand": "Glow Lab", "list_price": "390", "cost": "98", "stock": 610, "baseline_units": 140},
+    {"id": "SS-50", "name": "Daily Sunscreen SPF50+ 50 ml", "brand": "Glow Lab", "list_price": "450", "cost": "120", "stock": 880, "baseline_units": 210},
+    {"id": "CN-50", "name": "Ceramide Night Cream 50 g", "brand": "HydraLab", "list_price": "690", "cost": "330", "stock": 240, "baseline_units": 55},
+    {"id": "VC-30", "name": "Vitamin C Bright Serum 30 ml", "brand": "HydraLab", "list_price": "590", "cost": "300", "stock": 300, "baseline_units": 80},
+    {"id": "AC-150", "name": "Gentle Amino Cleanser 150 ml", "brand": "Glow Lab", "list_price": "290", "cost": "72", "stock": 950, "baseline_units": 240},
+    {"id": "RN-30", "name": "Retinal 0.1% Night Serum 30 ml", "brand": "Glow Lab", "list_price": "790", "cost": "395", "stock": 150, "baseline_units": 35},
+    {"id": "CG-80", "name": "Centella Repair Gel 80 g", "brand": "Glow Lab", "list_price": "350", "cost": "85", "stock": 520, "baseline_units": 120},
+    {"id": "LM-15", "name": "Lip Sleeping Mask 15 g", "brand": "Glow Lab", "list_price": "250", "cost": "58", "stock": 700, "baseline_units": 160, "gift_candidate": true},
+    {"id": "SM-10", "name": "Hyaluronic Sheet Mask x10", "brand": "Glow Lab", "list_price": "399", "cost": "215", "stock": 330, "baseline_units": 75},
+    {"id": "CM-100", "name": "Oil-Control Clay Mask 100 g", "brand": "Glow Lab", "list_price": "320", "cost": "88", "stock": 410, "baseline_units": 95},
+    {"id": "TK-4", "name": "Travel Kit, 4 minis", "brand": "Glow Lab", "list_price": "499", "cost": "205", "stock": 180, "baseline_units": 50},
+    {"id": "AC-30", "name": "Gentle Amino Cleanser 30 ml (mini)", "brand": "Glow Lab", "list_price": "90", "cost": "22", "stock": 1200, "baseline_units": 0, "gift_candidate": true}
+  ],
+  "brand_rules": [
+    {"brand": "HydraLab", "clause": "HydraLab reseller agreement, clause 4.2", "max_price_cut": "0.20", "vouchers_allowed": true, "gifts_allowed": true,
+     "text": "4.2 The Reseller shall not advertise HydraLab products at a headline discount greater than twenty percent (20%) off the recommended retail price. Shop vouchers and gifts with purchase are permitted."}
+  ],
+  "rival_snapshot": {
+    "NT-200": {"rival": "Lookalike niacinamide toner, 200 ml", "reference_price": "359"},
+    "SS-50": {"rival": "Lookalike SPF50+ sunscreen, 50 ml", "reference_price": "420"},
+    "AC-150": {"rival": "Lookalike amino cleanser, 150 ml", "reference_price": "259"},
+    "HB-30": {"rival": "Lookalike barrier serum, 30 ml", "reference_price": "549"}
+  }
+}
