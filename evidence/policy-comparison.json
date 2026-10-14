@@ -1,0 +1,544 @@
+{
+ "summary": {
+  "measured": "2026-10-14T20:19:59+00:00",
+  "route": "token-factory",
+  "model": "Gemma-4-31B-IT",
+  "telemetry": {
+   "calls_ok": 11,
+   "calls_invalid": 1,
+   "calls_failed": 0,
+   "retries": 0,
+   "in_flight": 0,
+   "completion_tokens": 1062,
+   "tokens_per_second": 22.8,
+   "elapsed_seconds": 46.55
+  },
+  "recorded_run": "token-factory-sample-12sku.sse",
+  "totals_over_decided_skus": {
+   "As invited": {
+    "worst_total": "297631.10",
+    "skus": 11,
+    "breaking_a_check": 2
+   },
+   "Match the competitor": {
+    "worst_total": "299217.29",
+    "skus": 11,
+    "breaking_a_check": 3
+   },
+   "LLM-direct": null,
+   "MarginArena": {
+    "worst_total": "303065.56",
+    "skus": 11,
+    "breaking_a_check": 0
+   }
+  },
+  "totals_over_skus_every_policy_answered": {
+   "skus": [
+    "HB-30",
+    "NT-200",
+    "CN-50",
+    "AC-150",
+    "RN-30",
+    "CG-80",
+    "LM-15",
+    "SM-10",
+    "CM-100",
+    "TK-4"
+   ],
+   "As invited": {
+    "worst_total": "233519.36",
+    "skus": 10,
+    "breaking_a_check": 2
+   },
+   "Match the competitor": {
+    "worst_total": "233269.94",
+    "skus": 10,
+    "breaking_a_check": 3
+   },
+   "LLM-direct": {
+    "worst_total": "231167.14",
+    "skus": 10,
+    "breaking_a_check": 2
+   },
+   "MarginArena": {
+    "worst_total": "235167.86",
+    "skus": 10,
+    "breaking_a_check": 0
+   }
+  },
+  "llm_direct_relative_error_pct": {
+   "median": "61.69",
+   "within_5pct": 1,
+   "answers": 11
+  }
+ },
+ "rows": [
+  {
+   "sku": "HB-30",
+   "name": "Hydra Barrier Serum 30 ml",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿88.50 off",
+    "worst_total": "41139.00",
+    "worst_margin": "0.3906",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿123.35 off",
+    "worst_total": "40811.64",
+    "worst_margin": "0.3659",
+    "failed_checks": [
+     "breaks HydraLab reseller agreement, clause 4.2"
+    ]
+   },
+   "LLM-direct": {
+    "plan": "฿118.0 off",
+    "worst_total": "40861.08",
+    "worst_margin": "0.3700",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿88.50 off",
+    "worst_total": "41139.00",
+    "worst_margin": "0.3906",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 281.0,
+    "engine_units": 313,
+    "claimed_profit": "58266.0",
+    "engine_profit": "54656.06",
+    "relative_error": "6.60",
+    "why": "The maximum headline discount of 20% is applied to maximize volume while staying within brand guidelines and maintaining the minimum margin."
+   }
+  },
+  {
+   "sku": "NT-200",
+   "name": "Niacinamide 10% Toner 200 ml",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿58.50 off",
+    "worst_total": "43599.09",
+    "worst_margin": "0.4229",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿84.85 off",
+    "worst_total": "43632.00",
+    "worst_margin": "0.3972",
+    "failed_checks": []
+   },
+   "LLM-direct": {
+    "plan": "฿59.0 off",
+    "worst_total": "43630.08",
+    "worst_margin": "0.4225",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿58.50 off",
+    "worst_total": "43599.09",
+    "worst_margin": "0.4229",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 414.0,
+    "engine_units": 446,
+    "claimed_profit": "65491.5",
+    "engine_profit": "62368.64",
+    "relative_error": "5.01",
+    "why": "A 15% price cut (to 331 THB) maximizes volume while comfortably exceeding the minimum 10% profit margin requirement."
+   }
+  },
+  {
+   "sku": "SS-50",
+   "name": "Daily Sunscreen SPF50+ 50 ml",
+   "verdict": "revise",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿90.00 off",
+    "worst_total": "64111.74",
+    "worst_margin": "0.3855",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿114.00 off",
+    "worst_total": "65947.35",
+    "worst_margin": "0.3615",
+    "failed_checks": []
+   },
+   "LLM-direct": null,
+   "MarginArena": {
+    "plan": "฿157.50 off",
+    "worst_total": "67897.70",
+    "worst_margin": "0.3079",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": null
+  },
+  {
+   "sku": "CN-50",
+   "name": "Ceramide Night Cream 50 g",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿103.50 off",
+    "worst_total": "11347.98",
+    "worst_margin": "0.1573",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿103.50 off",
+    "worst_total": "11347.98",
+    "worst_margin": "0.1573",
+    "failed_checks": []
+   },
+   "LLM-direct": {
+    "plan": "฿138.0 off",
+    "worst_total": "9228.32",
+    "worst_margin": "0.1220",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿103.50 off",
+    "worst_total": "11347.98",
+    "worst_margin": "0.1573",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 175.0,
+    "engine_units": 191,
+    "claimed_profit": "25514.25",
+    "engine_profit": "12865.76",
+    "relative_error": "98.31",
+    "why": "A 20% price cut maximizes volume while staying within the brand's maximum headline discount limit and maintaining the required minimum profit margin."
+   }
+  },
+  {
+   "sku": "VC-30",
+   "name": "Vitamin C Bright Serum 30 ml",
+   "verdict": "escalate",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿118.00 off",
+    "worst_total": "7369.32",
+    "worst_margin": "0.0839",
+    "failed_checks": [
+     "below the Margin Floor"
+    ]
+   },
+   "Match the competitor": {
+    "plan": "฿118.00 off",
+    "worst_total": "7369.32",
+    "worst_margin": "0.0839",
+    "failed_checks": [
+     "below the Margin Floor"
+    ]
+   },
+   "LLM-direct": {
+    "plan": "฿118.0 off",
+    "worst_total": "7369.32",
+    "worst_margin": "0.0839",
+    "failed_checks": [
+     "below the Margin Floor"
+    ]
+   },
+   "MarginArena": {
+    "plan": "a person decides (Escalate)",
+    "worst_total": null,
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 200.0,
+    "engine_units": 278,
+    "claimed_profit": "24840.0",
+    "engine_profit": "11014.36",
+    "relative_error": "125.52",
+    "why": "The brand agreement caps the headline discount at 20%, so the price cut is set exactly at ฿118 (20% of 590), and no voucher is needed as this maximizes profit while meeting the minimum margin requirement."
+   }
+  },
+  {
+   "sku": "AC-150",
+   "name": "Gentle Amino Cleanser 150 ml",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿43.50 off",
+    "worst_total": "53782.92",
+    "worst_margin": "0.4253",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿69.85 off",
+    "worst_total": "53827.95",
+    "worst_margin": "0.3900",
+    "failed_checks": []
+   },
+   "LLM-direct": {
+    "plan": "฿44.0 off",
+    "worst_total": "53812.35",
+    "worst_margin": "0.4248",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿43.50 off",
+    "worst_total": "53782.92",
+    "worst_margin": "0.4253",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 705.0,
+    "engine_units": 766,
+    "claimed_profit": "72276.5",
+    "engine_profit": "80039.34",
+    "relative_error": "9.70",
+    "why": "A price cut to 246 THB satisfies the minimum 15% discount requirement, beats the competitor's price, and maximizes profit while maintaining the minimum 10% margin per unit."
+   }
+  },
+  {
+   "sku": "RN-30",
+   "name": "Retinal 0.1% Night Serum 30 ml",
+   "verdict": "skip",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿197.50 off",
+    "worst_total": "2621.97",
+    "worst_margin": "0.0533",
+    "failed_checks": [
+     "below the Margin Floor",
+     "earns less than not joining"
+    ]
+   },
+   "Match the competitor": {
+    "plan": "฿197.50 off",
+    "worst_total": "2621.97",
+    "worst_margin": "0.0533",
+    "failed_checks": [
+     "below the Margin Floor",
+     "earns less than not joining"
+    ]
+   },
+   "LLM-direct": {
+    "plan": "฿198.0 off",
+    "worst_total": "2592.09",
+    "worst_margin": "0.0528",
+    "failed_checks": [
+     "below the Margin Floor",
+     "earns less than not joining"
+    ]
+   },
+   "MarginArena": {
+    "plan": "don't join",
+    "worst_total": "3483.00",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 124.0,
+    "engine_units": 134,
+    "claimed_profit": "23617.33",
+    "engine_profit": "4184.82",
+    "relative_error": "464.36",
+    "why": "A 25% price cut (rounding 197.5 to 198) maximizes volume while maintaining a profit margin above the 10% minimum requirement."
+   }
+  },
+  {
+   "sku": "CG-80",
+   "name": "Centella Repair Gel 80 g",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿52.50 off",
+    "worst_total": "25472.70",
+    "worst_margin": "0.4324",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿52.50 off",
+    "worst_total": "25472.70",
+    "worst_margin": "0.4324",
+    "failed_checks": []
+   },
+   "LLM-direct": {
+    "plan": "฿53.0 off",
+    "worst_total": "25533.69",
+    "worst_margin": "0.4320",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿52.50 off",
+    "worst_total": "25472.70",
+    "worst_margin": "0.4324",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 380.0,
+    "engine_units": 383,
+    "claimed_profit": "52552.6",
+    "engine_profit": "49142.73",
+    "relative_error": "6.94",
+    "why": "A price cut of 15.1% (53 baht) maximizes total campaign profit while maintaining the minimum 10% profit margin per unit after fees."
+   }
+  },
+  {
+   "sku": "LM-15",
+   "name": "Lip Sleeping Mask 15 g",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿50.00 off",
+    "worst_total": "20213.73",
+    "worst_margin": "0.4265",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿50.00 off",
+    "worst_total": "20213.73",
+    "worst_margin": "0.4265",
+    "failed_checks": []
+   },
+   "LLM-direct": {
+    "plan": "฿50.0 off",
+    "worst_total": "20213.73",
+    "worst_margin": "0.4265",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿50.00 off",
+    "worst_total": "20213.73",
+    "worst_margin": "0.4265",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 224.0,
+    "engine_units": 557,
+    "claimed_profit": "18197.41",
+    "engine_profit": "47506.53",
+    "relative_error": "61.69",
+    "why": "A 20% price cut (the minimum required) maximizes profit per unit while maintaining the required 10% margin and driving significant volume."
+   }
+  },
+  {
+   "sku": "SM-10",
+   "name": "Hyaluronic Sheet Mask x10",
+   "verdict": "skip",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿79.80 off",
+    "worst_total": "2305.52",
+    "worst_margin": "0.0449",
+    "failed_checks": [
+     "below the Margin Floor",
+     "earns less than not joining"
+    ]
+   },
+   "Match the competitor": {
+    "plan": "฿79.80 off",
+    "worst_total": "2305.52",
+    "worst_margin": "0.0449",
+    "failed_checks": [
+     "below the Margin Floor",
+     "earns less than not joining"
+    ]
+   },
+   "LLM-direct": {
+    "plan": "฿80.0 off",
+    "worst_total": "2282.98",
+    "worst_margin": "0.0445",
+    "failed_checks": [
+     "below the Margin Floor",
+     "earns less than not joining"
+    ]
+   },
+   "MarginArena": {
+    "plan": "don't join",
+    "worst_total": "3092.99",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 238.0,
+    "engine_units": 261,
+    "claimed_profit": "17758.32",
+    "engine_profit": "3700.98",
+    "relative_error": "379.83",
+    "why": "A price cut of 80 baht (approx 20%) maximizes volume while maintaining a profit margin above the required 10% per unit after all taxes and fees."
+   }
+  },
+  {
+   "sku": "CM-100",
+   "name": "Oil-Control Clay Mask 100 g",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿48.00 off",
+    "worst_total": "24133.50",
+    "worst_margin": "0.3943",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿48.00 off",
+    "worst_total": "24133.50",
+    "worst_margin": "0.3943",
+    "failed_checks": []
+   },
+   "LLM-direct": {
+    "plan": "฿48.0 off",
+    "worst_total": "24133.50",
+    "worst_margin": "0.3943",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿48.00 off",
+    "worst_total": "24133.50",
+    "worst_margin": "0.3943",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 283.0,
+    "engine_units": 302,
+    "claimed_profit": "32915.23",
+    "engine_profit": "32392.52",
+    "relative_error": "1.61",
+    "why": "A 15% price cut (฿48) maximizes volume while maintaining the required minimum 10% profit margin per unit after all fees and VAT."
+   }
+  },
+  {
+   "sku": "TK-4",
+   "name": "Travel Kit, 4 minis",
+   "verdict": "approve",
+   "scenarios": 7,
+   "As invited": {
+    "plan": "฿124.75 off",
+    "worst_total": "8902.95",
+    "worst_margin": "0.1711",
+    "failed_checks": []
+   },
+   "Match the competitor": {
+    "plan": "฿124.75 off",
+    "worst_total": "8902.95",
+    "worst_margin": "0.1711",
+    "failed_checks": []
+   },
+   "LLM-direct": {
+    "plan": "฿125.0 off",
+    "worst_total": "8879.32",
+    "worst_margin": "0.1708",
+    "failed_checks": []
+   },
+   "MarginArena": {
+    "plan": "฿124.75 off",
+    "worst_total": "8902.95",
+    "worst_margin": "0.1711",
+    "failed_checks": []
+   },
+   "llm_direct_arithmetic": {
+    "claimed_units": 178.0,
+    "engine_units": 180,
+    "claimed_profit": "23864.28",
+    "engine_profit": "11498.40",
+    "relative_error": "107.54",
+    "why": "A 25% price cut (the minimum required) maximizes the unit margin while driving high volume, staying within stock limits and meeting the minimum profit threshold."
+   }
+  }
+ ]
+}

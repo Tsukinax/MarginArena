@@ -53,7 +53,11 @@ Every number in this README comes from the engine or from these files:
 | Elasticity fit and its holdout against a naive baseline | [evidence/elasticity.md](evidence/elasticity.md) |
 | An AI Rival turning SS-50's Approve into a Revise, live on Token Factory | [evidence/red-team-token-factory.md](evidence/red-team-token-factory.md) |
 | Thai and English explanations checked number by number | [evidence/explainer-token-factory.md](evidence/explainer-token-factory.md) |
+| Four pricing policies under the same Scenarios, and Gemma's own arithmetic checked by the engine | [evidence/policy-comparison.md](evidence/policy-comparison.md) |
 | Recorded Arena runs, as streamed | [evidence/runs/](evidence/runs/) |
+
+Why the engine and not the model computes the numbers: given the same facts and formulas, Gemma's own Campaign profit
+estimates were off by a median 61.69% from the engine's, with 1 of 11 answers within 5% (`evidence/policy-comparison.md`).
 
 ## AMD
 
