@@ -147,3 +147,21 @@ class SkuVerdict:
     as_invited: PlanEvaluation
     candidates: tuple[PlanEvaluation, ...]
     dont_join_total: Decimal
+
+
+@dataclass(frozen=True)
+class InvitationItem:
+    """One SKU named in a Campaign Invitation, with the plan it was invited at and the alternatives to test."""
+
+    sku: Sku
+    as_invited: PromoPlan
+    candidates: list[PromoPlan]
+    required_discount: Decimal = ZERO
+    counter_moves: tuple[CounterMove, ...] | None = None
+    """Counter-moves for this SKU only, for example from its Rival Snapshot. None means the shared set."""
+
+
+@dataclass(frozen=True)
+class InvitationResult:
+    verdicts: tuple[SkuVerdict, ...]
+    margin_protected: Decimal

@@ -1,11 +1,14 @@
 """Robust selection of a Promo Plan and the Verdict for one invited SKU."""
 
+from dataclasses import replace
 from decimal import ROUND_HALF_UP, Decimal
 
 from .demand import campaign_outcome
 from .model import (
     CampaignTerms,
     CounterMove,
+    InvitationItem,
+    InvitationResult,
     MarketplaceProfile,
     PlanEvaluation,
     PriceCut,
@@ -54,3 +57,29 @@ def evaluate_sku(
     else:
         verdict, chosen = "revise", best
     return SkuVerdict(sku, verdict, chosen, invited, others, dont_join_total)
+
+
+def evaluate_invitation(
+    items: list[InvitationItem],
+    counter_moves: tuple[CounterMove, ...] | list[CounterMove],
+    profile: MarketplaceProfile,
+    terms: CampaignTerms,
+    settings: SellerSettings,
+) -> InvitationResult:
+    verdicts = tuple(
+        evaluate_sku(
+            item.sku,
+            item.as_invited,
+            item.candidates,
+            item.counter_moves or counter_moves,
+            profile,
+            replace(terms, required_discount=item.required_discount),
+            settings,
+        )
+        for item in items
+    )
+    protected = sum(
+        ((v.chosen.worst_total if v.chosen else v.dont_join_total) - v.as_invited.worst_total for v in verdicts),
+        Decimal("0"),
+    )
+    return InvitationResult(verdicts=verdicts, margin_protected=protected)

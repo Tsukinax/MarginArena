@@ -7,6 +7,8 @@ from .model import (
     CampaignTerms,
     CounterMove,
     FeeBreakdown,
+    InvitationItem,
+    InvitationResult,
     MarketplaceProfile,
     Mechanic,
     PlanEvaluation,
@@ -19,13 +21,15 @@ from .model import (
     UnitEconomics,
 )
 from .profiles import get_profile
-from .verdict import evaluate_sku
+from .verdict import evaluate_invitation, evaluate_sku
 
 __all__ = [
     "CampaignOutcome",
     "CampaignTerms",
     "CounterMove",
     "FeeBreakdown",
+    "InvitationItem",
+    "InvitationResult",
     "MarketplaceProfile",
     "Mechanic",
     "PlanEvaluation",
@@ -37,6 +41,7 @@ __all__ = [
     "SkuVerdict",
     "UnitEconomics",
     "campaign_outcome",
+    "evaluate_invitation",
     "evaluate_sku",
     "get_profile",
     "unit_economics",
