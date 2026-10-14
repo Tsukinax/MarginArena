@@ -11,6 +11,7 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
   }, [onClose])
 
   const w = r.waterfall
+  const hasPlan = r.chosen_plan !== null && !r.skip
   const price = Number(w.selling_price)
   const steps = [
     { label: 'Campaign price', value: w.selling_price, kind: 'total' },
@@ -91,7 +92,11 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
               <th scope="col">Rival move</th>
               <th scope="col" className="num">Rival at</th>
               <th scope="col" className="num">As invited</th>
-              <th scope="col" className="num">{r.chosen_plan ? 'MarginArena' : 'Shown plan'}</th>
+              {hasPlan && (
+                <th scope="col" className="num">
+                  MarginArena
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -100,7 +105,7 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
                 <th scope="row">{g.rival}</th>
                 <td className="num">{baht(g.effective_rival_price)}</td>
                 <td className="num">{baht(g.invited_total)}</td>
-                <td className="num">{baht(g.shown_total)}</td>
+                {hasPlan && <td className="num">{baht(g.shown_total)}</td>}
               </tr>
             ))}
           </tbody>
