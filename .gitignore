@@ -13,3 +13,4 @@ node_modules/
 skills-lock.json
 docs/chatai-context/
 .pytest_cache/
+backend/.data/

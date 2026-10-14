@@ -1,0 +1,184 @@
+{
+  "source": "FreshRetailNet-50K (Dingdong Ltd.), CC BY 4.0",
+  "revision": "c374e85975c82816c495acfa904cc55ab14a47d3",
+  "fitted_on": "2026-10-14",
+  "method": "two-way FE (store x SKU, city x date) OLS on log sales vs log discount, in-stock days",
+  "pooled": {
+    "elasticity": -1.49,
+    "se_cluster_product": 0.122,
+    "activity_lift_log": 0.072
+  },
+  "band_p10_p90": [
+    -1.977,
+    -0.771
+  ],
+  "categories": [
+    {
+      "category": 29,
+      "series": 3495,
+      "elasticity": -2.878,
+      "raw": -2.993,
+      "se": 0.179
+    },
+    {
+      "category": 15,
+      "series": 692,
+      "elasticity": -2.72,
+      "raw": -2.914,
+      "se": 0.245
+    },
+    {
+      "category": 28,
+      "series": 1998,
+      "elasticity": -1.98,
+      "raw": -2.555,
+      "se": 0.603
+    },
+    {
+      "category": 24,
+      "series": 1383,
+      "elasticity": -1.95,
+      "raw": -2.144,
+      "se": 0.357
+    },
+    {
+      "category": 5,
+      "series": 1650,
+      "elasticity": -1.905,
+      "raw": -2.031,
+      "se": 0.298
+    },
+    {
+      "category": 23,
+      "series": 301,
+      "elasticity": -1.844,
+      "raw": -2.069,
+      "se": 0.42
+    },
+    {
+      "category": 0,
+      "series": 365,
+      "elasticity": -1.797,
+      "raw": -2.034,
+      "se": 0.45
+    },
+    {
+      "category": 16,
+      "series": 7082,
+      "elasticity": -1.79,
+      "raw": -1.808,
+      "se": 0.127
+    },
+    {
+      "category": 31,
+      "series": 1912,
+      "elasticity": -1.762,
+      "raw": -2.123,
+      "se": 0.575
+    },
+    {
+      "category": 18,
+      "series": 2349,
+      "elasticity": -1.548,
+      "raw": -1.567,
+      "se": 0.174
+    },
+    {
+      "category": 22,
+      "series": 326,
+      "elasticity": -1.442,
+      "raw": -1.676,
+      "se": 0.793
+    },
+    {
+      "category": 7,
+      "series": 1018,
+      "elasticity": -1.284,
+      "raw": -1.287,
+      "se": 0.411
+    },
+    {
+      "category": 4,
+      "series": 10888,
+      "elasticity": -1.171,
+      "raw": -1.166,
+      "se": 0.146
+    },
+    {
+      "category": 25,
+      "series": 412,
+      "elasticity": -1.161,
+      "raw": -1.104,
+      "se": 0.465
+    },
+    {
+      "category": 20,
+      "series": 5533,
+      "elasticity": -1.063,
+      "raw": -1.051,
+      "se": 0.152
+    },
+    {
+      "category": 11,
+      "series": 511,
+      "elasticity": -0.953,
+      "raw": -0.75,
+      "se": 0.527
+    },
+    {
+      "category": 30,
+      "series": 670,
+      "elasticity": -0.911,
+      "raw": -0.783,
+      "se": 0.394
+    },
+    {
+      "category": 10,
+      "series": 2838,
+      "elasticity": -0.846,
+      "raw": -0.841,
+      "se": 0.069
+    },
+    {
+      "category": 27,
+      "series": 230,
+      "elasticity": -0.786,
+      "raw": -0.513,
+      "se": 0.497
+    },
+    {
+      "category": 8,
+      "series": 2885,
+      "elasticity": -0.769,
+      "raw": -0.704,
+      "se": 0.238
+    },
+    {
+      "category": 21,
+      "series": 2662,
+      "elasticity": -0.74,
+      "raw": -0.702,
+      "se": 0.178
+    },
+    {
+      "category": 14,
+      "series": 203,
+      "elasticity": -0.587,
+      "raw": -0.457,
+      "se": 0.29
+    }
+  ],
+  "shrinkage": {
+    "mu": -1.277,
+    "tau": 0.667
+  },
+  "holdout": {
+    "rows_deeper_cut": 22575,
+    "wape_naive_deeper_cut": 0.426,
+    "wape_model_deeper_cut": 0.35,
+    "rows_shallower": 54612,
+    "wape_naive_shallower": 0.405,
+    "wape_model_shallower": 0.479
+  },
+  "applies_to": "price cuts only (overstates losses when a discount ends)"
+}
