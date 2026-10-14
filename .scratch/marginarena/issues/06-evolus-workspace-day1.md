@@ -30,3 +30,11 @@ Create the workspace through https://app.evolus.ai/join/AMDACT3, put the API key
   2. A **User API Key** with the scopes for agents, memories, webservices, json structures and workflows, also in `.env`.
   3. Confirmation that our vLLM model is added under "Your models" (needs the droplet; ticket 08).
 - 15 Oct: the Evolus kit is in [infra/evolus/](../../../infra/evolus/README.md): the knowledge-library documents and `evolus_kit.py plan`, which only reads. The user approved running `plan`; it has not been run yet. Creating resources (`apply`) will be written against what `plan` returns, and the user approves each run that writes.
+- 15 Oct: `plan` ran (read-only; it now also saves the docs of the workflow steps `apply` uses, the own model
+  connections and the AI Tools catalog). The workspace had no agents, workflows, web services or own models. The user
+  approved one run of `apply` for the knowledge library: "MarginArena Campaign Desk library" now holds both
+  `library/` documents, uploaded with `language=en` (Evolus keeps the file name as the title); its ID is
+  `EVOLUS_LIBRARY_ID` in `.env`. Decided with the user: until the droplet exists, the agent uses Token Factory's Gemma
+  under "Your models" (alias `tf-gemma`, added by the user); after the GPU session the MI300X model becomes the main
+  model and Token Factory its labelled fallback. The Verdict workflow drafts the approval request with the `email` AI
+  Tool and sends nothing.

@@ -3,12 +3,15 @@
 Run from the repo root with the keys from .env:
   uv run --project backend --env-file .env python infra/evolus/evolus_kit.py plan
 
+  uv run --project backend --env-file .env python infra/evolus/evolus_kit.py apply
+
   plan    read-only: what the workspace holds now, the workflow step catalog and the keys' scopes.
           Prints a summary and saves the raw answers to infra/evolus/.plan/latest.json (gitignored).
+  apply   writes: creates what MarginArena needs, finding each resource by name first, so a rerun creates nothing
+          new. So far the knowledge library with every document in infra/evolus/library/. Saves the IDs to .env.
+          Ask the user before every run.
 
-Creating resources (the knowledge library from infra/evolus/library/, the extractor, the Campaign Desk agent and the
-workflow) comes next, written against what `plan` returns. Ask the user before running anything that writes.
-API notes: docs/api-guide/evolus-api.md.
+The extractor, the Campaign Desk agent and the Verdict workflow come next. API notes: docs/api-guide/evolus-api.md.
 """
 
 from __future__ import annotations
@@ -23,7 +26,11 @@ import httpx
 BASE_URL = "https://api.evolus.ai/api/v1"
 KEYS = ("EVOLUS_API_KEY", "EVOLUS_APPLICATION_ID", "EVOLUS_USER_API_KEY")
 SECRETS = ("EVOLUS_API_KEY", "EVOLUS_USER_API_KEY")
-PLAN_DIR = Path(__file__).resolve().parent / ".plan"
+HERE = Path(__file__).resolve().parent
+PLAN_DIR = HERE / ".plan"
+LIBRARY_DIR = HERE / "library"
+ENV_FILE = HERE.parents[1] / ".env"
+LIBRARY = "MarginArena Campaign Desk library"
 # (label, path, which key). Web services, extractors, memories and skills need the personal User API Key.
 LOOKS = (
     ("agents", "/agents", "app"),
@@ -45,16 +52,7 @@ DOCS = (
 
 def plan(env: dict[str, str], transport: httpx.BaseTransport | None = None) -> dict:
     """GET each resource list once and report what is there. Nothing in the workspace changes."""
-    headers = {
-        "app": {
-            "X-ApiKey": env["EVOLUS_API_KEY"],
-            "X-Application-Id": env["EVOLUS_APPLICATION_ID"],
-        },
-        "user": {
-            "X-User-ApiKey": env["EVOLUS_USER_API_KEY"],
-            "X-Application-Id": env["EVOLUS_APPLICATION_ID"],
-        },
-    }
+    headers = _headers(env)
     answers = {}
     with httpx.Client(base_url=BASE_URL, transport=transport, timeout=30) as client:
         for label, path, key in LOOKS:
@@ -89,6 +87,80 @@ def plan(env: dict[str, str], transport: httpx.BaseTransport | None = None) -> d
         answers["step docs"] = docs
         print(f"step docs (GET /workflows/step-catalog/{{key}}): {len(docs)} parts")
     return answers
+
+
+def apply(
+    env: dict[str, str],
+    transport: httpx.BaseTransport | None = None,
+    env_file: Path = ENV_FILE,
+) -> dict[str, str]:
+    """Create what MarginArena needs, once: each resource is found by name before anything is created."""
+    headers = _headers(env)
+    with httpx.Client(base_url=BASE_URL, transport=transport, timeout=60) as client:
+        ids = {"library": _library(client, headers["user"])}
+    _set_env(env_file, "EVOLUS_LIBRARY_ID", ids["library"])
+    return ids
+
+
+def _library(client: httpx.Client, headers: dict[str, str]) -> str:
+    """The knowledge library with every document in library/, uploaded in English (Evolus defaults to Italian)."""
+    libraries = _ok(client.get("/memories", headers=headers)).json()
+    found = [m["id"] for m in libraries if m.get("name") == LIBRARY]
+    if found:
+        library = found[0]
+        print(f"knowledge library {LIBRARY!r}: found")
+    else:
+        # type 0 = Rag: semantic search over the documents
+        body = {"name": LIBRARY, "type": 0}
+        response = client.post("/memories/simple", json=body, headers=headers)
+        library = _ok(response).json()["id"]
+        print(f"knowledge library {LIBRARY!r}: created")
+    documents = _ok(client.get(f"/memories/{library}/documents", headers=headers))
+    titles = {d.get("title") for d in documents.json()}
+    for path in sorted(LIBRARY_DIR.glob("*.md")):
+        if path.name in titles:  # Evolus keeps the uploaded file name as the title
+            print(f"  {path.name}: already uploaded")
+            continue
+        _ok(
+            client.post(
+                f"/memories/{library}/documents",
+                params={"language": "en"},
+                files={"file": (path.name, path.read_bytes(), "text/markdown")},
+                headers=headers,
+            )
+        )
+        print(f"  {path.name}: uploaded (language=en)")
+    return library
+
+
+def _headers(env: dict[str, str]) -> dict[str, dict[str, str]]:
+    return {
+        "app": {
+            "X-ApiKey": env["EVOLUS_API_KEY"],
+            "X-Application-Id": env["EVOLUS_APPLICATION_ID"],
+        },
+        "user": {
+            "X-User-ApiKey": env["EVOLUS_USER_API_KEY"],
+            "X-Application-Id": env["EVOLUS_APPLICATION_ID"],
+        },
+    }
+
+
+def _ok(response: httpx.Response) -> httpx.Response:
+    if not response.is_success:
+        request = response.request
+        raise SystemExit(
+            f"{request.method} {request.url.path}: HTTP {response.status_code} "
+            f"{response.text[:300]}"
+        )
+    return response
+
+
+def _set_env(path: Path, key: str, value: str) -> None:
+    """Write key=value into the .env file, replacing an earlier value and keeping every other line."""
+    lines = path.read_text().splitlines() if path.exists() else []
+    kept = [line for line in lines if not line.startswith(f"{key}=")]
+    path.write_text("\n".join([*kept, f"{key}={value}"]) + "\n")
 
 
 def _json(response: httpx.Response, limit: int | None = 2000):
@@ -126,12 +198,19 @@ def _redact(text: str, env: dict[str, str]) -> str:
 
 
 def main(argv: list[str]) -> None:
-    if argv[1:] != ["plan"]:
+    if argv[1:] not in (["plan"], ["apply"]):
         raise SystemExit(__doc__)
     missing = [k for k in KEYS if not os.environ.get(k)]
     if missing:
         raise SystemExit(f"Missing in .env: {', '.join(missing)}")
     env = {k: os.environ[k] for k in KEYS}
+    if argv[1] == "apply":
+        ids = apply(env)
+        print(
+            f"Saved to {ENV_FILE.name}: "
+            + ", ".join(f"{k} {v}" for k, v in ids.items())
+        )
+        return
     answers = plan(env)
     PLAN_DIR.mkdir(exist_ok=True)
     (PLAN_DIR / "latest.json").write_text(
