@@ -90,6 +90,8 @@ export type SkuResult = {
   waterfall: Waterfall
   scenario_grid: { rival: string; effective_rival_price: string; invited_total: string; shown_total: string }[]
   evidence: EvidenceLink[]
+  /** The server's HMAC of this result; /api/explain refuses a result without it or with any field changed. */
+  signature: string
 }
 
 export type ArenaEvent =

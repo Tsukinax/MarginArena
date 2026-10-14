@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import hmac
 import json
+import os
+import secrets
 from collections.abc import Awaitable, Callable
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -19,6 +23,9 @@ from marginarena.sample import describe_shop, load_shop
 
 # Token Factory's limits (20 requests/min per account) keep the fallback Arena small (spec, ADR 0002).
 FALLBACK_CAPS = {"skus": 4, "rounds": 2, "rivals": 2, "strategists": 1}
+# Signs each decided SKU when RESULT_SIGNING_KEY is unset. It lives as long as this process, so a deploy that runs
+# several processes must set RESULT_SIGNING_KEY.
+PROCESS_KEY = secrets.token_bytes(32)
 
 
 class ArenaRequest(BaseModel):
@@ -44,6 +51,7 @@ def create_app(
 ) -> FastAPI:
     """`llm_settings` forces one route; otherwise the first healthy of `routes` (default: from the environment)."""
     app = FastAPI(title="MarginArena")
+    key = os.environ.get("RESULT_SIGNING_KEY", "").encode() or PROCESS_KEY
 
     async def settings() -> LLMSettings:
         if llm_settings:
@@ -73,10 +81,19 @@ def create_app(
 
         queue: asyncio.Queue[dict | None] = asyncio.Queue()
 
+        async def emit(event: dict) -> None:
+            # /api/explain accepts only results this server's Arena signed, unchanged.
+            if event["type"] == "sku_decided":
+                event["signature"] = _signature(event, key)
+            elif event["type"] == "run_done":
+                for result in event["results"]:
+                    result["signature"] = _signature(result, key)
+            await queue.put(event)
+
         async def produce() -> None:
             llm = LLMClient(s, transport=llm_transport, sleep=sleep)
             try:
-                await run_arena(shop, skus, rounds, rivals, strategists, llm, queue.put)
+                await run_arena(shop, skus, rounds, rivals, strategists, llm, emit)
             except Exception as error:  # surface the failure to the client, then end the stream
                 await queue.put({"type": "error", "message": f"{type(error).__name__}: {error}"})
             finally:
@@ -93,6 +110,10 @@ def create_app(
 
     @app.post("/api/explain")
     async def explain_verdict(request: ExplainRequest) -> dict:
+        # Token Factory may see only our sample data, and every number explained must be the engine's (ADR 0001).
+        signature = request.result.get("signature")
+        if not isinstance(signature, str) or not hmac.compare_digest(signature, _signature(request.result, key)):
+            raise HTTPException(403, "Only a Verdict this server's Arena produced, unchanged, can be explained.")
         s = await settings()
         llm = LLMClient(s, transport=llm_transport, sleep=sleep)
         try:
@@ -102,3 +123,10 @@ def create_app(
         return {**explanation, "route": s.route, "model": s.model}
 
     return app
+
+
+def _signature(result: dict, key: bytes) -> str:
+    """HMAC of one decided SKU, over every field except the event type and the signature itself."""
+    body = {k: v for k, v in result.items() if k not in ("type", "signature")}
+    message = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
+    return hmac.new(key, message.encode(), hashlib.sha256).hexdigest()
