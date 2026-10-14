@@ -161,6 +161,7 @@ async def _sku_arena(
     generic_plan = (generic_verdict.chosen or generic_verdict.as_invited).plan
     generic_under_all = evaluate_sku(sku, generic_plan, [], scenarios, shop.profile, terms, settings).as_invited
     chosen = verdict.chosen
+    shown = chosen or verdict.as_invited
     result = {
         "sku": sku.id,
         "name": sku.name,
@@ -181,6 +182,17 @@ async def _sku_arena(
         "generic_worst_total_all_scenarios": str(generic_under_all.worst_total),
         "red_team_gain": str(chosen.worst_total - generic_under_all.worst_total) if chosen else None,
         "scenarios": len(scenarios),
+        "waterfall": _waterfall(shown.plan, shown.outcomes[0].unit, sku),
+        "scenario_grid": [
+            {
+                "rival": move.rival,
+                "effective_rival_price": str(_satang(rival_effective_price(sku, terms, move))),
+                "invited_total": str(inv.total_profit),
+                "shown_total": str(chosen_outcome.total_profit),
+            }
+            for move, inv, chosen_outcome in zip(scenarios, verdict.as_invited.outcomes, shown.outcomes, strict=True)
+        ],
+        "evidence": _evidence(shop, item, rules, snapshot),
         "rounds_played": rounds_played,
         "plans_searched": len(plans) + 1,
     }
@@ -299,6 +311,62 @@ async def _ask_rivals(shop, item, terms, leader, round_no, count, llm, emit) -> 
 
     batches = await asyncio.gather(*(ask(n, s) for n, s in RIVALS[:count]))
     return [move for batch in batches for move in batch]
+
+
+def _waterfall(plan: PromoPlan, unit, sku) -> dict:
+    return {
+        "plan": _label(plan),
+        "list_price": str(sku.list_price),
+        "selling_price": str(unit.selling_price),
+        "voucher": str(unit.selling_price - unit.seller_net),
+        "seller_net": str(unit.seller_net),
+        "fees": {
+            "commission": str(unit.fees.commission),
+            "payment": str(unit.fees.payment),
+            "programme": str(unit.fees.programme),
+            "fixed": str(unit.fees.fixed),
+            "total": str(unit.fees.total),
+        },
+        "unit_cost": str(unit.unit_cost),
+        "profit": str(unit.unit_profit),
+        "margin": str(unit.margin),
+    }
+
+
+def _evidence(shop: Shop, item: InvitedSku, rules, snapshot) -> list[dict]:
+    """Evidence Links: where each input behind this SKU's numbers came from."""
+    p = shop.profile
+    links = [
+        {
+            "kind": "invitation",
+            "text": f"{shop.invitation['campaign']} asks for at least {_pct(item.required_discount)} "
+            f"off {item.sku.name}.",
+            "source": f"Campaign Invitation, {shop.invitation['marketplace']} (sample)",
+        },
+        {
+            "kind": "fees",
+            "text": f"Commission {_pct(p.commission_rate)}, payment {_pct(p.payment_fee_rate)}, programme "
+            f"{_pct(p.programme_fee_rate)} and ฿{p.fixed_fee_per_order} per order, plus {_pct(p.vat_rate)} VAT.",
+            "source": f"Marketplace Profile {p.id}, effective {p.effective_from}",
+        },
+        {"kind": "elasticity", "text": shop.elasticity_source, "source": "evidence/elasticity.md"},
+        {
+            "kind": "rival_snapshot",
+            "text": f"{snapshot.rival} at ฿{snapshot.reference_price}."
+            if snapshot
+            else "No Rival Snapshot for this product: the rival's price is assumed equal to your list price.",
+            "source": "Rival Snapshot (sample)" if snapshot else "Assumption",
+        },
+        {
+            "kind": "assumption",
+            "text": f"Campaign traffic x{shop.terms.traffic_lift}; rival sensitivity "
+            f"{shop.terms.cross_price_sensitivity}; a gift is valued at {_pct(shop.gift_value_ratio)} "
+            "of its retail price.",
+            "source": "Sample-shop assumptions (overridable)",
+        },
+    ]
+    links += [{"kind": "brand_rule", "text": shop.brand_rule_texts[r.clause], "source": r.clause} for r in rules]
+    return links
 
 
 def _label(plan: PromoPlan) -> str:

@@ -5,6 +5,7 @@ model server is replaced by an httpx MockTransport.
 """
 
 import json
+from decimal import Decimal
 
 import httpx
 
@@ -105,3 +106,34 @@ async def test_busy_model_server_is_retried():
 
     assert events[-1]["telemetry"]["calls_ok"] == 2
     assert events[-1]["telemetry"]["retries"] == 2
+
+
+async def get(path: str) -> httpx.Response:
+    app = create_app(llm_settings=SETTINGS)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        return await client.get(path)
+
+
+async def test_shop_endpoint_describes_the_invitation_and_every_assumption():
+    response = await get("/api/shops/glow-lab-bkk")
+
+    shop = response.json()
+    assert response.status_code == 200
+    assert len(shop["invited"]) == 12
+    assert shop["margin_floor"] == "0.10"
+    assert shop["profile"]["effective_from"] == "2026-08-04"
+    assert {"traffic_lift", "cross_price_sensitivity", "gift_value_ratio"} <= set(shop["assumptions"])
+    assert shop["brand_rules"][0]["clause"] == "HydraLab reseller agreement, clause 4.2"
+
+
+async def test_decided_sku_explains_its_numbers_with_a_waterfall_scenarios_and_evidence():
+    events = await run(FakeModelServer())
+
+    decided = next(e for e in events if e["type"] == "sku_decided")
+    waterfall = {k: v for k, v in decided["waterfall"].items() if k not in ("plan", "fees")}
+    fees = Decimal(decided["waterfall"]["fees"]["total"])
+    # The waterfall must add up: what the Seller is credited, less fees and cost, is the profit shown.
+    assert Decimal(waterfall["seller_net"]) - fees - Decimal(waterfall["unit_cost"]) == Decimal(waterfall["profit"])
+    assert len(decided["scenario_grid"]) == decided["scenarios"]
+    kinds = {link["kind"] for link in decided["evidence"]}
+    assert {"invitation", "fees", "elasticity", "rival_snapshot"} <= kinds

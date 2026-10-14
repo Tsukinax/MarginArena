@@ -104,3 +104,49 @@ def load_shop(shop_id: str) -> Shop:
         },
         elasticity_source=f"{fit['source']}, pooled {pooled} (band {low} to {high})",
     )
+
+
+def describe_shop(shop: Shop) -> dict:
+    """The shop as the UI shows it: invitation, catalogue, rules and every assumption, as plain JSON."""
+    p = shop.profile
+    return {
+        "id": shop.id,
+        "name": shop.name,
+        "label": shop.label,
+        "invitation": shop.invitation,
+        "margin_floor": str(shop.margin_floor),
+        "profile": {
+            "id": p.id,
+            "currency": p.currency,
+            "effective_from": p.effective_from,
+            "commission_rate": str(p.commission_rate),
+            "payment_fee_rate": str(p.payment_fee_rate),
+            "programme_fee_rate": str(p.programme_fee_rate),
+            "fixed_fee_per_order": str(p.fixed_fee_per_order),
+            "vat_rate": str(p.vat_rate),
+        },
+        "assumptions": {
+            "traffic_lift": str(shop.terms.traffic_lift),
+            "cross_price_sensitivity": str(shop.terms.cross_price_sensitivity),
+            "gift_value_ratio": str(shop.gift_value_ratio),
+            "elasticity": shop.elasticity_source,
+        },
+        "invited": [
+            {
+                "id": i.sku.id,
+                "name": i.sku.name,
+                "brand": i.sku.brand,
+                "list_price": str(i.sku.list_price),
+                "cost": str(i.sku.cost),
+                "stock": i.sku.stock,
+                "required_discount": str(i.required_discount),
+            }
+            for i in shop.invited
+        ],
+        "brand_rules": [
+            {"clause": r.clause, "brand": r.brand, "text": shop.brand_rule_texts[r.clause]} for r in shop.brand_rules
+        ],
+        "rival_snapshot": {
+            k: {"rival": v.rival, "reference_price": str(v.reference_price)} for k, v in shop.rival_snapshot.items()
+        },
+    }

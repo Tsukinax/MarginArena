@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from marginarena.arena import run_arena
 from marginarena.llm import LLMClient, LLMSettings
-from marginarena.sample import load_shop
+from marginarena.sample import describe_shop, load_shop
 
 # Token Factory's limits (20 requests/min per account) keep the fallback Arena small (spec, ADR 0002).
 FALLBACK_CAPS = {"skus": 3, "rounds": 2, "rivals": 2, "strategists": 1}
@@ -43,6 +43,10 @@ def create_app(
     async def health() -> dict:
         s = settings()
         return {"route": s.route, "model": s.model}
+
+    @app.get("/api/shops/{shop_id}")
+    async def shop(shop_id: Literal["glow-lab-bkk"]) -> dict:
+        return describe_shop(load_shop(shop_id))
 
     @app.post("/api/arena")
     async def arena(request: ArenaRequest) -> StreamingResponse:
