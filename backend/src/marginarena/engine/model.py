@@ -38,8 +38,19 @@ class PriceCut:
 
 
 @dataclass(frozen=True)
+class ShopVoucher:
+    """Promo Mechanic: a Seller-funded voucher in baht, usable above a minimum spend."""
+
+    amount: Decimal
+    min_spend: Decimal = ZERO
+
+
+Mechanic = PriceCut | ShopVoucher
+
+
+@dataclass(frozen=True)
 class PromoPlan:
-    mechanics: tuple[PriceCut, ...] = field(default_factory=tuple)
+    mechanics: tuple[Mechanic, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True)
@@ -65,5 +76,8 @@ class FeeBreakdown:
 @dataclass(frozen=True)
 class UnitEconomics:
     selling_price: Decimal
+    """Shelf price after Seller price cuts."""
+    seller_net: Decimal
+    """What the Seller is credited after its own vouchers; the base for marketplace fees."""
     fees: FeeBreakdown
     payout: Decimal

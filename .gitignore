@@ -12,3 +12,4 @@ node_modules/
 .claude/skills/
 skills-lock.json
 docs/chatai-context/
+.pytest_cache/
