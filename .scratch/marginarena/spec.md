@@ -95,7 +95,7 @@ Throughout, an AMD Evidence panel shows what ran on the AMD Instinct MI300X (Gem
 ## Implementation Decisions
 
 **Architecture.** A Python FastAPI backend contains the engine, the Arena and the integrations. The frontend is React + TypeScript (Vite). Both ship in Docker, with a compose file. The public demo is hosted on Vercel. Inference uses two routes ([ADR 0002](../../docs/adr/0002-two-inference-routes.md)):
-- **Primary:** our own vLLM endpoint on an AMD Developer Cloud MI300X, serving Gemma-4-31B-IT with the gemma4 tool and reasoning parsers. It listens on localhost behind Caddy HTTPS on a DuckDNS name.
+- **Primary:** our own vLLM endpoint on an AMD Developer Cloud MI300X, serving Gemma-4-31B-IT with the gemma4 tool and reasoning parsers. It listens on localhost behind Caddy HTTPS on an sslip.io name made from the droplet's IP. No domain or DNS account is needed.
 - **Fallback:** AMD Token Factory's shared Gemma-4-31B-IT (30 requests/min, 8 concurrent).
 
 The route is chosen per run by a health check and recorded on every result.
@@ -190,7 +190,7 @@ An AMD Evidence panel stays visible, and a full Evidence page is linked. The UI 
 6. Arena vs Grid: worst-case profit and the number of engine evaluations.
 
 **Ops.**
-- A droplet bootstrap script: pinned `vllm/vllm-openai-rocm` digest, Caddy, DuckDNS, and only ports 22, 80 and 443 open.
+- A droplet bootstrap script: pinned `vllm/vllm-openai-rocm` digest, Caddy with an sslip.io hostname (it prints the new URL to paste into Evolus "Your models" after each rebuild), and only ports 22, 80 and 443 open.
 - The droplet is destroyed after each session, because a powered-off droplet still bills. GPU hours follow ticket 04's budget.
 - Secrets live only in `.env`.
 
@@ -244,6 +244,6 @@ An AMD Evidence panel stays visible, and a full Evidence page is linked. The UI 
   - Only published Seller voices are quoted.
 - **Open dependencies (map fog):**
   - the Seller Centre bulk-upload file format, which needs research;
-  - the user's tickets 06 and 07: keys in `.env` including the Evolus User API Key, a card check, DuckDNS, and the GitHub account;
+  - the user's tickets 06 and 07: keys in `.env` including the Evolus User API Key, a card check, and the GitHub account;
   - ticket 08's tool-calling gate;
   - a competitor re-snapshot on 17 Oct.

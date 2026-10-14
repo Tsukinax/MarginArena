@@ -134,3 +134,12 @@ Round 11:
   - a roadmap slide: small Sellers, then Shopee Mall/LazMall, then large brands on their own AMD hardware (the Trade Promotion Optimization / Revenue Growth Management space).
   - The engine must not get in the way of thousands of SKUs or per-SKU elasticity overrides.
 - The `.gitignore` edit was accidental and has been reverted to the committed version.
+
+Round 12:
+- **Q49 (supersedes Q20)** – The droplet's HTTPS hostname comes from **sslip.io**, a name made from its IP, so no domain or account is needed. Options considered:
+  - DuckDNS, which needs a signup;
+  - a Cloudflare named tunnel, which needs a domain on Cloudflare;
+  - the user's production domain: not worth the risk to production DNS or the public association;
+  - plain http, rejected as insecure.
+  
+  Cost: after each rebuild the URL changes and the user pastes the new one into Evolus "Your models"; the bootstrap script prints it.
