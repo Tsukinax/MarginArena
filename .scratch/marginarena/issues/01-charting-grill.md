@@ -120,3 +120,11 @@ Round 10:
 Round 11:
 - **Q44** – The user is relaxed about the "three screens" pattern. Keep the flow short (around four steps), never sprawling, and trim later if needed.
 - **The lablab "How to Win" guide reviewed against the plan.** Gaps: no revenue model, no team/roadmap segment in the video, no first-hand seller pain, and an over-engineering perception risk that the Arena-vs-Grid and LLM-direct proofs must answer.
+- **Q45** – Revenue model: tiered SaaS priced by SKUs checked per Campaign.
+  - Tiers:
+    - Free: 1 Campaign a month, up to 10 SKUs.
+    - Pro: ฿390 a month, every Campaign, up to 200 SKUs, Rival Snapshot and the Thai explanation.
+    - Agency: ฿1,990 a month, multiple shops, Evolus workflow.
+  - Later distribution: the Shopee and Lazada app stores.
+  - Slide TAM, conservative: 170k Sellers joined 9.9 (Shopee figure). 5% on Pro at ฿390 is about ฿40M a year (about $1.15M) in Thailand alone, plus five more SEA markets running the same Campaign mechanics.
+  - Assumptions are labelled as assumptions in the slides.
