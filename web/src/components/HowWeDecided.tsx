@@ -88,6 +88,7 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
         </div>
 
         <h3>Every rival move it was tested against</h3>
+        <p className="small">Campaign profit in the worst case across the elasticity band, for each move.</p>
         <table className="grid">
           <thead>
             <tr>
@@ -106,8 +107,8 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
               <tr key={i}>
                 <th scope="row">{g.rival}</th>
                 <td className="num">{baht(g.effective_rival_price)}</td>
-                <td className="num">{baht(g.invited_total)}</td>
-                {hasPlan && <td className="num">{baht(g.shown_total)}</td>}
+                <td className="num">{baht(g.invited_worst)}</td>
+                {hasPlan && <td className="num">{baht(g.shown_worst)}</td>}
               </tr>
             ))}
           </tbody>

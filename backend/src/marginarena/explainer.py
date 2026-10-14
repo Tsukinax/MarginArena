@@ -124,9 +124,10 @@ def fact_sheet(r: dict) -> str:
         f"marketplace fees {_money(w['fees']['total'])}, product cost {_money(w['unit_cost'])}, profit "
         f"{_money(w['profit'])} ({_pct(w['margin'])} of the shelf price)."
     )
-    hardest = min(r["scenario_grid"], key=lambda g: Decimal(g["shown_total"]))
+    hardest = min(r["scenario_grid"], key=lambda g: Decimal(g["shown_worst"]))
     lines.append(
-        f"Hardest Counter-move: {hardest['rival']}, rival price {_money(hardest['effective_rival_price'])}. "
+        f"Hardest Counter-move: {hardest['rival']}, rival price {_money(hardest['effective_rival_price'])}; against "
+        f"it, {w['plan']} keeps {_money(hardest['shown_worst'])} in the worst case across the elasticity band. "
         f"Tested against {r['scenarios']} Counter-moves over {r['rounds_played']} rounds; "
         f"{r['plans_searched']} Promo Plans searched."
     )

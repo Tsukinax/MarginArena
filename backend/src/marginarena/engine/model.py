@@ -181,6 +181,8 @@ class PlanEvaluation:
     expected_total: Decimal
     failed_checks: tuple[str, ...]
     """Why the plan can't be chosen; empty when eligible."""
+    worst_by_move: tuple[Decimal, ...] = ()
+    """For each Counter-move, in order, the lowest Campaign profit at the point elasticity and both band edges."""
 
     @property
     def eligible(self) -> bool:

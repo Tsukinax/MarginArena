@@ -200,8 +200,18 @@ async def _sku_arena(
                 "effective_rival_price": str(_satang(rival_effective_price(sku, terms, move))),
                 "invited_total": str(inv.total_profit),
                 "shown_total": str(chosen_outcome.total_profit),
+                # The lowest profit for this move across the elasticity band: the worst case comes from these.
+                "invited_worst": str(inv_worst),
+                "shown_worst": str(shown_worst),
             }
-            for move, inv, chosen_outcome in zip(scenarios, verdict.as_invited.outcomes, shown.outcomes, strict=True)
+            for move, inv, chosen_outcome, inv_worst, shown_worst in zip(
+                scenarios,
+                verdict.as_invited.outcomes,
+                shown.outcomes,
+                verdict.as_invited.worst_by_move,
+                shown.worst_by_move,
+                strict=True,
+            )
         ],
         "evidence": _evidence(shop, item, rules, snapshot, override),
         "rounds_played": rounds_played,

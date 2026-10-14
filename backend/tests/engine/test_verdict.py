@@ -7,6 +7,7 @@ profit (mean over Counter-moves at the point elasticity) only breaks ties. Expec
 by hand (Shopee TH Non-Mall PRIME fees, k = 1).
 """
 
+from dataclasses import replace
 from decimal import Decimal
 
 from marginarena.engine import (
@@ -116,6 +117,21 @@ def test_plan_must_survive_the_weak_end_of_the_elasticity_band():
     assert with_band.verdict == "escalate"
     assert with_band.as_invited.worst_total == Decimal("1974.32")
     assert "earns less than not joining" in with_band.as_invited.failed_checks
+
+
+def test_each_counter_moves_worst_case_spans_the_elasticity_band():
+    # ฿80 shelf price: fees 23.33, so 6.67 profit a unit. Stock 300 caps both moves at the point elasticity (-1.52:
+    # 350 units held, 307 undercut), so each earns 2,001.00 and the point estimate can't tell them apart. At the weak
+    # edge (-0.77) the holder leaves 296 units (1,974.32) and the ฿70 undercut keeps 296.87 x 70/80 -> 259 units
+    # (1,727.53): the undercut is the harder Counter-move.
+    capped = replace(sku("50", "-1.52"), stock=300)
+    band = terms("2.5", "0.20", band=(Decimal("-0.77"), Decimal("-1.98")))
+
+    result = evaluate_sku(capped, cut("20"), [], RIVALS, SHOPEE, band, floor("0.05"))
+
+    assert [o.total_profit for o in result.as_invited.outcomes] == [Decimal("2001.00"), Decimal("2001.00")]
+    assert result.as_invited.worst_by_move == (Decimal("1974.32"), Decimal("1727.53"))
+    assert result.as_invited.worst_total == Decimal("1727.53")
 
 
 def test_the_plan_with_the_best_worst_case_wins_even_if_another_expects_more():

@@ -44,7 +44,9 @@ def evaluate_sku(
 
     def evaluate(plan: PromoPlan) -> PlanEvaluation:
         outcomes = tuple(campaign_outcome(sku, plan, profile, terms, cm) for cm in moves)
-        scenarios = outcomes + tuple(campaign_outcome(b, plan, profile, terms, cm) for b in band_skus for cm in moves)
+        edges = [tuple(campaign_outcome(b, plan, profile, terms, cm) for cm in moves) for b in band_skus]
+        scenarios = outcomes + tuple(o for edge in edges for o in edge)
+        worst_by_move = tuple(min(o.total_profit for o in move) for move in zip(outcomes, *edges, strict=True))
         worst_margin = min(o.unit.margin for o in scenarios)
         worst_total = min(o.total_profit for o in scenarios)
         expected_total = _mean([o.total_profit for o in outcomes])
@@ -61,7 +63,7 @@ def evaluate_sku(
             for r in settings.brand_rules
             if r.binds(sku) and _breaks(r, sku, price_cut, plan.mechanics)
         ]
-        return PlanEvaluation(plan, outcomes, worst_margin, worst_total, expected_total, tuple(failed))
+        return PlanEvaluation(plan, outcomes, worst_margin, worst_total, expected_total, tuple(failed), worst_by_move)
 
     invited = evaluate(as_invited)
     others = tuple(evaluate(p) for p in candidates)

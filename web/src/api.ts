@@ -88,7 +88,15 @@ export type SkuResult = {
   rounds_played: number
   plans_searched: number
   waterfall: Waterfall
-  scenario_grid: { rival: string; effective_rival_price: string; invited_total: string; shown_total: string }[]
+  /** Per Counter-move: totals at the point elasticity, and the worst case across the elasticity band. */
+  scenario_grid: {
+    rival: string
+    effective_rival_price: string
+    invited_total: string
+    shown_total: string
+    invited_worst: string
+    shown_worst: string
+  }[]
   evidence: EvidenceLink[]
   /** The server's HMAC of this result; /api/explain refuses a result without it or with any field changed. */
   signature: string

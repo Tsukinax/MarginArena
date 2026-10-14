@@ -131,6 +131,23 @@ async def test_an_english_request_gets_an_english_template():
     assert not THAI.search(response["text"])
 
 
+async def test_the_hardest_counter_move_is_judged_across_the_elasticity_band():
+    # At the point elasticity SS-50 sells out its stock against every move, so those totals tie. The deep undercut
+    # (32% off, a ฿20 voucher, ฿40 free shipping: ฿420 -> ฿225.60) sets the worst case at the band's weak edge.
+    result = await decided("SS-50", {"headline_cut_pct": 32, "voucher_baht": 20, "free_shipping_baht": 40, "why": "x"})
+    facts: list[str] = []
+
+    def model(request: httpx.Request) -> httpx.Response:
+        facts.append(json.loads(request.content)["messages"][1]["content"])
+        return answer({"explanation": "Revise"})
+
+    await explain_with(result, "en", model)
+
+    hardest = next(line for line in facts[0].splitlines() if line.startswith("Hardest Counter-move"))
+    assert "rival price ฿225.60" in hardest
+    assert len({g["shown_total"] for g in result["scenario_grid"]}) == 1
+
+
 async def refused(result: dict) -> list[httpx.Request]:
     """Posts `result` to /api/explain, expects a refusal, and returns what reached the model server."""
     seen: list[httpx.Request] = []
