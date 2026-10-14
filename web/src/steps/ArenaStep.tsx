@@ -85,7 +85,13 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
           <ol>
             {skus.map((s) => {
               const sv = views.get(s)
-              const status = sv?.decided ? sv.decided.verdict : sv && sv.rounds.size > 0 ? 'live' : 'waiting'
+              const status = sv?.decided
+                ? sv.decided.skip
+                  ? 'skip'
+                  : sv.decided.verdict
+                : sv && sv.rounds.size > 0
+                  ? 'live'
+                  : 'waiting'
               const name = shop?.invited.find((x) => x.id === s)?.name ?? s
               return (
                 <li key={s}>
@@ -145,8 +151,9 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
                     ))}
                     {r.leader && (
                       <p className={`leader ${r.leader.changed ? 'is-changed' : ''}`}>
-                        {r.leader.changed ? 'New leader: ' : 'Leader holds: '}
-                        {r.leader.plan ?? 'no plan passes'}
+                        {r.leader.skip
+                          ? 'Not joining beats every plan so far'
+                          : `${r.leader.changed ? 'New leader: ' : 'Leader holds: '}${r.leader.plan ?? 'no plan passes'}`}
                       </p>
                     )}
                   </div>
@@ -154,12 +161,12 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
               </div>
 
               {v.decided && (
-                <article className={`champion champion--${v.decided.verdict}`}>
-                  <p className="verdict">{verdictWord(v.decided.verdict)}</p>
+                <article className={`champion champion--${v.decided.skip ? 'skip' : v.decided.verdict}`}>
+                  <p className="verdict">{verdictWord(v.decided.verdict, v.decided.skip)}</p>
                   <p className="champion-plan">{v.decided.chosen_plan ?? 'No plan survives every rival move'}</p>
                   <dl>
                     <div>
-                      <dt>Worst case, this plan</dt>
+                      <dt>{v.decided.skip ? 'Worst case, not joining' : 'Worst case, this plan'}</dt>
                       <dd>{baht(v.decided.chosen_worst_total ?? v.decided.invited_worst_total)}</dd>
                     </div>
                     <div>
@@ -233,7 +240,7 @@ function commentary(e: ArenaEvent): string | null {
     case 'leader':
       return `${e.sku} round ${e.round}: ${e.changed ? 'leader changes to' : 'leader holds:'} ${e.plan ?? 'nothing passes'}.`
     case 'sku_decided':
-      return `${e.sku}: ${verdictWord(e.verdict)}.`
+      return `${e.sku}: ${verdictWord(e.verdict, e.skip)}.`
     case 'error':
       return `Error: ${e.message}`
     default:
@@ -242,5 +249,5 @@ function commentary(e: ArenaEvent): string | null {
 }
 
 function statusWord(s: string) {
-  return ({ waiting: 'Waiting', live: 'Live', approve: 'Approve', revise: 'Revise', escalate: 'Escalate' } as Record<string, string>)[s] ?? s
+  return ({ waiting: 'Waiting', live: 'Live', approve: 'Approve', revise: 'Revise', skip: 'Skip', escalate: 'Escalate' } as Record<string, string>)[s] ?? s
 }

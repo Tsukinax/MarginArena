@@ -5,10 +5,31 @@ import HowWeDecided from '../components/HowWeDecided'
 type Props = { results: SkuResult[]; marginProtected: string; onNext: () => void }
 
 const GROUPS = [
-  { verdict: 'escalate', title: 'Needs your decision', hint: 'No plan keeps your Margin Floor against every rival move.' },
-  { verdict: 'revise', title: 'Better plan found', hint: 'Join, but with a different discount, voucher or gift.' },
-  { verdict: 'approve', title: 'Good to join as invited', hint: 'The discount asked works for you, even against rivals.' },
-] as const
+  {
+    key: 'escalate',
+    title: 'Needs your decision',
+    hint: 'Joining earns more than not joining, but breaks your Margin Floor or depends on uncertain demand.',
+    match: (r: SkuResult) => r.verdict === 'escalate',
+  },
+  {
+    key: 'skip',
+    title: 'Skip these',
+    hint: 'Not joining keeps more profit than any plan, even in the worst case.',
+    match: (r: SkuResult) => r.skip,
+  },
+  {
+    key: 'revise',
+    title: 'Better plan found',
+    hint: 'Join, but with a different discount, voucher or gift.',
+    match: (r: SkuResult) => r.verdict === 'revise' && !r.skip,
+  },
+  {
+    key: 'approve',
+    title: 'Good to join as invited',
+    hint: 'The discount asked works for you, even against rivals.',
+    match: (r: SkuResult) => r.verdict === 'approve',
+  },
+]
 
 export default function VerdictsStep({ results, marginProtected, onNext }: Props) {
   const [open, setOpen] = useState<SkuResult | null>(null)
@@ -26,10 +47,10 @@ export default function VerdictsStep({ results, marginProtected, onNext }: Props
       </p>
 
       {GROUPS.map((g) => {
-        const rows = results.filter((r) => r.verdict === g.verdict)
+        const rows = results.filter(g.match)
         if (rows.length === 0) return null
         return (
-          <section key={g.verdict} className={`group group--${g.verdict}`}>
+          <section key={g.key} className={`group group--${g.key}`}>
             <header>
               <h2>
                 {g.title} <span>{rows.length}</span>
@@ -43,9 +64,11 @@ export default function VerdictsStep({ results, marginProtected, onNext }: Props
                     <span className="row-name">{r.name}</span>
                     <span className="row-plan">{r.chosen_plan ?? `Invited: ${r.invited_plan}`}</span>
                     <span className="row-num">
-                      {r.chosen_worst_total
-                        ? `${baht(r.chosen_worst_total)} worst case`
-                        : `${pct(r.invited_worst_margin, 1)} margin if joined`}
+                      {r.skip
+                        ? `keeps ${baht(r.protected)} more by not joining`
+                        : r.chosen_worst_total
+                          ? `${baht(r.chosen_worst_total)} worst case`
+                          : `${pct(r.invited_worst_margin, 1)} margin if joined`}
                     </span>
                     <span className="row-more">How we decided</span>
                   </button>

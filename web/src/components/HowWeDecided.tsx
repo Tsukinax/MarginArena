@@ -27,7 +27,7 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
         <button type="button" className="close" onClick={onClose} aria-label="Close">
           ×
         </button>
-        <p className={`pill pill--${r.verdict}`}>{verdictWord(r.verdict)}</p>
+        <p className={`pill pill--${r.skip ? 'skip' : r.verdict}`}>{verdictWord(r.verdict, r.skip)}</p>
         <h2>{r.name}</h2>
 
         <table className="compare">
@@ -35,7 +35,7 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
             <tr>
               <th />
               <th scope="col">As invited</th>
-              <th scope="col">{r.chosen_plan ? 'MarginArena' : 'Your call'}</th>
+              <th scope="col">{r.skip ? 'Not joining' : r.chosen_plan ? 'MarginArena' : 'Your call'}</th>
             </tr>
           </thead>
           <tbody>
@@ -54,7 +54,7 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
               <td className={r.invited_failed_checks.includes('below the Margin Floor') ? 'neg' : ''}>
                 {pct(r.invited_worst_margin, 1)}
               </td>
-              <td>{r.chosen_worst_margin ? pct(r.chosen_worst_margin, 1) : '–'}</td>
+              <td>{r.skip ? 'Full price, no Campaign' : r.chosen_worst_margin ? pct(r.chosen_worst_margin, 1) : '–'}</td>
             </tr>
           </tbody>
         </table>

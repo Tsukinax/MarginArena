@@ -128,8 +128,8 @@ The route is chosen per run by a health check and recorded on every result.
   Among eligible plans, the one with the best worst-case profit wins (maximin, Q52). Expected profit only breaks ties.
 - **Verdict:**
   - **Approve** when joining as invited is eligible and its worst case is within 5% of the best plan's worst case.
-  - **Revise** when a better eligible plan exists.
-  - **Escalate** when no plan is eligible, when the elasticity band is too wide to separate plans, or when a Brand Price Rule is ambiguous.
+  - **Revise** when a better eligible plan exists, or as a **Skip** when no plan is eligible and not joining beats every feasible plan both in the worst case and in expectation (Q54).
+  - **Escalate** when no plan is eligible and the answer depends on the Seller: joining earns more than not joining but breaks the Margin Floor, the outcome flips across the elasticity band, or a Brand Price Rule blocks the invited discount.
 - **Margin Protected** = for SKUs that are Approved or Revised, the worst-case profit of following the Verdict minus the worst-case profit of joining as invited. Escalated SKUs are left out, since a person decides them. Each one shows its own line instead: what joining as invited would earn in the worst case, and the margin it would leave.
 
 **Elasticity fit (offline).**

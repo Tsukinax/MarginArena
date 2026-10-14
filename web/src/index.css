@@ -468,6 +468,10 @@ button:disabled {
   background: var(--rival);
 }
 
+.dot--skip {
+  background: var(--dim);
+}
+
 @keyframes pulse {
   50% {
     opacity: 0.3;
@@ -489,6 +493,10 @@ button:disabled {
 
 .tag--escalate {
   color: var(--rival);
+}
+
+.tag--skip {
+  color: var(--chalk);
 }
 
 .stage {
@@ -633,6 +641,15 @@ button:disabled {
   color: var(--seller);
 }
 
+.champion--skip {
+  border-color: var(--dim);
+  background: linear-gradient(160deg, rgba(167, 163, 207, 0.18), var(--night-2) 55%);
+}
+
+.champion--skip .verdict {
+  color: var(--chalk);
+}
+
 .champion-plan {
   margin: 6px 0 10px;
   font: 900 30px/1.05 'Big Shoulders Display', sans-serif;
@@ -713,6 +730,10 @@ button:disabled {
 
 .group--escalate {
   border-left-color: var(--violet);
+}
+
+.group--skip {
+  border-left-color: #6b7280;
 }
 
 .group header {
@@ -834,6 +855,11 @@ button:disabled {
 .pill--escalate {
   background: #ece8fb;
   color: var(--violet);
+}
+
+.pill--skip {
+  background: #eceef1;
+  color: #374151;
 }
 
 .drawer h2 {

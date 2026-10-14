@@ -39,7 +39,7 @@ One way a Seller can make an offer more attractive: a price cut, a shop voucher 
 _Avoid_: Promo type, tactic, lever
 
 **Margin Protected**:
-How much more profit, in the worst case, a Seller keeps by following MarginArena's Approve and Revise Verdicts than by joining those SKUs exactly as invited. Escalated SKUs are left out, because a person decides them.
+How much more profit, in the worst case, a Seller keeps by following MarginArena's Approve and Revise Verdicts (including Skips) than by joining those SKUs exactly as invited. Escalated SKUs are left out, because a person decides them.
 _Avoid_: Savings, profit uplift, money saved
 
 **Evidence Link**:
@@ -47,7 +47,7 @@ The connection from a number in a Verdict to the document it came from: a line o
 _Avoid_: Citation, reference, source
 
 **Verdict**:
-MarginArena's ruling on a Promo Plan. It is one of three outcomes: Approve; Revise, which comes with a better Promo Plan; or Escalate, which hands the decision to a person.
+MarginArena's ruling on an invited SKU. It is one of three outcomes: Approve; Revise, which comes with a better Promo Plan or, as a Skip, with the advice not to join because not joining wins in the worst case and in expectation; or Escalate, which hands the decision to a person when the trade-off is the Seller's to make.
 _Avoid_: Recommendation, result, decision, output
 
 ### Agents

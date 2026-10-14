@@ -132,3 +132,25 @@ def test_the_plan_with_the_best_worst_case_wins_even_if_another_expects_more():
     assert result.chosen.worst_total == Decimal("9011.70")
     assert result.as_invited.expected_total == Decimal("9022.72")
     assert result.as_invited.worst_total == Decimal("8257.40")
+
+
+def test_skip_when_not_joining_beats_every_plan_in_the_worst_case():
+    # Weak Campaign traffic (x1.5): 20% off is worst 1,227.28 and 25% off 660.96, while not joining keeps
+    # 1,477.70 even if a rival cuts to ฿70. The answer is clear, so it is a Revise to skip (Q54).
+    result = evaluate_sku(
+        sku("50", "-1.52"), cut("20"), [cut("25")], RIVALS, SHOPEE, terms("1.5", "0.20"), floor("0.10")
+    )
+
+    assert result.verdict == "revise"
+    assert result.skip is True
+    assert result.chosen is None
+    assert result.dont_join_total == Decimal("1477.70")
+    assert result.as_invited.worst_total == Decimal("1227.28")
+
+
+def test_escalate_not_skip_when_joining_still_earns_more_than_not_joining():
+    # Lift x3: 20% off keeps 2,454.56 in the worst case against 1,477.70 for not joining, but breaks the 10% floor.
+    result = evaluate_sku(sku("50", "-1.52"), cut("20"), [cut("25")], RIVALS, SHOPEE, terms("3", "0.20"), floor("0.10"))
+
+    assert result.verdict == "escalate"
+    assert result.skip is False

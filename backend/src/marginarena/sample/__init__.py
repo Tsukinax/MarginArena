@@ -42,6 +42,7 @@ class Shop:
     brand_rule_texts: dict[str, str]
     rival_snapshot: dict[str, RivalSnapshotEntry]
     elasticity_source: str
+    fallback_demo_skus: tuple[str, ...] = ()
 
 
 def _elasticity() -> dict:
@@ -103,6 +104,7 @@ def load_shop(shop_id: str) -> Shop:
             for sku_id, v in raw["rival_snapshot"].items()
         },
         elasticity_source=f"{fit['source']}, pooled {pooled} (band {low} to {high})",
+        fallback_demo_skus=tuple(raw.get("fallback_demo_skus", ())),
     )
 
 

@@ -1,8 +1,9 @@
 """Evaluating a whole Campaign Invitation and its Margin Protected.
 
 Margin Protected = worst-case profit of following the Verdicts minus worst-case profit of joining
-exactly as invited, over the SKUs MarginArena decides (Approve or Revise). An Escalate hands the
-decision to a person, so it is left out rather than assumed. Hand-worked numbers, k = 1.
+exactly as invited, over the SKUs MarginArena decides (Approve or Revise, including Skip, where not
+joining is the better offer). An Escalate hands the decision to a person, so it is left out rather
+than assumed. Hand-worked numbers, k = 1.
 """
 
 from decimal import Decimal
@@ -47,6 +48,8 @@ def test_margin_protected_adds_the_gain_from_every_verdict():
         InvitationItem(sku("ELASTIC", "30", "-2.8"), cut("15"), [cut("25")], required_discount=Decimal("0.15")),
         # Escalate: 20% off breaks the 10% floor, so a person decides; it adds nothing either way.
         InvitationItem(sku("THIN", "50", "-1.52"), cut("20"), [cut("25")], required_discount=Decimal("0.20")),
+        # Skip: at cost ฿60, 20% off loses ฿3.33 a unit (worst -932.40); not joining keeps 777.70 (+1,710.10).
+        InvitationItem(sku("LOSSY", "60", "-1.52"), cut("20"), [cut("25")], required_discount=Decimal("0.20")),
     ]
 
     result = evaluate_invitation(
@@ -57,5 +60,6 @@ def test_margin_protected_adds_the_gain_from_every_verdict():
         SellerSettings(margin_floor=Decimal("0.10")),
     )
 
-    assert [v.verdict for v in result.verdicts] == ["revise", "escalate"]
-    assert result.margin_protected == Decimal("1773.50")
+    assert [v.verdict for v in result.verdicts] == ["revise", "escalate", "revise"]
+    assert [v.skip for v in result.verdicts] == [False, False, True]
+    assert result.margin_protected == Decimal("3483.60")

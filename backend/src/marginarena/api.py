@@ -58,7 +58,8 @@ def create_app(
         shop = load_shop(request.shop)
         skus, rounds, rivals, strategists = request.skus, request.rounds, request.rivals, request.strategists
         if s.route == "token-factory":
-            skus = (skus or [i.sku.id for i in shop.invited])[: FALLBACK_CAPS["skus"]]
+            # Q55: a trio chosen to show every kind of Verdict, unless the Seller picked products.
+            skus = (skus or list(shop.fallback_demo_skus) or [i.sku.id for i in shop.invited])[: FALLBACK_CAPS["skus"]]
             rounds = min(rounds, FALLBACK_CAPS["rounds"])
             rivals = min(rivals, FALLBACK_CAPS["rivals"])
             strategists = min(strategists, FALLBACK_CAPS["strategists"])

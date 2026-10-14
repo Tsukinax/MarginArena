@@ -60,6 +60,8 @@ export type SkuResult = {
   sku: string
   name: string
   verdict: 'approve' | 'revise' | 'escalate'
+  /** A Revise whose better offer is not joining (Q54). */
+  skip: boolean
   invited_plan: string
   invited_failed_checks: string[]
   invited_worst_total: string
@@ -114,6 +116,7 @@ export type ArenaEvent =
       sku: string
       round: number
       verdict: string
+      skip: boolean
       plan: string | null
       changed: boolean
       telemetry: Telemetry
@@ -182,4 +185,5 @@ export const usd = (x: string | number): string =>
 
 export const pct = (x: string | number, digits = 0): string => `${(Number(x) * 100).toFixed(digits)}%`
 
-export const verdictWord = (v: string): string => (v === 'approve' ? 'Approve' : v === 'revise' ? 'Revise' : 'Escalate')
+export const verdictWord = (v: string, skip = false): string =>
+  skip ? 'Skip' : v === 'approve' ? 'Approve' : v === 'revise' ? 'Revise' : 'Escalate'

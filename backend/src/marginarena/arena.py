@@ -34,6 +34,7 @@ from marginarena.llm import LLMClient
 from marginarena.sample import InvitedSku, Shop
 
 Emit = Callable[[dict], Awaitable[None]]
+SKIP_LABEL = "Skip: don't join the Campaign with this product"
 
 STRATEGISTS = (
     ("Margin keeper", "protects profit per unit and joins as lightly as the invitation allows"),
@@ -149,6 +150,7 @@ async def _sku_arena(
                 "sku": sku.id,
                 "round": round_no,
                 "verdict": verdict.verdict,
+                "skip": verdict.skip,
                 "plan": _label(current) if current else None,
                 "changed": current != previous,
                 "telemetry": llm.telemetry.snapshot(),
@@ -162,22 +164,24 @@ async def _sku_arena(
     generic_under_all = evaluate_sku(sku, generic_plan, [], scenarios, shop.profile, terms, settings).as_invited
     chosen = verdict.chosen
     shown = chosen or verdict.as_invited
+    kept = chosen.worst_total if chosen else verdict.dont_join_total if verdict.skip else None
     result = {
         "sku": sku.id,
         "name": sku.name,
         "verdict": verdict.verdict,
+        "skip": verdict.skip,
         "invited_plan": _label(invited_plan),
         "invited_failed_checks": list(verdict.as_invited.failed_checks),
         "invited_worst_total": str(verdict.as_invited.worst_total),
         "invited_expected_total": str(verdict.as_invited.expected_total),
-        "chosen_plan": _label(chosen.plan) if chosen else None,
-        "chosen_worst_total": str(chosen.worst_total) if chosen else None,
+        "chosen_plan": _label(chosen.plan) if chosen else SKIP_LABEL if verdict.skip else None,
+        "chosen_worst_total": str(kept) if kept is not None else None,
         "chosen_expected_total": str(chosen.expected_total) if chosen else None,
         "chosen_worst_margin": str(chosen.worst_margin) if chosen else None,
         "dont_join_total": str(verdict.dont_join_total),
         "invited_worst_margin": str(verdict.as_invited.worst_margin),
         # Escalate hands the decision to a person: no Margin Protected and no red-team gain are claimed.
-        "protected": str(chosen.worst_total - verdict.as_invited.worst_total) if chosen else "0",
+        "protected": str(kept - verdict.as_invited.worst_total) if kept is not None else "0",
         "generic_plan": _label(generic_plan),
         "generic_worst_total_all_scenarios": str(generic_under_all.worst_total),
         "red_team_gain": str(chosen.worst_total - generic_under_all.worst_total) if chosen else None,

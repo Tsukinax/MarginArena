@@ -196,6 +196,8 @@ class SkuVerdict:
     as_invited: PlanEvaluation
     candidates: tuple[PlanEvaluation, ...]
     dont_join_total: Decimal
+    skip: bool = False
+    """A Revise whose better offer is not joining: every feasible plan earns less than skipping (Q54)."""
 
 
 @dataclass(frozen=True)

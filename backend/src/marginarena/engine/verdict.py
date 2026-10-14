@@ -37,7 +37,9 @@ def evaluate_sku(
     no_campaign = replace(
         terms, traffic_lift=Decimal("1"), required_discount=Decimal("0"), platform_funded_discount=Decimal("0")
     )
-    dont_join_total = min(campaign_outcome(sku, PromoPlan(), profile, no_campaign, cm).total_profit for cm in moves)
+    dont_join = [campaign_outcome(sku, PromoPlan(), profile, no_campaign, cm).total_profit for cm in moves]
+    dont_join_total = min(dont_join)
+    dont_join_expected = _mean(dont_join)
     band_skus = [replace(sku, elasticity=e) for e in (terms.elasticity_band or ())]
 
     def evaluate(plan: PromoPlan) -> PlanEvaluation:
@@ -45,9 +47,7 @@ def evaluate_sku(
         scenarios = outcomes + tuple(campaign_outcome(b, plan, profile, terms, cm) for b in band_skus for cm in moves)
         worst_margin = min(o.unit.margin for o in scenarios)
         worst_total = min(o.total_profit for o in scenarios)
-        expected_total = (sum(o.total_profit for o in outcomes) / len(outcomes)).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
+        expected_total = _mean([o.total_profit for o in outcomes])
         price_cut = sum((m.amount for m in plan.mechanics if isinstance(m, PriceCut)), Decimal("0"))
         failed: list[str] = []
         if price_cut < terms.required_discount * sku.list_price:
@@ -69,15 +69,26 @@ def evaluate_sku(
     # Maximin (Q52): the plan whose worst case is best wins; expected profit only breaks ties.
     best = max(eligible, key=lambda e: (e.worst_total, e.expected_total), default=None)
 
+    skip = False
     if best is None:
-        verdict, chosen = "escalate", None
+        # Feasible plans meet the invitation and every Brand Price Rule; only their economics failed. Skip only
+        # when not joining wins in the worst case and in expectation; otherwise uncertainty decides, so escalate.
+        feasible = [e for e in (invited, *others) if not any(_is_rule_failure(f) for f in e.failed_checks)]
+        skip = bool(feasible) and all(
+            e.worst_total < dont_join_total and e.expected_total < dont_join_expected for e in feasible
+        )
+        verdict, chosen = ("revise" if skip else "escalate"), None
     elif invited.eligible and best.worst_total - invited.worst_total <= settings.approve_tolerance * abs(
         invited.worst_total
     ):
         verdict, chosen = "approve", invited
     else:
         verdict, chosen = "revise", best
-    return SkuVerdict(sku, verdict, chosen, invited, others, dont_join_total)
+    return SkuVerdict(sku, verdict, chosen, invited, others, dont_join_total, skip)
+
+
+def _is_rule_failure(check: str) -> bool:
+    return check == "below the invited discount" or check.startswith("breaks ")
 
 
 def evaluate_invitation(
@@ -100,7 +111,7 @@ def evaluate_invitation(
         for item in items
     )
     # Escalate hands the decision to a person, so it counts toward neither side.
-    protected = sum((v.chosen.worst_total - v.as_invited.worst_total for v in verdicts if v.chosen), Decimal("0"))
+    protected = sum((_kept(v) - v.as_invited.worst_total for v in verdicts if v.chosen or v.skip), Decimal("0"))
     return InvitationResult(verdicts=verdicts, margin_protected=protected)
 
 
@@ -112,3 +123,12 @@ def _breaks(rule: BrandPriceRule, sku: Sku, price_cut: Decimal, mechanics: tuple
     if not rule.vouchers_allowed and any(isinstance(m, ShopVoucher) for m in mechanics):
         return True
     return not rule.gifts_allowed and any(isinstance(m, GiftWithPurchase) for m in mechanics)
+
+
+def _kept(v: SkuVerdict) -> Decimal:
+    """Worst-case profit of following a decided Verdict: the chosen plan, or not joining for a Skip."""
+    return v.chosen.worst_total if v.chosen else v.dont_join_total
+
+
+def _mean(values: list[Decimal]) -> Decimal:
+    return (sum(values, Decimal("0")) / len(values)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)

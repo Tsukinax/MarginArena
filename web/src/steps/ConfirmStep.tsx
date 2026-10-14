@@ -3,7 +3,8 @@ import type { Shop, SkuResult } from '../api'
 type Props = { results: SkuResult[]; shop: Shop | null }
 
 export default function ConfirmStep({ results, shop }: Props) {
-  const joining = results.filter((r) => r.verdict !== 'escalate')
+  const joining = results.filter((r) => r.verdict !== 'escalate' && !r.skip)
+  const skipped = results.filter((r) => r.skip)
   const escalated = results.filter((r) => r.verdict === 'escalate')
 
   return (
@@ -13,6 +14,12 @@ export default function ConfirmStep({ results, shop }: Props) {
         <li>
           <b>{joining.length} products join the Campaign</b> with the plans shown. MarginArena prepares the Seller Centre
           bulk-upload file; you upload it before {shop?.invitation.registration_closes ?? 'registration closes'}.
+        </li>
+        <li>
+          <b>
+            {skipped.length} {skipped.length === 1 ? 'product stays' : 'products stay'} out of the Campaign
+          </b>{' '}
+          at full price, because joining would cost profit even before rivals react.
         </li>
         <li>
           <b>

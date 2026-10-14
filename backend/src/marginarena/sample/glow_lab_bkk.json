@@ -10,6 +10,8 @@
     "gift_value_ratio": "0.3",
     "gift_value_ratio_note": "Conservative assumption (Q53): buyers value a free gift at 30% of its retail price, treated like a price cut of that size. No data supports a higher figure; the Seller can override it."
   },
+  "fallback_demo_skus": ["NT-200", "VC-30", "SM-10"],
+  "fallback_demo_note": "On the Token Factory fallback the Arena checks three products, chosen to show Approve, Escalate and Skip (Q55). Every number is still computed live.",
   "invitation": {
     "marketplace": "Shopee Thailand",
     "campaign": "11.11 Big Sale",
