@@ -74,9 +74,9 @@ export default function App() {
         <div className="route">
           {route ? (
             <>
-              <span className={`route-dot ${route.route === 'mi300x' ? 'is-amd' : ''}`} aria-hidden />
+              <span className="route-dot is-amd" aria-hidden />
               <span>
-                {route.route === 'mi300x' ? 'AMD Instinct MI300X, our vLLM' : 'AMD Token Factory (fallback)'}
+                {route.route === 'mi300x' ? 'AMD Instinct MI300X, our vLLM' : 'AMD Token Factory'}
                 <small>{route.model}</small>
               </span>
             </>

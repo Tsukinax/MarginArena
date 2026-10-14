@@ -105,8 +105,8 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
       </button>
       {fallback && (
         <p className="small">
-          Running on AMD Token Factory: the Arena checks {count} products to stay within its shared rate limit. On our
-          own MI300X it checks all {shop.invited.length} at once.
+          Running on AMD Token Factory: the Arena checks {count} of the {shop.invited.length} products live, to stay
+          within its shared rate limit.
         </p>
       )}
     </section>
