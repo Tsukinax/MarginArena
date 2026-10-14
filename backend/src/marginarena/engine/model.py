@@ -28,6 +28,11 @@ class Sku:
     name: str
     list_price: Decimal
     cost: Decimal
+    stock: int = 0
+    baseline_units: int = 0
+    """Units this SKU sells over a Campaign-length period at its list price, without a Campaign."""
+    elasticity: Decimal | None = None
+    """Price elasticity of demand (negative). Category default or the Seller's override."""
 
 
 @dataclass(frozen=True)
@@ -59,6 +64,8 @@ class CampaignTerms:
 
     platform_funded_discount: Decimal = ZERO
     buyer_paid_shipping: Decimal = ZERO
+    traffic_lift: Decimal = Decimal("1")
+    """How much more traffic joining the Campaign brings, before any price effect."""
 
 
 @dataclass(frozen=True)
@@ -91,3 +98,10 @@ class UnitEconomics:
     def margin(self) -> Decimal:
         """Unit profit as a share of the selling price: the measure the Margin Floor uses."""
         return (self.unit_profit / self.selling_price).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+
+
+@dataclass(frozen=True)
+class CampaignOutcome:
+    unit: UnitEconomics
+    units: int
+    total_profit: Decimal
