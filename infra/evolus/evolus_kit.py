@@ -32,6 +32,14 @@ LOOKS = (
     ("workflow step catalog", "/workflows/step-catalog", "app"),
     ("web services", "/webservices", "user"),
     ("user key scopes", "/user/api-keys/scopes", "user"),
+    ("own model connections", "/own-models/connections", "user"),
+    ("AI tools", "/ai-tools", "app"),
+)
+# Workflow steps and catalog topics whose docs `apply` is written against; plan reads every part.
+DOCS = (
+    *("AgentCall", "Webhook", "Email", "CreateFile", "LlmCall", "Switch"),
+    *("DataExtractor", "Output", "AiTool", "Script"),
+    *("fields", "input", "links", "placeholders", "parameters", "default-model"),
 )
 
 
@@ -63,21 +71,44 @@ def plan(env: dict[str, str], transport: httpx.BaseTransport | None = None) -> d
                     env,
                 )
             )
+        catalog = answers["workflow step catalog"]["body"]
+        entries = (
+            catalog.get("steps", []) + catalog.get("topics", [])
+            if isinstance(catalog, dict)
+            else []
+        )
+        docs = {}
+        for entry in (e for e in entries if e.get("key") in DOCS):
+            for part in range(1, entry.get("parts", 1) + 1):
+                response = client.get(
+                    f"/workflows/step-catalog/{entry['key']}",
+                    params={"part": part},
+                    headers=headers["app"],
+                )
+                docs[f"{entry['key']}#{part}"] = _json(response, limit=None)
+        answers["step docs"] = docs
+        print(f"step docs (GET /workflows/step-catalog/{{key}}): {len(docs)} parts")
     return answers
 
 
-def _json(response: httpx.Response):
+def _json(response: httpx.Response, limit: int | None = 2000):
     try:
         return response.json()
     except ValueError:
-        return response.text[:2000]
+        return response.text[:limit]
 
 
 def _summary(body) -> str:
     items = body.get("items") or body.get("data") if isinstance(body, dict) else body
     if isinstance(items, list):
         names = [
-            str(i.get("name") or i.get("title") or i.get("key") or i.get("id"))
+            str(
+                i.get("name")
+                or i.get("title")
+                or i.get("key")
+                or i.get("slug")
+                or i.get("id")
+            )
             for i in items
             if isinstance(i, dict)
         ]
