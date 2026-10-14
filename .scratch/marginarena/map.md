@@ -22,6 +22,10 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
   - Evolus track: the event workspace (code AMDACT3); the main agent on our own vLLM endpoint on AMD Developer Cloud; at least 2 Evolus building blocks driven through the API; a containerized app; a public repo; a README that runs.
 - Event context: `docs/reports/` and `docs/research_notes/`. Token Factory API: `docs/api-guide/tokenfactory-guide.md`.
 
+## Destination reached
+
+[spec.md](spec.md) was written on 14 Oct 2026 (Status: ready-for-agent). The remaining fog items below are build-time dependencies, not open design decisions.
+
 ## Decisions so far
 
 - [01 Charting grill](issues/01-charting-grill.md): the destination is a spec; the tracker is local; the Seller is a B2C marketplace Seller at 11.11; the user submits and Claude builds; the AMD credits and Token Factory login are ready; the decision unit is the Promo Plan and the outcome the Verdict; LLMs propose and the engine computes ([ADR 0001](../../docs/adr/0001-numbers-come-only-from-the-engine.md)); real public data drives elasticity; the Evolus track is in scope. Round 3: two tracks; Shopee TH framing with THB and USD; the Campaign Invitation storyline; robust Arena selection against the Margin Floor; [ADR 0002](../../docs/adr/0002-two-inference-routes.md) two inference routes; DuckDNS. Round 11: Enterprise is roadmap and pricing only (Q47); published Seller voices only, no invented testimonials; a short flow is fine without being strict; a tiered SaaS revenue model with a TAM (assumptions labelled). Round 10: the glossary is `CONTEXT.md`; the video is English voice-over, done last. Round 9: MarginArena confirmed over ClausePulse; Evidence Links; the Brand Price Rule in the Evolus library; an LLM-direct baseline; only measured numbers may be published. Round 8: the Seller's inputs and the sample shop; MUST/SHOULD/COULD priorities; the Wed–Sun schedule; the video and slide plan. Round 7: five Promo Mechanics; an Arena-vs-Grid proof; Rival Snapshot grounding; three measured "why AMD" reasons; an Explain-in-Thai toggle. Round 4: the Arena runs every Invitation SKU in parallel; [ADR 0003](../../docs/adr/0003-arena-bypasses-evolus.md) the Arena bypasses Evolus while the Campaign Desk agent and a workflow carry out the Verdict; FastAPI, React and Vercel; five proof metrics; a 12-SKU skincare demo Seller with a 10% Margin Floor.
@@ -35,7 +39,7 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
 
 ## Not yet specified
 
-- The Seller Centre bulk-upload file format for Approve actions (research). The Evolus API facts are now in `docs/api-guide/evolus-api.md`, and the agent can call our engine through a Web API.
+- The Seller Centre bulk-upload file format for Approve actions (research, needed before the workflow step that produces the file). The Evolus API facts are now in `docs/api-guide/evolus-api.md`, and the agent can call our engine through a Web API.
 - A competitor re-snapshot on 17 Oct, using the same lablab endpoints as ticket 10.
 
 ## Out of scope
