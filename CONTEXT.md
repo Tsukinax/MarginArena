@@ -53,11 +53,15 @@ _Avoid_: Recommendation, result, decision, output
 ### Agents
 
 **Strategist**:
-An AI agent, acting for the Seller, that proposes Promo Plans.
+An AI agent, acting for the Seller, that proposes Plan Ideas.
 _Avoid_: Planner, optimizer, advisor
 
+**Plan Idea**:
+A Strategist's non-numeric proposal for a Promo Plan, such as which catalogue item to give as a gift, or to use a voucher instead of a headline cut. The numbers are chosen afterwards.
+_Avoid_: Template, structure, strategy
+
 **Rival**:
-An AI agent that plays a competing seller and proposes counter-moves to stress-test Promo Plans. A Rival's moves are never treated as forecasts.
+An AI agent that plays a competing seller and searches for Counter-moves that would break the leading Promo Plan. A Rival's moves are never treated as forecasts.
 _Avoid_: Competitor agent, adversary, opponent
 
 **Counter-move**:
@@ -68,6 +72,10 @@ _Avoid_: Reaction, response, attack
 What a Seller captures from lookalike competitor listings, such as price, vouchers and gifts. Rivals may only propose Counter-moves that are plausible given this snapshot.
 _Avoid_: Competitor data, market scan
 
+**Scenario**:
+One Counter-move combined with one demand assumption (an elasticity from the band). A chosen Promo Plan must survive every Scenario.
+_Avoid_: Case, simulation run, what-if
+
 **Arena**:
-The multi-round tournament in which Strategists' Promo Plans face Rivals' Counter-moves. The engine scores every pairing, and the Promo Plan that wins is the one that stays above the Margin Floor in every case.
+The multi-round red-team contest for one Campaign Invitation. Each round, Rivals search for Counter-moves that break the leading Promo Plan, and the Promo Plan that survives every Scenario becomes the new leader.
 _Avoid_: Simulation, war room, debate, battle

@@ -115,12 +115,14 @@ The route is chosen per run by a health check and recorded on every result.
 
   Each mechanic has its own formula for effective price and unit cost. The MUST minimum is price cut, voucher with minimum spend, and gift.
 - **Demand:**
-  - Campaign units = baseline × Campaign traffic lift × (effective price ratio)^elasticity × Counter-move factor, capped at stock.
+  - Campaign units = baseline × Campaign traffic lift × (effective price ratio)^elasticity × retained share, capped at stock.
+  - **Retained share depends on relative price** ([ADR 0004](../../docs/adr/0004-ai-explores-open-ended-math-solves-closed.md)). It is 1 when our buyer price is at or below the Rival's effective price after its Counter-move; otherwise (rival / ours)^k, where k is an overridable assumption.
+  - A Rival's voucher, free shipping and gift convert to an effective price cut against its reference price, which comes from the Rival Snapshot (default: our list price).
   - Elasticity applies to price cuts only.
   - Each category elasticity comes with a confidence band, and the Seller can override it per SKU.
 - **Robust selection.** A Promo Plan is eligible only if all three hold:
-  - for every Counter-move, its unit margin is at least the Margin Floor;
-  - its worst-case Campaign profit is at least the "don't join" baseline;
+  - in every Scenario (each Counter-move × each elasticity in the p10/p90 band and the point estimate), its unit margin is at least the Margin Floor;
+  - its worst-case Campaign profit is at least the worst case of not joining under the same Scenarios;
   - it respects every Brand Price Rule.
 
   Among eligible plans, the one with the highest expected profit wins.
@@ -137,9 +139,13 @@ The route is chosen per run by a health check and recorded on every result.
 - Commit only the parameters, a holdout report against the naive 14-day baseline, and an attribution notice.
 
 **Arena orchestrator.**
-- **Calls:** asynchronous, with a concurrency limit set per route.
-- **Agents:** Strategists are 6 styles proposing 3 Promo Plans each; Rivals are 6 styles proposing Counter-moves inside the Rival Snapshot's plausible range.
-- **Scale:** 3 rounds on the MI300X route. On the fallback route, 2 Strategists × 2 Rivals × 2 rounds on up to 3 SKUs, unless the Seller chooses otherwise.
+- **Division of labour** ([ADR 0004](../../docs/adr/0004-ai-explores-open-ended-math-solves-closed.md)):
+  - The engine exhaustively searches the numeric Promo Plans for each Plan Idea.
+  - Strategists propose Plan Ideas (non-numeric choices).
+  - Rivals red-team the leading plan. Each round they propose Counter-moves inside the Rival Snapshot's plausible range, and the engine re-selects the plan that survives every Scenario. A round in which no Counter-move changes the leader ends the Arena early.
+- **Calls:** asynchronous, with a concurrency limit and a requests-per-minute limiter per route, plus retry with backoff on 429 and 5xx.
+- **Scale:** on the MI300X route, 3 Strategists once and 6 Rivals × 3 rounds per SKU, for all invited SKUs in parallel. On the fallback route, 1 Strategist and 2 Rivals × 2 rounds on up to 3 SKUs.
+- **Data guard:** Token Factory runs only on sample data, because its terms forbid sensitive financial data. The sample shop also ships a recorded MI300X run, labelled "recorded", with a "Run live" button.
 - **Validation:** every LLM output is JSON against a schema. Invalid or out-of-range proposals are rejected and counted, never repaired silently.
 - **Events:** the run streams events over Server-Sent Events (round started, plan proposed, Counter-move, pairing scored, SKU decided, telemetry).
 - **Telemetry:** tokens/s, time to first token, requests in flight, calls done and failed, route, and cost per Verdict.
@@ -187,7 +193,7 @@ An AMD Evidence panel stays visible, and a full Evidence page is linked. The UI 
 3. a policy comparison over the demo catalogue: platform suggestion, match the competitor, LLM-direct, and MarginArena, labelled as model-based estimates; it includes the LLM-direct numeric error rate;
 4. AMD performance: Arena wall time, tokens/s, time to first token, and a concurrency sweep from 1 to 128, on the MI300X against Token Factory;
 5. agent quality: the share of valid proposals and the tool-call success rate;
-6. Arena vs Grid: worst-case profit and the number of engine evaluations.
+6. Red-team value: evaluate both the plan chosen under generic Scenarios (engine only, no AI) and the Arena's plan against every Scenario, including those the AI discovered. Report how much the discovered Counter-moves cut the generic plan's worst-case profit, on how many SKUs, and whether the Arena plan holds up.
 
 **Ops.**
 - A droplet bootstrap script: pinned `vllm/vllm-openai-rocm` digest, Caddy with an sslip.io hostname (it prints the new URL to paste into Evolus "Your models" after each rebuild), and only ports 22, 80 and 443 open.
@@ -227,7 +233,7 @@ An AMD Evidence panel stays visible, and a full Evidence page is linked. The UI 
 
 - **Priorities ([ticket 01](issues/01-charting-grill.md), Q36):**
   - **MUST:** engine with golden tests; Arena on our vLLM; the Verdicts; the chosen UI; Evolus extractor, library and workflow; AMD Evidence with a real benchmark; Token Factory fallback; Vercel; README and Docker.
-  - **SHOULD:** all five mechanics; Arena vs Grid; Rival Snapshot; Explain in Thai; Evidence Links; Brand Price Rule; LLM-direct baseline.
+  - **SHOULD:** all five mechanics; red-team value (proof 6); Rival Snapshot; Explain in Thai; Evidence Links; Brand Price Rule; LLM-direct baseline.
   - **COULD:** a Lazada profile; the Evolus chat widget.
 - **Schedule:**
   - **Wed 14:** engine and elasticity; Arena on Token Factory.

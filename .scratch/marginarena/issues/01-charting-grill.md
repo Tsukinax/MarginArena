@@ -143,3 +143,10 @@ Round 12:
   - plain http, rejected as insecure.
   
   Cost: after each rebuild the URL changes and the user pastes the new one into Evolus "Your models"; the bootstrap script prints it.
+- **Q51 (supersedes parts of Q17, Q30 and Q31)** – After a `/scrutinize` pass ([ADR 0004](../../../docs/adr/0004-ai-explores-open-ended-math-solves-closed.md)), the work is split: the engine exhaustively searches the numeric plans; Rivals red-team the leading plan over several rounds; Strategists propose non-numeric Plan Ideas; the AI also reads inputs and explains Verdicts.
+  - Counter-moves act through relative price.
+  - Scenarios include the elasticity band.
+  - Demo SKUs use the pooled elasticity of −1.49 with its band; any per-SKU value is labelled a Seller override.
+  - Token Factory is used for sample data only.
+  - A recorded MI300X run backs the sample shop.
+  - Proof 6 becomes "red-team value".
