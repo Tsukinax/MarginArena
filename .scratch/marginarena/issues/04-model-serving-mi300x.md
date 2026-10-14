@@ -51,3 +51,7 @@ Full findings: [research/model-serving-mi300x.md](../research/model-serving-mi30
 - **Open, for the user:**
   - How to keep the demo up during the judging window (judges may test until 15 Nov; one always-on day costs about $62).
   - A DuckDNS account or domain.
+
+## Comments
+
+- 14 Oct: superseded by Q49. The HTTPS hostname now comes from sslip.io (a name made from the droplet IP), so no DuckDNS account or domain is needed.
