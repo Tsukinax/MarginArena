@@ -35,7 +35,9 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
 
 ## Not yet specified
 
-- Final Evolus details once ticket 06's day-1 checks come back: the bulk-upload file format, and whether our own MCP connector is allowed.
+- The Seller Centre bulk-upload file format for Approve actions (research). The Evolus API facts are now in `docs/api-guide/evolus-api.md`, and the agent can call our engine through a Web API.
+- The business model and TAM for the pitch (revenue model, pricing).
+- First-hand Seller voice: a quote, an interview or the team's own experience.
 - A competitor re-snapshot on 17 Oct, using the same lablab endpoints as ticket 10.
 
 ## Out of scope

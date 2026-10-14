@@ -116,3 +116,7 @@ Round 9, where the user said "yes to all":
 Round 10:
 - **Q42** – The glossary is renamed to `CONTEXT.md`, and `docs/agents/domain.md` points the project skills at it.
 - **Q43** – Option (a): the user records the voice-over in English from Claude's script, with a short Thai line plus English subtitles in the problem intro. **The video comes last**, after everything else is built.
+
+Round 11:
+- **Q44** – The user is relaxed about the "three screens" pattern. Keep the flow short (around four steps), never sprawling, and trim later if needed.
+- **The lablab "How to Win" guide reviewed against the plan.** Gaps: no revenue model, no team/roadmap segment in the video, no first-hand seller pain, and an over-engineering perception risk that the Arena-vs-Grid and LLM-direct proofs must answer.
