@@ -18,7 +18,7 @@ from marginarena.llm import LLMClient, LLMSettings, first_healthy
 from marginarena.sample import describe_shop, load_shop
 
 # Token Factory's limits (20 requests/min per account) keep the fallback Arena small (spec, ADR 0002).
-FALLBACK_CAPS = {"skus": 3, "rounds": 2, "rivals": 2, "strategists": 1}
+FALLBACK_CAPS = {"skus": 4, "rounds": 2, "rivals": 2, "strategists": 1}
 
 
 class ArenaRequest(BaseModel):
@@ -65,7 +65,7 @@ def create_app(
         shop = load_shop(request.shop)
         skus, rounds, rivals, strategists = request.skus, request.rounds, request.rivals, request.strategists
         if s.route == "token-factory":
-            # Q55: a trio chosen to show every kind of Verdict, unless the Seller picked products.
+            # Q55/Q56: products chosen to show every kind of Verdict, unless the Seller picked products.
             skus = (skus or list(shop.fallback_demo_skus) or [i.sku.id for i in shop.invited])[: FALLBACK_CAPS["skus"]]
             rounds = min(rounds, FALLBACK_CAPS["rounds"])
             rivals = min(rivals, FALLBACK_CAPS["rivals"])

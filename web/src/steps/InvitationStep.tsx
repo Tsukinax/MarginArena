@@ -5,7 +5,7 @@ type Props = { shop: Shop | null; route: string | null; onStart: () => void }
 export default function InvitationStep({ shop, route, onStart }: Props) {
   if (!shop) return <p className="muted">Loading the sample invitation…</p>
   const fallback = route !== 'mi300x'
-  const count = fallback ? Math.min(3, shop.invited.length) : shop.invited.length
+  const count = fallback ? Math.min(4, shop.invited.length) : shop.invited.length
 
   return (
     <section className="panel">

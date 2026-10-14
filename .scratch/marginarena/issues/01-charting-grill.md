@@ -161,6 +161,6 @@ Round 12:
 Round 14 (15 Oct, with the user):
 - **Q56** – No run since Q52 had the AI Rivals change a decision ([research/q56-red-team.md](../research/q56-red-team.md)). The user chose option 2, in two parts:
   - Every decided SKU shows what the Rivals found: the worst case of the plan chosen against the generic hold, match and undercut moves, and how far the Counter-moves the Rivals found cut it (`red_team_cut`, commit 488948c). This part is built.
-  - SS-50 (sunscreen, a lookalike-heavy product) gets a labelled Seller override: the literature mean elasticity −2.62 with its own band at the fitted band's relative width (−3.48 to −1.36). Q51 already allows labelled per-SKU values. With it, five of six recorded Counter-moves each turn SS-50's Approve into a Revise. k stays 1.0, and the other SKUs keep the pooled fit and its band. This part is not built yet.
-  - Still to confirm with the user: whether the Token Factory fallback set grows to four SKUs (NT-200, SS-50, VC-30, SM-10) so it can show this.
+  - SS-50 (sunscreen, a lookalike-heavy product) gets a labelled Seller override: the literature mean elasticity −2.62 with its own band at the fitted band's relative width (−3.48 to −1.36). Q51 already allows labelled per-SKU values. With it, five of six recorded Counter-moves each turn SS-50's Approve into a Revise. k stays 1.0, and the other SKUs keep the pooled fit and its band. Built in commit 2fc31df.
+  - The Token Factory fallback set grows to four SKUs (NT-200, SS-50, VC-30, SM-10) so it can show this. The user chose it on 15 Oct, accepting about a third more time per run.
 - The next question is Q57.

@@ -212,11 +212,12 @@ async def test_token_factory_takes_over_when_the_mi300x_endpoint_is_down():
 
 
 async def test_fallback_demo_shows_every_kind_of_verdict():
-    # Q55: on Token Factory the sample run checks a trio chosen to show Approve, Escalate and Skip.
+    # Q55: on Token Factory the sample run checks products chosen to show Approve, Escalate and Skip, plus SS-50,
+    # where an AI Rival can turn an Approve into a Revise (Q56).
     events = await run(FakeModelServer(), skus=None)
 
     started = events[0]
     by_sku = {r["sku"]: r for r in events[-1]["results"]}
-    assert started["skus"] == ["NT-200", "VC-30", "SM-10"]
+    assert started["skus"] == ["NT-200", "SS-50", "VC-30", "SM-10"]
     assert by_sku["SM-10"]["verdict"] == "revise"
     assert by_sku["SM-10"]["skip"] is True

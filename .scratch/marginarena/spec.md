@@ -144,7 +144,7 @@ The route is chosen per run by a health check and recorded on every result.
   - Strategists propose Plan Ideas (non-numeric choices).
   - Rivals red-team the leading plan. Each round they propose Counter-moves inside the Rival Snapshot's plausible range, and the engine re-selects the plan that survives every Scenario. A round in which no Counter-move changes the leader ends the Arena early.
 - **Calls:** asynchronous, with a concurrency limit and a requests-per-minute limiter per route, plus retry with backoff on 429 and 5xx.
-- **Scale:** on the MI300X route, 3 Strategists once and 6 Rivals × 3 rounds per SKU, for all invited SKUs in parallel. On the fallback route, 1 Strategist and 2 Rivals × 2 rounds on up to 3 SKUs.
+- **Scale:** on the MI300X route, 3 Strategists once and 6 Rivals × 3 rounds per SKU, for all invited SKUs in parallel. On the fallback route, 1 Strategist and 2 Rivals × 2 rounds on up to 4 SKUs (Q56).
 - **Data guard:** Token Factory runs only on sample data, because its terms forbid sensitive financial data. The sample shop also ships a recorded MI300X run, labelled "recorded", with a "Run live" button.
 - **Validation:** every LLM output is JSON against a schema. Invalid or out-of-range proposals are rejected and counted, never repaired silently.
 - **Events:** the run streams events over Server-Sent Events (round started, plan proposed, Counter-move, pairing scored, SKU decided, telemetry).
