@@ -6,7 +6,7 @@ only see sample data, which is all this uses):
 
 Each SKU gets the same Arena as a live Token Factory run (api.FALLBACK_CAPS); only the number of SKUs differs. Writes
 evidence/runs/<route>-sample-12sku.sse with each event's seconds since the start as an SSE comment (": t=12.34"),
-which the replay uses for pacing.
+which the replay uses for pacing, and the copy the app ships (api.RECORDED_RUN) when the route is Token Factory.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
-from marginarena.api import FALLBACK_CAPS
+from marginarena.api import FALLBACK_CAPS, RECORDED_RUN
 from marginarena.arena import run_arena
 from marginarena.llm import LLMClient, LLMSettings, first_healthy
 from marginarena.sample import load_shop
@@ -57,6 +57,8 @@ async def main() -> None:
         await llm.aclose()
     out = RUNS / f"{settings.route}-sample-12sku.sse"
     out.write_text("".join(lines))
+    if out.name == RECORDED_RUN.name:
+        RECORDED_RUN.write_text("".join(lines))
     print(f"Wrote {out} ({len(lines)} events, {time.monotonic() - started:.1f} s)")
 
 

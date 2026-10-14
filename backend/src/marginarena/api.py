@@ -29,8 +29,9 @@ FALLBACK_CAPS = {"skus": 4, "rounds": 2, "rivals": 2, "strategists": 1}
 # several processes must set RESULT_SIGNING_KEY.
 PROCESS_KEY = secrets.token_bytes(32)
 # The default demo: a full 12-SKU run recorded on Token Factory (backend/scripts/record_arena.py), replayed in about
-# REPLAY_SECONDS whatever it took live.
-RECORDED_RUN = Path(__file__).resolve().parents[3] / "evidence" / "runs" / "token-factory-sample-12sku.sse"
+# REPLAY_SECONDS whatever it took live. The package ships its own copy of evidence/runs/token-factory-sample-12sku.sse,
+# because a deploy of the backend alone can't see evidence/.
+RECORDED_RUN = Path(__file__).resolve().parent / "sample" / "recorded" / "token-factory-sample-12sku.sse"
 REPLAY_SECONDS = 20
 
 

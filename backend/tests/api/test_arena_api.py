@@ -6,9 +6,11 @@ model server is replaced by an httpx MockTransport.
 
 import json
 from decimal import Decimal
+from pathlib import Path
 
 import httpx
 
+from marginarena import api
 from marginarena.api import create_app
 from marginarena.llm import LLMSettings
 
@@ -120,6 +122,14 @@ async def test_the_recorded_run_replays_every_product_signed_and_labelled_withou
     assert len(events[-1]["results"]) == 12
     assert all(r["signature"] for r in events[-1]["results"])
     assert server.requests == []
+
+
+def test_the_replayed_run_is_the_recorded_evidence():
+    # The app ships its own copy (a deploy may not see evidence/); it must stay the run evidence/ records.
+    evidence = Path(__file__).resolve().parents[3] / "evidence" / "runs" / "token-factory-sample-12sku.sse"
+
+    assert Path(str(api.RECORDED_RUN)).is_relative_to(Path(api.__file__).parent)
+    assert api.RECORDED_RUN.read_bytes() == evidence.read_bytes()
 
 
 async def test_model_output_that_is_not_json_is_rejected_and_counted():

@@ -1,0 +1,19 @@
+# Never upload secrets or local state; the backend ships its own copy of the recorded run.
+.env
+.env.*
+!.env.example
+**/.venv
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+web/dist
+.agents
+.claude
+.scratch
+docs
+infra
+evidence
+handoff.md
+backend/tests
+backend/scripts

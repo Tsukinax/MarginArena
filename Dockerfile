@@ -15,8 +15,6 @@ COPY backend/pyproject.toml backend/uv.lock backend/
 RUN uv sync --project backend --frozen --no-dev --no-install-project
 COPY backend/src backend/src
 RUN uv sync --project backend --frozen --no-dev
-# The recorded Arena the app replays by default (backend/scripts/record_arena.py).
-COPY evidence/runs evidence/runs
 COPY --from=web /web/dist web/dist
 ENV WEB_DIST=/app/web/dist PATH="/app/backend/.venv/bin:$PATH"
 EXPOSE 8008
