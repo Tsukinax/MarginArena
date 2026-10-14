@@ -95,3 +95,20 @@ Round 8, where the user said "yes to all":
   - **Sun 18:** small fixes and a freeze before 17:00 ICT; the GPU stays up during judging windows.
 - **Q38** – Claude writes a 4:30 video script with a shot list, plus a PDF deck. The user records and does the voice-over (language to be confirmed). Storyline: hook (฿100 item → ฿6.67), problem (1.2M Sellers, 2.3% net profit), live demo, six proofs, why AMD, market.
 - The private Gemini chat and the local skills tooling are git-ignored.
+
+Round 9, where the user said "yes to all":
+- **Q39**
+  - (a) The project is confirmed as **MarginArena** in the 11.11 Campaign theme. ClausePulse Live, Gemini's alternative idea, was rejected.
+  - (b) Every number in a Verdict gets an **Evidence Link** (SHOULD).
+- **Q40** – A **Brand Price Rule**: the demo shop has a fictional brand agreement, clearly labelled as fictional, stored in the Evolus knowledge library.
+  - An agent extracts each clause into a structured constraint and keeps the clause reference.
+  - The engine enforces the constraint deterministically.
+  - An ambiguous clause leads to Escalate.
+  - Priority: SHOULD.
+- **Q41** – Proof metric 3 compares four policies: the platform's suggested discount, matching the competitor, an **LLM-direct** policy (Gemma plans and computes profit on its own), and MarginArena. Report how far the LLM-direct profit figures are from the engine's.
+- **Gemini claims rejected as unverified or false:**
+  - "90%+ win odds".
+  - The backtest figures "28 loss cases / 0.0% leaks / +34.8% / 1.4 s".
+  - "TokenRouter was the ACT II champion".
+
+  Only numbers we measure ourselves may appear in the deck, the video or the README.

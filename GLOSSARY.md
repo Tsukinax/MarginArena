@@ -26,6 +26,10 @@ _Avoid_: Platform config, market settings
 The lowest profit per unit, after marketplace fees and product cost and expressed as a percentage of the selling price, that a Seller will accept on a SKU during a Campaign. A Promo Plan that falls below it against any Counter-move cannot be approved.
 _Avoid_: Minimum margin, threshold, red line
 
+**Brand Price Rule**:
+A clause in a Seller's agreement with a brand that limits how that brand's products may be priced or promoted, such as a maximum headline discount. It is set by the brand, not the Seller. A Promo Plan that breaks one cannot be approved.
+_Avoid_: MAP policy, brand policy, price floor
+
 **Promo Plan**:
 A proposed promotion for one SKU during one Campaign. It combines one or more Promo Mechanics and includes the costs of joining the Campaign.
 _Avoid_: Promotion, offer, deal, scenario, strategy
@@ -33,6 +37,14 @@ _Avoid_: Promotion, offer, deal, scenario, strategy
 **Promo Mechanic**:
 One way a Seller can make an offer more attractive: a price cut, a shop voucher with a minimum spend, a multi-buy discount on the same SKU, a gift with purchase, or a per-buyer quantity limit.
 _Avoid_: Promo type, tactic, lever
+
+**Margin Protected**:
+How much more profit, in the worst case, a Seller keeps by following MarginArena's Verdicts than by joining every invited SKU exactly as invited.
+_Avoid_: Savings, profit uplift, money saved
+
+**Evidence Link**:
+The connection from a number in a Verdict to the document it came from: a line of the Campaign Invitation, a fee rule, a Brand Price Rule clause, or a Rival Snapshot.
+_Avoid_: Citation, reference, source
 
 **Verdict**:
 MarginArena's ruling on a Promo Plan. It is one of three outcomes: Approve; Revise, which comes with a better Promo Plan; or Escalate, which hands the decision to a person.
