@@ -12,7 +12,7 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
 
 ## Notes
 
-- Domain: e-commerce promotion economics for marketplace Sellers. Terms live in `GLOSSARY.md`; decisions live in `docs/adr/`.
+- Domain: e-commerce promotion economics for marketplace Sellers. Terms live in `CONTEXT.md`; decisions live in `docs/adr/`.
 - Skills for every session: `grilling` and `domain-modeling`. Research tickets follow the method in `research`.
 - Tracker: local markdown (see `docs/agents/issue-tracker.md`). There is no git remote yet. Research findings go in `.scratch/marginarena/research/` instead of `research/*` branches.
 - Team: the user plus Claude. Claude writes all the code. The user submits on lablab.ai, records the video, and handles anything that needs their account.
