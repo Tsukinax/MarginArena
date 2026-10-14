@@ -13,3 +13,7 @@ Run the 30-minute tool-calling pass/fail test from [research/model-serving-mi300
 - **Fail:** add Qwen3.6-27B for the Evolus agent.
 
 Record the results; they are AMD evidence.
+
+## Comments
+
+- 14 Oct: the droplet kit is merged (`infra/droplet/`, commit a0e1400; 27 tests). `kit.py prepare` has run: the SSH key is `~/.ssh/marginarena_droplet_ed25519`, and VLLM_API_KEY is in `.env`. The gate is `python3 infra/droplet/kit.py gate`, which writes `evidence/gate-gemma-tool-calling.{md,json}`. It is still blocked on the user creating the droplet (`infra/droplet/README.md`).
