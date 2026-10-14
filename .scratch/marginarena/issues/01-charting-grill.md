@@ -128,3 +128,4 @@ Round 11:
   - Later distribution: the Shopee and Lazada app stores.
   - Slide TAM, conservative: 170k Sellers joined 9.9 (Shopee figure). 5% on Pro at ฿390 is about ฿40M a year (about $1.15M) in Thailand alone, plus five more SEA markets running the same Campaign mechanics.
   - Assumptions are labelled as assumptions in the slides.
+- **Q46** – No Seller in the user's network, so the pitch uses only **published** Seller voices: the Thai e-Commerce Association survey (fees are the top complaint for 96%; average net profit 2.3%) and complaints reported in the press, as collected in ticket 11. Sources are cited, and no testimonial is invented.
