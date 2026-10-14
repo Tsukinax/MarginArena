@@ -129,3 +129,8 @@ Round 11:
   - Slide TAM, conservative: 170k Sellers joined 9.9 (Shopee figure). 5% on Pro at ฿390 is about ฿40M a year (about $1.15M) in Thailand alone, plus five more SEA markets running the same Campaign mechanics.
   - Assumptions are labelled as assumptions in the slides.
 - **Q46** – No Seller in the user's network, so the pitch uses only **published** Seller voices: the Thai e-Commerce Association survey (fees are the top complaint for 96%; average net profit 2.3%) and complaints reported in the press, as collected in ticket 11. Sources are cited, and no testimonial is invented.
+- **Q47** – The hackathon focus stays on small Sellers, the underserved segment. Enterprise appears only as a roadmap and pricing tier, with no extra features built:
+  - an **Enterprise** tier, "contact sales", for Mall stores and brands with thousands of SKUs, deployed on the customer's own AMD GPUs, with multi-step approval through Evolus;
+  - a roadmap slide: small Sellers, then Shopee Mall/LazMall, then large brands on their own AMD hardware (the Trade Promotion Optimization / Revenue Growth Management space).
+  - The engine must not get in the way of thousands of SKUs or per-SKU elasticity overrides.
+- The `.gitignore` edit was accidental and has been reverted to the committed version.
