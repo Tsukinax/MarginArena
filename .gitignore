@@ -6,3 +6,9 @@ __pycache__/
 .venv/
 node_modules/
 .DS_Store
+
+# Local AI tooling and private brainstorming (not part of the product)
+.agents/
+.claude/skills/
+skills-lock.json
+docs/chatai-context/

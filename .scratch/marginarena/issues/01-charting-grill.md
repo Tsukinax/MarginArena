@@ -74,3 +74,24 @@ Round 7, where the user said "yes to all":
 - **Q34** – The UI stays in English, with an "Explain in Thai" toggle on Verdicts. Gemma writes the text, and every number comes from the engine.
 - **Positioning lesson from ticket 10:** lead with the Arena, the measured MI300X benchmark and Evolus carrying out the Verdict, not with "the LLM never invents numbers".
 - The user approved local git commits (14 Oct). Do not push until ticket 07 names the GitHub account.
+
+Round 8, where the user said "yes to all":
+- **Q35** – The Seller provides four inputs:
+  1. a Campaign Invitation screenshot or PDF, read by an Evolus extractor or Gemma vision;
+  2. a catalogue CSV with cost, stock, current price and the 30-day lowest price;
+  3. a Margin Floor;
+  4. an optional Rival Snapshot.
+
+  A "Use sample invitation" button loads the fictional Glow Lab BKK shop (12 skincare SKUs).
+- **Q36** – Priorities:
+  - **MUST:** engine with golden tests; Arena on our own vLLM; the three Verdicts; the chosen UI; Evolus extractor, library and workflow; an AMD Evidence page with a real benchmark; Token Factory fallback; Vercel deploy; README and Docker.
+  - **SHOULD:** all five Promo Mechanics (three at minimum: price cut, shop voucher with minimum spend, gift); Arena vs Grid; Rival Snapshot; Explain in Thai.
+  - **COULD:** a Lazada profile; the Evolus chat widget.
+- **Q37** – Schedule:
+  - **Wed 14:** engine, elasticity fit, Arena on Token Factory.
+  - **Thu 15:** MI300X for 3 h (ticket 08 gate), real UI, Evolus.
+  - **Fri 16:** MI300X for 5 h (full Arena and benchmarks), mechanics, Rival Snapshot, Vercel.
+  - **Sat 17:** polish, README, slides, video script; the user records; a complete submission before 00:00 ICT.
+  - **Sun 18:** small fixes and a freeze before 17:00 ICT; the GPU stays up during judging windows.
+- **Q38** – Claude writes a 4:30 video script with a shot list, plus a PDF deck. The user records and does the voice-over (language to be confirmed). Storyline: hook (฿100 item → ฿6.67), problem (1.2M Sellers, 2.3% net profit), live demo, six proofs, why AMD, market.
+- The private Gemini chat and the local skills tooling are git-ignored.
