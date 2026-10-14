@@ -14,6 +14,7 @@ from .model import (
     MarketplaceProfile,
     Mechanic,
     PlanEvaluation,
+    PlanIdea,
     PriceCut,
     PromoPlan,
     SellerSettings,
@@ -23,6 +24,7 @@ from .model import (
     UnitEconomics,
 )
 from .profiles import get_profile
+from .search import candidate_plans
 from .verdict import evaluate_invitation, evaluate_sku
 
 __all__ = [
@@ -37,6 +39,7 @@ __all__ = [
     "MarketplaceProfile",
     "Mechanic",
     "PlanEvaluation",
+    "PlanIdea",
     "PriceCut",
     "PromoPlan",
     "SellerSettings",
@@ -45,6 +48,7 @@ __all__ = [
     "SkuVerdict",
     "UnitEconomics",
     "campaign_outcome",
+    "candidate_plans",
     "evaluate_invitation",
     "evaluate_sku",
     "get_profile",

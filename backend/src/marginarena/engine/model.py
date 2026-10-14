@@ -67,6 +67,14 @@ class PromoPlan:
 
 
 @dataclass(frozen=True)
+class PlanIdea:
+    """A Strategist's non-numeric choice; the engine fills in the numbers (ADR 0004)."""
+
+    use_voucher: bool = False
+    gift: GiftWithPurchase | None = None
+
+
+@dataclass(frozen=True)
 class CampaignTerms:
     """Per-order terms the Seller doesn't control."""
 
