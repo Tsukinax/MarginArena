@@ -66,6 +66,16 @@ class CampaignTerms:
     buyer_paid_shipping: Decimal = ZERO
     traffic_lift: Decimal = Decimal("1")
     """How much more traffic joining the Campaign brings, before any price effect."""
+    cross_price_sensitivity: Decimal = Decimal("0.6")
+    """Assumption, shown to the Seller and overridable: how strongly a Rival's effective price cut pulls demand away."""
+
+
+@dataclass(frozen=True)
+class CounterMove:
+    """A Rival's response to a Promo Plan, expressed as its effective price cut (a fraction of its price)."""
+
+    rival: str
+    rival_price_cut: Decimal
 
 
 @dataclass(frozen=True)

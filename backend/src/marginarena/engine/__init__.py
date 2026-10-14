@@ -2,12 +2,13 @@
 
 from .demand import campaign_outcome
 from .fees import unit_economics
-from .model import CampaignOutcome, CampaignTerms, FeeBreakdown, MarketplaceProfile, Mechanic, PriceCut, PromoPlan, ShopVoucher, Sku, UnitEconomics
+from .model import CampaignOutcome, CampaignTerms, CounterMove, FeeBreakdown, MarketplaceProfile, Mechanic, PriceCut, PromoPlan, ShopVoucher, Sku, UnitEconomics
 from .profiles import get_profile
 
 __all__ = [
     "CampaignOutcome",
     "CampaignTerms",
+    "CounterMove",
     "FeeBreakdown",
     "MarketplaceProfile",
     "Mechanic",
