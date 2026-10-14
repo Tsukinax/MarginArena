@@ -157,3 +157,10 @@ Round 12:
 - **Escalate is not "don't join"** (consistency fix found in the second live run). Margin Protected counts only Approve and Revise SKUs; an Escalate hands the decision to a person and shows its own worst-case line. Previously, assuming "don't join" made the run's total −฿1,130, because the Seller's own Margin Floor blocked a profitable join. Token Factory pacing is lowered to 15/min after 7 retries at 20/min.
 - **Q54** – Skip is a kind of Revise: when no plan is eligible and not joining beats every feasible plan (one that meets the invitation and the Brand Price Rules) in both the worst case and expectation, the Verdict is Revise/Skip, and Margin Protected counts not joining minus joining as invited. Escalate is kept for genuine trade-offs: a floor that blocks a profitable join, an elasticity band that flips the outcome, or a brand conflict.
 - **Q55** – The Token Factory fallback checks a trio chosen to show every Verdict (NT-200 Approve, VC-30 Escalate, SM-10 Skip) unless the Seller picks products. The numbers are still computed live.
+
+Round 14 (15 Oct, with the user):
+- **Q56** – No run since Q52 had the AI Rivals change a decision ([research/q56-red-team.md](../research/q56-red-team.md)). The user chose option 2, in two parts:
+  - Every decided SKU shows what the Rivals found: the worst case of the plan chosen against the generic hold, match and undercut moves, and how far the Counter-moves the Rivals found cut it (`red_team_cut`, commit 488948c). This part is built.
+  - SS-50 (sunscreen, a lookalike-heavy product) gets a labelled Seller override: the literature mean elasticity −2.62 with its own band at the fitted band's relative width (−3.48 to −1.36). Q51 already allows labelled per-SKU values. With it, five of six recorded Counter-moves each turn SS-50's Approve into a Revise. k stays 1.0, and the other SKUs keep the pooled fit and its band. This part is not built yet.
+  - Still to confirm with the user: whether the Token Factory fallback set grows to four SKUs (NT-200, SS-50, VC-30, SM-10) so it can show this.
+- The next question is Q57.

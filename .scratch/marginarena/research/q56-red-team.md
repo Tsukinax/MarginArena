@@ -50,8 +50,13 @@ red team adds.
 1. Keep the assumptions; show the red team as risk discovery (done in 488948c). Honest, but the demo never shows the
    AI changing a plan.
 2. Option 1, plus one labelled Seller override on a lookalike-heavy SKU (for example SS-50 sunscreen at the
-   literature mean, with its own band), so the demo can show the AI turning an Approve into a Revise. It needs a
-   per-SKU band in the sample loader and the Arena (the engine is unchanged), and the UI must label it as a sample
-   Seller override.
+   literature mean, with its own band), so the demo can show the AI turning an Approve into a Revise. Q51 already
+   allows labelled per-SKU values. It needs a per-SKU band in the sample loader and the Arena (the engine is
+   unchanged), and the UI must label it as a sample Seller override.
 3. Change k or the default elasticity for every SKU. Not recommended: neither has a source, and the second reverses
    Q51.
+
+## Decision
+
+15 Oct: the user chose option 2 (recorded as Q56 in `issues/01-charting-grill.md`). Option 1 is built; the SS-50
+override is next.

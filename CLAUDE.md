@@ -62,7 +62,8 @@ Live checks against a real model or Evolus are scripts that write to `evidence/`
 
 ## Gotchas
 
-- Token Factory is paced at 15 requests/min (the account limit is 20) with 8 in flight, and it has been flaky; a labelled recorded run is the fallback.
+- Token Factory is paced at 15 requests/min (the account limit is 20) with 8 in flight, and it has been flaky; a labelled recorded run is the fallback. On 14 Oct its first calls hung for over 2 minutes: the client waits 120 s per try and makes up to 4 tries, so the Arena page looks frozen meanwhile. `/v1/usage` reports the limits; the daily quota resets at 16:00 UTC (midnight in Shanghai).
+- `uvicorn` runs without reload: restart the `api` preview after any backend change. If ports 8008 or 5173 are taken by another session's stale servers, stop those first.
 - vLLM serves the model as `google/gemma-4-31B-it`, and Evolus "Your models" uses that same name.
 - Evolus: create workflows with `isActive: true` (otherwise execute returns 409), upload library documents with `language=en` (the default is Italian), and use `EVOLUS_USER_API_KEY` for web services, extractors, memories and skills. The limit is 60 requests/min.
 - Write Python files with the Write tool; a shell heredoc once left a literal `\n` in a file.
