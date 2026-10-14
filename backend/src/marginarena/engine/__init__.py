@@ -3,6 +3,7 @@
 from .demand import campaign_outcome
 from .fees import unit_economics
 from .model import (
+    BrandPriceRule,
     CampaignOutcome,
     CampaignTerms,
     CounterMove,
@@ -25,6 +26,7 @@ from .profiles import get_profile
 from .verdict import evaluate_invitation, evaluate_sku
 
 __all__ = [
+    "BrandPriceRule",
     "CampaignOutcome",
     "CampaignTerms",
     "CounterMove",

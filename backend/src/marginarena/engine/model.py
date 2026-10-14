@@ -128,8 +128,21 @@ class CampaignOutcome:
 
 
 @dataclass(frozen=True)
+class BrandPriceRule:
+    """A brand's pricing clause, already turned into a structured constraint, citing its clause."""
+
+    clause: str
+    max_price_cut: Decimal | None = None
+    """Largest allowed headline cut, as a fraction of list price."""
+    min_shelf_price: Decimal | None = None
+    vouchers_allowed: bool = True
+    gifts_allowed: bool = True
+
+
+@dataclass(frozen=True)
 class SellerSettings:
     margin_floor: Decimal
+    brand_rules: tuple[BrandPriceRule, ...] = ()
     approve_tolerance: Decimal = Decimal("0.05")
     """Joining as invited is approved when the best plan earns at most this much more (relative)."""
 
@@ -139,11 +152,15 @@ class PlanEvaluation:
     plan: PromoPlan
     outcomes: tuple[CampaignOutcome, ...]
     """One outcome per Counter-move, in the order given."""
-    meets_invitation: bool
     worst_margin: Decimal
     worst_total: Decimal
     expected_total: Decimal
-    eligible: bool
+    failed_checks: tuple[str, ...]
+    """Why the plan can't be chosen; empty when eligible."""
+
+    @property
+    def eligible(self) -> bool:
+        return not self.failed_checks
 
 
 @dataclass(frozen=True)

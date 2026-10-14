@@ -5,8 +5,12 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from .demand import campaign_outcome
 from .model import (
+    BrandPriceRule,
     CampaignTerms,
     CounterMove,
+    GiftWithPurchase,
+    Mechanic,
+    ShopVoucher,
     InvitationItem,
     InvitationResult,
     MarketplaceProfile,
@@ -39,9 +43,15 @@ def evaluate_sku(
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )
         price_cut = sum((m.amount for m in plan.mechanics if isinstance(m, PriceCut)), Decimal("0"))
-        meets_invitation = price_cut >= terms.required_discount * sku.list_price
-        eligible = meets_invitation and worst_margin >= settings.margin_floor and worst_total >= dont_join_total
-        return PlanEvaluation(plan, outcomes, meets_invitation, worst_margin, worst_total, expected_total, eligible)
+        failed: list[str] = []
+        if price_cut < terms.required_discount * sku.list_price:
+            failed.append("below the invited discount")
+        if worst_margin < settings.margin_floor:
+            failed.append("below the Margin Floor")
+        if worst_total < dont_join_total:
+            failed.append("earns less than not joining")
+        failed += [f"breaks {r.clause}" for r in settings.brand_rules if _breaks(r, sku, price_cut, plan.mechanics)]
+        return PlanEvaluation(plan, outcomes, worst_margin, worst_total, expected_total, tuple(failed))
 
     invited = evaluate(as_invited)
     others = tuple(evaluate(p) for p in candidates)
@@ -83,3 +93,13 @@ def evaluate_invitation(
         Decimal("0"),
     )
     return InvitationResult(verdicts=verdicts, margin_protected=protected)
+
+
+def _breaks(rule: BrandPriceRule, sku: Sku, price_cut: Decimal, mechanics: tuple[Mechanic, ...]) -> bool:
+    if rule.max_price_cut is not None and price_cut > rule.max_price_cut * sku.list_price:
+        return True
+    if rule.min_shelf_price is not None and sku.list_price - price_cut < rule.min_shelf_price:
+        return True
+    if not rule.vouchers_allowed and any(isinstance(m, ShopVoucher) for m in mechanics):
+        return True
+    return not rule.gifts_allowed and any(isinstance(m, GiftWithPurchase) for m in mechanics)
