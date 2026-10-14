@@ -14,3 +14,6 @@ skills-lock.json
 docs/chatai-context/
 .pytest_cache/
 backend/.data/
+
+# The droplet startup script holds the vLLM API key (infra/droplet/kit.py prepare)
+infra/droplet/.generated/
