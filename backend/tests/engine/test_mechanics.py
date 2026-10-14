@@ -43,7 +43,9 @@ def test_gift_costs_the_seller_but_lifts_demand_by_its_perceived_value():
 
 def test_voucher_below_its_minimum_spend_is_not_used():
     # A ฿10 voucher with a ฿100 minimum spend can't be used on an ฿80 single-unit order.
-    plan = PromoPlan(mechanics=(PriceCut(amount=Decimal("20")), ShopVoucher(amount=Decimal("10"), min_spend=Decimal("100"))))
+    plan = PromoPlan(
+        mechanics=(PriceCut(amount=Decimal("20")), ShopVoucher(amount=Decimal("10"), min_spend=Decimal("100")))
+    )
 
     outcome = campaign_outcome(ITEM, plan, SHOPEE, DOUBLE_TRAFFIC)
 

@@ -50,4 +50,10 @@ def unit_economics(sku: Sku, plan: PromoPlan, profile: MarketplaceProfile, terms
         programme=_with_vat(fee_base, profile.programme_fee_rate, vat),
         fixed=_with_vat(profile.fixed_fee_per_order, Decimal("1"), vat),
     )
-    return UnitEconomics(selling_price=selling_price, seller_net=seller_net, fees=fees, payout=seller_net - fees.total, unit_cost=sku.cost + gift_cost)
+    return UnitEconomics(
+        selling_price=selling_price,
+        seller_net=seller_net,
+        fees=fees,
+        payout=seller_net - fees.total,
+        unit_cost=sku.cost + gift_cost,
+    )

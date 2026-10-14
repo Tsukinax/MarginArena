@@ -56,7 +56,7 @@ def demean(values: np.ndarray, groups: list[np.ndarray], tol: float = 1e-8, max_
     counts = [np.bincount(g) for g in groups]
     for _ in range(max_iter):
         before = out.copy()
-        for g, n in zip(groups, counts):
+        for g, n in zip(groups, counts, strict=True):
             for j in range(out.shape[1]):
                 out[:, j] -= (np.bincount(g, weights=out[:, j]) / n)[g]
         if np.max(np.abs(out - before)) < tol:
@@ -128,8 +128,17 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, default=ROOT / "backend/.data/freshretailnet")
     args = parser.parse_args()
 
-    cols = ["city_id", "store_id", "first_category_id", "product_id", "dt", "sale_amount",
-            "stock_hour6_22_cnt", "discount", "activity_flag"]
+    cols = [
+        "city_id",
+        "store_id",
+        "first_category_id",
+        "product_id",
+        "dt",
+        "sale_amount",
+        "stock_hour6_22_cnt",
+        "discount",
+        "activity_flag",
+    ]
     train = pd.read_parquet(fetch(args.data_dir, "train"), columns=cols)
     test = pd.read_parquet(fetch(args.data_dir, "eval"), columns=cols)
     for frame in (train, test):
@@ -156,11 +165,20 @@ def main() -> None:
         "revision": REVISION,
         "fitted_on": date.today().isoformat(),
         "method": "two-way FE (store x SKU, city x date) OLS on log sales vs log discount, in-stock days",
-        "pooled": {"elasticity": round(beta, 3), "se_cluster_product": round(se, 3), "activity_lift_log": round(gamma, 3)},
+        "pooled": {
+            "elasticity": round(beta, 3),
+            "se_cluster_product": round(se, 3),
+            "activity_lift_log": round(gamma, 3),
+        },
         "band_p10_p90": [round(band[0], 3), round(band[1], 3)],
         "categories": [
-            {"category": r.category, "series": r.series, "elasticity": round(r.beta_shrunk, 3),
-             "raw": round(r.beta_raw, 3), "se": round(r.se, 3)}
+            {
+                "category": r.category,
+                "series": r.series,
+                "elasticity": round(r.beta_shrunk, 3),
+                "raw": round(r.beta_raw, 3),
+                "se": round(r.se, 3),
+            }
             for r in cats.sort_values("beta_shrunk").itertuples()
         ],
         "shrinkage": {"mu": round(mu, 3), "tau": round(tau, 3)},
@@ -187,8 +205,8 @@ Each model predicts daily sales for a store × SKU from its last 14 training day
 
 | Days | Rows | Naive 14-day mean | Mean × (discount ratio)^β |
 |---|---|---|---|
-| Discount deepened >10% | {ho['rows_deeper_cut']:,} | {ho['wape_naive_deeper_cut']:.3f} | **{ho['wape_model_deeper_cut']:.3f}** |
-| Discount became shallower >10% | {ho['rows_shallower']:,} | {ho['wape_naive_shallower']:.3f} | {ho['wape_model_shallower']:.3f} |
+| Discount deepened >10% | {ho["rows_deeper_cut"]:,} | {ho["wape_naive_deeper_cut"]:.3f} | **{ho["wape_model_deeper_cut"]:.3f}** |
+| Discount became shallower >10% | {ho["rows_shallower"]:,} | {ho["wape_naive_shallower"]:.3f} | {ho["wape_model_shallower"]:.3f} |
 
 The engine applies elasticity to **price cuts only**, because the constant-elasticity model is not reliable when a discount ends.
 

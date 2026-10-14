@@ -9,15 +9,15 @@ from .model import (
     CampaignTerms,
     CounterMove,
     GiftWithPurchase,
-    Mechanic,
-    ShopVoucher,
     InvitationItem,
     InvitationResult,
     MarketplaceProfile,
+    Mechanic,
     PlanEvaluation,
     PriceCut,
     PromoPlan,
     SellerSettings,
+    ShopVoucher,
     Sku,
     SkuVerdict,
 )
@@ -32,13 +32,19 @@ def evaluate_sku(
     terms: CampaignTerms,
     settings: SellerSettings,
 ) -> SkuVerdict:
-    no_campaign = CampaignTerms(cross_price_sensitivity=terms.cross_price_sensitivity)
-    dont_join_total = campaign_outcome(sku, PromoPlan(), profile, no_campaign).total_profit
+    moves = list(counter_moves) or [None]
+    # Rivals act whether or not the Seller joins, so not joining faces the same Counter-moves (ADR 0004).
+    no_campaign = replace(
+        terms, traffic_lift=Decimal("1"), required_discount=Decimal("0"), platform_funded_discount=Decimal("0")
+    )
+    dont_join_total = min(campaign_outcome(sku, PromoPlan(), profile, no_campaign, cm).total_profit for cm in moves)
+    band_skus = [replace(sku, elasticity=e) for e in (terms.elasticity_band or ())]
 
     def evaluate(plan: PromoPlan) -> PlanEvaluation:
-        outcomes = tuple(campaign_outcome(sku, plan, profile, terms, cm) for cm in counter_moves)
-        worst_margin = min(o.unit.margin for o in outcomes)
-        worst_total = min(o.total_profit for o in outcomes)
+        outcomes = tuple(campaign_outcome(sku, plan, profile, terms, cm) for cm in moves)
+        scenarios = outcomes + tuple(campaign_outcome(b, plan, profile, terms, cm) for b in band_skus for cm in moves)
+        worst_margin = min(o.unit.margin for o in scenarios)
+        worst_total = min(o.total_profit for o in scenarios)
         expected_total = (sum(o.total_profit for o in outcomes) / len(outcomes)).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )

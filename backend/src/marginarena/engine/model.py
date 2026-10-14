@@ -76,16 +76,25 @@ class CampaignTerms:
     """How much more traffic joining the Campaign brings, before any price effect."""
     required_discount: Decimal = ZERO
     """The Campaign Invitation's minimum price cut, as a fraction of list price."""
-    cross_price_sensitivity: Decimal = Decimal("0.6")
-    """Assumption, shown to the Seller and overridable: how strongly a Rival's effective price cut pulls demand away."""
+    cross_price_sensitivity: Decimal = Decimal("1")
+    """Assumption, shown to the Seller and overridable (ADR 0004): when a Rival ends up cheaper than us,
+    we keep (rival price / our price) ** this of our demand."""
+    rival_reference_price: Decimal | None = None
+    """The Rival's price before its Counter-move, from the Rival Snapshot. Defaults to our list price."""
+    elasticity_band: tuple[Decimal, Decimal] | None = None
+    """Elasticities at the edges of the uncertainty band; a chosen plan must survive both (ADR 0004)."""
 
 
 @dataclass(frozen=True)
 class CounterMove:
-    """A Rival's response to a Promo Plan, expressed as its effective price cut (a fraction of its price)."""
+    """A Rival's response to a Promo Plan. Vouchers, free shipping and gifts count toward its effective cut."""
 
     rival: str
     rival_price_cut: Decimal
+    """Headline cut as a fraction of the Rival's reference price."""
+    voucher: Decimal = ZERO
+    free_shipping: Decimal = ZERO
+    gift_value: Decimal = ZERO
 
 
 @dataclass(frozen=True)

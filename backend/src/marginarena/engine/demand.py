@@ -4,7 +4,7 @@ import math
 from decimal import Decimal
 
 from .fees import unit_economics
-from .model import GiftWithPurchase, CampaignOutcome, CampaignTerms, CounterMove, MarketplaceProfile, PromoPlan, Sku
+from .model import CampaignOutcome, CampaignTerms, CounterMove, GiftWithPurchase, MarketplaceProfile, PromoPlan, Sku
 
 
 def campaign_outcome(
@@ -22,9 +22,24 @@ def campaign_outcome(
     buyer_price = unit.seller_net - terms.platform_funded_discount - gift_value
     # Elasticity is applied to price cuts only: the fitted model is unreliable when prices rise.
     ratio = min(1.0, float(buyer_price / sku.list_price))
+    if buyer_price <= 0:
+        raise ValueError(f"Promo Plan gives {sku.id} away: effective buyer price {buyer_price}")
     retained = 1.0
     if counter_move is not None:
-        retained = (1.0 - float(counter_move.rival_price_cut)) ** float(terms.cross_price_sensitivity)
+        rival_price = _rival_price(sku, terms, counter_move)
+        # ADR 0004: shoppers compare lookalikes, so we lose demand only to a Rival that ends up cheaper.
+        if buyer_price > rival_price:
+            retained = float(rival_price / buyer_price) ** float(terms.cross_price_sensitivity)
     demand = sku.baseline_units * float(terms.traffic_lift) * ratio ** float(sku.elasticity) * retained
     units = min(sku.stock, math.floor(demand))
     return CampaignOutcome(unit=unit, units=units, total_profit=unit.unit_profit * units)
+
+
+MAX_RIVAL_CUT = Decimal("0.6")
+
+
+def _rival_price(sku: Sku, terms: CampaignTerms, move: CounterMove) -> Decimal:
+    reference = terms.rival_reference_price or sku.list_price
+    extras = move.voucher + move.free_shipping + move.gift_value
+    cut = min(MAX_RIVAL_CUT, move.rival_price_cut + extras / reference)
+    return reference * (1 - cut)
