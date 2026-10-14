@@ -15,3 +15,6 @@ docs/chatai-context/
 .pytest_cache/
 backend/.data/
 .claude/worktrees/
+
+# The droplet startup script holds the vLLM API key (infra/droplet/kit.py prepare)
+infra/droplet/.generated/
