@@ -59,7 +59,7 @@ Live checks against a real model or Evolus are scripts that write to `evidence/`
 - Token Factory receives sample data only; its terms forbid sensitive financial data.
 - The MI300X droplet bills $2.59 an hour until it is destroyed, even powered off. The user creates and destroys it; afterwards run `python3 infra/droplet/kit.py forget`.
 - Refer to `.env` entries by variable name only.
-- Commit in small steps on `main`, subject line "Area: what changed" (`Engine:`, `Arena:`, `API:`, `Droplet:`). There is no remote yet.
+- Commit in small steps on `main`, subject line "Area: what changed" (`Engine:`, `Arena:`, `API:`, `Droplet:`). The remote is the private repo `Tsukinax/MarginArena`; every push to `main` redeploys https://marginarena.vercel.app (Vercel project `marginarena`, `vercel.json` services). Its secrets (`TOKEN_FACTORY_API_KEY`, `RESULT_SIGNING_KEY`) are set by the user in the Vercel dashboard. The repo goes public at submission.
 
 ## Gotchas
 

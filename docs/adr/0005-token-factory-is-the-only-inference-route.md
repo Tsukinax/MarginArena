@@ -20,4 +20,4 @@ The $100 credit needs days of approval, and the user chose not to request it (Q5
 - AMD evidence is what Token Factory measurably did: recorded runs and their telemetry in `evidence/`. We make no claim about our own GPU, batching throughput or MI300X benchmarks.
 - The live Arena stays small (Token Factory allows 20 requests a minute per account). Larger runs are recorded on Token Factory and labelled, in place of ADR 0004's recorded MI300X run.
 - Token Factory still receives sample data only.
-- The Evolus track's wording on lablab asks for the main agent on our own vLLM endpoint on AMD Developer Cloud. Until the organisers say Token Factory is accepted there, an Evolus agent on Token Factory may not meet it. That prize is in kind (plans and credits); the cash prizes from AMD and Google accept Token Factory.
+- The Evolus track's wording on lablab asks for the main agent on our own vLLM endpoint on AMD Developer Cloud. The AMD mentor answered that exact question in Discord on 14 Oct (07:13 ICT): Token Factory is the AMD-hosted vLLM endpoint given to participants and "perfectly satisfies this requirement". So the Evolus agent runs on Token Factory too.

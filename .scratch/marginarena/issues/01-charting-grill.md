@@ -169,5 +169,5 @@ Round 15 (15 Oct, with the user):
   - Evidence, from the user's Discord screenshots: lablab's announcement (13 Oct) that ACT III is hosted on Token Factory with no card and no need for the $100 credit, and an AMD mentor's answers (14 Oct) that the Token Factory API counts as a meaningful AMD component and Gemma through it counts for the Google prize.
   - The credit needs days of approval, so the user chose not to request it.
   - Consequences: no GPU session; AMD evidence comes from recorded Token Factory runs; the UI's claim about checking all 12 SKUs on our own MI300X goes.
-  - Open: whether the Evolus track accepts Token Factory for its main agent (its lablab wording asks for our own vLLM on AMD Developer Cloud). The user asks in Discord. Until then the Evolus agent is built on Token Factory under "Your models" (alias `tf-gemma`).
+  - Resolved the same day: another team asked in Discord whether Token Factory meets the Evolus track's "own vLLM endpoint" rule, and the AMD mentor answered (14 Oct, 07:13 ICT) that it "perfectly satisfies this requirement". The Evolus agent runs on Token Factory under "Your models" (alias `tf-gemma`).
 - The next question is Q58.

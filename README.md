@@ -19,7 +19,8 @@ Joining is opt-in, and the Seller has to decide product by product whether it ma
 
 ## Try it
 
-- **Live demo:** coming with the submission.
+- **Live demo:** https://marginarena.vercel.app (the recorded run works at once; live runs and Gemma's explanations
+  call AMD Token Factory).
 - **On your machine:** `cp .env.example .env`, then `docker compose up --build` and open http://localhost:8008.
   - **Watch all 12 products (recorded run)** replays a real Arena recorded on AMD Token Factory. It needs no key.
   - **Run live** needs `TOKEN_FACTORY_API_KEY` in `.env`. It checks 4 of the 12 products, chosen to show every kind of
