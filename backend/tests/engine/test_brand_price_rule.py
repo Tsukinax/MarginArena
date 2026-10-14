@@ -65,3 +65,31 @@ def test_invitation_that_demands_more_than_the_brand_allows_escalates():
     assert result.verdict == "escalate"
     assert "breaks Brand agreement 4.2" in result.as_invited.failed_checks
     assert "below the invited discount" in result.candidates[0].failed_checks
+
+
+def test_a_brand_rule_only_binds_that_brands_products():
+    # The cap belongs to HydraLab; this item is the shop's own label, so the 25% plan stays eligible.
+    own_label = Sku(
+        id="T-2",
+        name="own-label item",
+        list_price=Decimal("100"),
+        cost=Decimal("30"),
+        stock=1000,
+        baseline_units=100,
+        elasticity=Decimal("-2.8"),
+        brand="Glow Lab",
+    )
+    hydralab_cap = BrandPriceRule(clause="HydraLab agreement 4.2", max_price_cut=Decimal("0.15"), brand="HydraLab")
+    terms = CampaignTerms(traffic_lift=Decimal("2"), required_discount=Decimal("0.15"))
+
+    result = evaluate_sku(
+        own_label,
+        PromoPlan(mechanics=(PriceCut(amount=Decimal("15")),)),
+        [PromoPlan(mechanics=(PriceCut(amount=Decimal("25")),))],
+        RIVALS,
+        SHOPEE,
+        terms,
+        SellerSettings(margin_floor=Decimal("0.10"), brand_rules=(hydralab_cap,)),
+    )
+
+    assert result.candidates[0].failed_checks == ()

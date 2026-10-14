@@ -12,6 +12,7 @@ MAX_CUT = Decimal("0.60")
 def candidate_plans(
     sku: Sku, terms: CampaignTerms, ideas: list[PlanIdea], brand_rules: tuple[BrandPriceRule, ...] = ()
 ) -> list[PromoPlan]:
+    brand_rules = tuple(r for r in brand_rules if r.binds(sku))
     max_cut = min((r.max_price_cut for r in brand_rules if r.max_price_cut is not None), default=MAX_CUT)
     min_shelf = max((r.min_shelf_price for r in brand_rules if r.min_shelf_price is not None), default=Decimal("0"))
     vouchers_ok = all(r.vouchers_allowed for r in brand_rules)

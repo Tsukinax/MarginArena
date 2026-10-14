@@ -56,7 +56,11 @@ def evaluate_sku(
             failed.append("below the Margin Floor")
         if worst_total < dont_join_total:
             failed.append("earns less than not joining")
-        failed += [f"breaks {r.clause}" for r in settings.brand_rules if _breaks(r, sku, price_cut, plan.mechanics)]
+        failed += [
+            f"breaks {r.clause}"
+            for r in settings.brand_rules
+            if r.binds(sku) and _breaks(r, sku, price_cut, plan.mechanics)
+        ]
         return PlanEvaluation(plan, outcomes, worst_margin, worst_total, expected_total, tuple(failed))
 
     invited = evaluate(as_invited)

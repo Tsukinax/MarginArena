@@ -33,6 +33,7 @@ class Sku:
     """Units this SKU sells over a Campaign-length period at its list price, without a Campaign."""
     elasticity: Decimal | None = None
     """Price elasticity of demand (negative). Category default or the Seller's override."""
+    brand: str | None = None
 
 
 @dataclass(frozen=True)
@@ -154,6 +155,11 @@ class BrandPriceRule:
     min_shelf_price: Decimal | None = None
     vouchers_allowed: bool = True
     gifts_allowed: bool = True
+    brand: str | None = None
+    """The brand whose products the clause binds; None binds every product."""
+
+    def binds(self, sku: Sku) -> bool:
+        return self.brand is None or self.brand == sku.brand
 
 
 @dataclass(frozen=True)
