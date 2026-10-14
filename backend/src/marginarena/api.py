@@ -13,7 +13,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from marginarena.arena import run_arena
-from marginarena.llm import LLMClient, LLMSettings
+from marginarena.llm import LLMClient, LLMSettings, first_healthy
 from marginarena.sample import describe_shop, load_shop
 
 # Token Factory's limits (20 requests/min per account) keep the fallback Arena small (spec, ADR 0002).
@@ -33,15 +33,19 @@ def create_app(
     llm_settings: LLMSettings | None = None,
     llm_transport: httpx.AsyncBaseTransport | None = None,
     sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+    routes: tuple[LLMSettings, ...] | None = None,
 ) -> FastAPI:
+    """`llm_settings` forces one route; otherwise the first healthy of `routes` (default: from the environment)."""
     app = FastAPI(title="MarginArena")
 
-    def settings() -> LLMSettings:
-        return llm_settings or LLMSettings.from_env()
+    async def settings() -> LLMSettings:
+        if llm_settings:
+            return llm_settings
+        return await first_healthy(routes or LLMSettings.routes_from_env(), llm_transport)
 
     @app.get("/api/health")
     async def health() -> dict:
-        s = settings()
+        s = await settings()
         return {"route": s.route, "model": s.model}
 
     @app.get("/api/shops/{shop_id}")
@@ -50,7 +54,7 @@ def create_app(
 
     @app.post("/api/arena")
     async def arena(request: ArenaRequest) -> StreamingResponse:
-        s = settings()
+        s = await settings()
         shop = load_shop(request.shop)
         skus, rounds, rivals, strategists = request.skus, request.rounds, request.rivals, request.strategists
         if s.route == "token-factory":

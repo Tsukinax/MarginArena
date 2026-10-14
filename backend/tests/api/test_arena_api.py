@@ -137,3 +137,23 @@ async def test_decided_sku_explains_its_numbers_with_a_waterfall_scenarios_and_e
     assert len(decided["scenario_grid"]) == decided["scenarios"]
     kinds = {link["kind"] for link in decided["evidence"]}
     assert {"invitation", "fees", "elasticity", "rival_snapshot"} <= kinds
+
+
+GPU = LLMSettings(route="mi300x", base_url="http://gpu.test/v1", api_key="k", model="google/gemma-4-31B-it")
+
+
+async def health_with_gpu_answering(status: int) -> dict:
+    def handle(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(status, json={"data": []})
+
+    app = create_app(routes=(GPU, SETTINGS), llm_transport=httpx.MockTransport(handle))
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        return (await client.get("/api/health")).json()
+
+
+async def test_our_mi300x_endpoint_is_used_when_it_answers():
+    assert (await health_with_gpu_answering(200))["route"] == "mi300x"
+
+
+async def test_token_factory_takes_over_when_the_mi300x_endpoint_is_down():
+    assert (await health_with_gpu_answering(503))["route"] == "token-factory"

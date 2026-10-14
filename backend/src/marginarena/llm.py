@@ -31,23 +31,43 @@ class LLMSettings:
     concurrency: int = 8
 
     @classmethod
-    def from_env(cls) -> LLMSettings:
-        if os.environ.get("VLLM_BASE_URL"):
-            return cls(
-                route="mi300x",
-                base_url=os.environ["VLLM_BASE_URL"],
-                api_key=os.environ.get("VLLM_API_KEY", ""),
-                model=os.environ.get("VLLM_MODEL", "google/gemma-4-31B-it"),
-                requests_per_minute=6000,
-                concurrency=128,
-            )
-        return cls(
+    def routes_from_env(cls) -> tuple[LLMSettings, ...]:
+        """Routes in order of preference: our own MI300X endpoint if configured, then Token Factory."""
+        token_factory = cls(
             route="token-factory",
             base_url=os.environ.get("TOKEN_FACTORY_BASE_URL", "https://developer.amd.com.cn/radeon/api/v1"),
             api_key=os.environ.get("TOKEN_FACTORY_API_KEY", ""),
             model=os.environ.get("TOKEN_FACTORY_MODEL", "Gemma-4-31B-IT"),
             requests_per_minute=15,  # the account limit is 20/min; leave headroom for other callers
         )
+        if not os.environ.get("VLLM_BASE_URL"):
+            return (token_factory,)
+        mi300x = cls(
+            route="mi300x",
+            base_url=os.environ["VLLM_BASE_URL"],
+            api_key=os.environ.get("VLLM_API_KEY", ""),
+            model=os.environ.get("VLLM_MODEL", "google/gemma-4-31B-it"),
+            requests_per_minute=6000,
+            concurrency=128,
+        )
+        return (mi300x, token_factory)
+
+
+async def first_healthy(
+    routes: tuple[LLMSettings, ...], transport: httpx.AsyncBaseTransport | None = None
+) -> LLMSettings:
+    """The first route whose /models answers; the last route is the fallback and is not probed (ADR 0002)."""
+    for route in routes[:-1]:
+        try:
+            async with httpx.AsyncClient(transport=transport, timeout=3) as client:
+                response = await client.get(
+                    route.base_url.rstrip("/") + "/models", headers={"Authorization": f"Bearer {route.api_key}"}
+                )
+            if response.status_code == 200:
+                return route
+        except httpx.HTTPError:
+            pass
+    return routes[-1]
 
 
 @dataclass
