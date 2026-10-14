@@ -130,7 +130,7 @@ The route is chosen per run by a health check and recorded on every result.
   - **Approve** when joining as invited is eligible and its worst case is within 5% of the best plan's worst case.
   - **Revise** when a better eligible plan exists.
   - **Escalate** when no plan is eligible, when the elasticity band is too wide to separate plans, or when a Brand Price Rule is ambiguous.
-- **Margin Protected** = the worst-case profit of following the Verdicts minus the worst-case profit of joining every SKU as invited.
+- **Margin Protected** = for SKUs that are Approved or Revised, the worst-case profit of following the Verdict minus the worst-case profit of joining as invited. Escalated SKUs are left out, since a person decides them. Each one shows its own line instead: what joining as invited would earn in the worst case, and the margin it would leave.
 
 **Elasticity fit (offline).**
 - Download FreshRetailNet-50K (CC BY 4.0) at a pinned revision, checked by SHA-256.

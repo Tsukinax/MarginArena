@@ -154,3 +154,4 @@ Round 12:
   - Evidence: in the live Token Factory run, picking by expected profit chose a plan ฿88 worse in the worst case than the engine-only plan. That contradicts Margin Protected (a worst-case metric) and could make proof 6 negative.
 - **Q53** – The default gift perceived value drops from 50% to **30%** of retail. It is shown and overridable, with its sensitivity in the UI.
   - Evidence: at 50%, the live run chose "add a mini gift" on every Revise.
+- **Escalate is not "don't join"** (consistency fix found in the second live run). Margin Protected counts only Approve and Revise SKUs; an Escalate hands the decision to a person and shows its own worst-case line. Previously, assuming "don't join" made the run's total −฿1,130, because the Seller's own Margin Floor blocked a profitable join. Token Factory pacing is lowered to 15/min after 7 retries at 20/min.

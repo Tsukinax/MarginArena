@@ -46,6 +46,7 @@ class LLMSettings:
             base_url=os.environ.get("TOKEN_FACTORY_BASE_URL", "https://developer.amd.com.cn/radeon/api/v1"),
             api_key=os.environ.get("TOKEN_FACTORY_API_KEY", ""),
             model=os.environ.get("TOKEN_FACTORY_MODEL", "Gemma-4-31B-IT"),
+            requests_per_minute=15,  # the account limit is 20/min; leave headroom for other callers
         )
 
 

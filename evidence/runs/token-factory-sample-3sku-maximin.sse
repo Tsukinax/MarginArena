@@ -1,0 +1,72 @@
+data: {"type": "run_started", "route": "token-factory", "model": "Gemma-4-31B-IT", "shop": "Glow Lab BKK", "label": "Fictional sample shop for the demo. Catalogue costs, stock, baselines, the brand agreement and the Rival Snapshot are invented. Fees are Shopee Thailand Non-Mall PRIME rates effective 4 Aug 2026; elasticity is the FreshRetailNet-50K pooled estimate.", "invitation": {"marketplace": "Shopee Thailand", "campaign": "11.11 Big Sale", "slot": "Shocking Sale, 11 Nov 00:00 to 23:59", "registration_closes": "7 Nov 2026"}, "skus": ["HB-30", "NT-200", "VC-30"], "rounds": 2, "rivals": 2, "strategists": 1, "elasticity": "FreshRetailNet-50K (Dingdong Ltd.), CC BY 4.0, pooled -1.49 (band -1.977 to -0.771)"}
+
+data: {"type": "idea", "sku": "NT-200", "strategist": "Margin keeper", "use_voucher": false, "gift": "Gentle Amino Cleanser 30 ml (mini)", "why": "Adding a low-value mini cleanser maintains perceived value while minimizing the impact on unit margin."}
+
+data: {"type": "idea", "sku": "NT-200", "strategist": "Margin keeper", "use_voucher": true, "gift": null, "why": "Using a voucher instead of a direct discount or gift minimizes losses by limiting the number of redemptions."}
+
+data: {"type": "round_started", "sku": "NT-200", "round": 1, "leader": "฿58.50 off"}
+
+data: {"type": "idea", "sku": "VC-30", "strategist": "Margin keeper", "use_voucher": true, "gift": null, "why": "Utilize shop vouchers to meet campaign requirements while keeping the headline discount within the brand's 20% limit."}
+
+data: {"type": "idea", "sku": "VC-30", "strategist": "Margin keeper", "use_voucher": true, "gift": "Gentle Amino Cleanser 30 ml (mini)", "why": "Combine a voucher with a low-cost mini cleanser to drive conversion without sacrificing significant margin per unit."}
+
+data: {"type": "round_started", "sku": "VC-30", "round": 1, "leader": "฿118.00 off"}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 1, "rival": "Price matcher", "headline_cut_pct": 7.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "293.87", "why": "I will match the target price of 331.50 via a direct discount and add free shipping to create a better perceived value."}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 1, "rival": "Undercutter", "headline_cut_pct": 5.0, "voucher_baht": 30.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "271.05", "why": "I will undercut the shelf price slightly and add a shipping subsidy to make my final cost clearly lower than theirs."}
+
+data: {"type": "leader", "sku": "NT-200", "round": 1, "verdict": "approve", "plan": "฿58.50 off", "changed": false, "telemetry": {"calls_ok": 4, "calls_invalid": 0, "calls_failed": 0, "retries": 7, "in_flight": 2, "completion_tokens": 335, "tokens_per_second": 3.9, "elapsed_seconds": 86.38}}
+
+data: {"type": "round_started", "sku": "NT-200", "round": 2, "leader": "฿58.50 off"}
+
+data: {"type": "idea", "sku": "HB-30", "strategist": "Margin keeper", "use_voucher": false, "gift": "Gentle Amino Cleanser 30 ml (mini)", "why": "Minimize direct price drops by using a low-cost mini cleanser to satisfy campaign requirements while protecting margin."}
+
+data: {"type": "idea", "sku": "HB-30", "strategist": "Margin keeper", "use_voucher": true, "gift": null, "why": "Use a shop voucher to reach the minimum discount threshold without permanently lowering the headline price."}
+
+data: {"type": "idea", "sku": "HB-30", "strategist": "Margin keeper", "use_voucher": true, "gift": "Gentle Amino Cleanser 30 ml (mini)", "why": "Combine a small voucher and a mini gift to stay within the strict 20% brand discount ceiling."}
+
+data: {"type": "round_started", "sku": "HB-30", "round": 1, "leader": "฿88.50 off"}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 1, "rival": "Undercutter", "headline_cut_pct": 22.0, "voucher_baht": 50.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "370.20", "why": "Cutting the headline price to ฿458 ensures I appear first in the 'Lowest Price' sort while using a voucher to drive the final price even lower than the competitor."}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 1, "rival": "Price matcher", "headline_cut_pct": 20.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "432.00", "why": "Matching the final price of 472 THB via a 20% discount and adding free shipping to increase perceived value over the competitor."}
+
+data: {"type": "leader", "sku": "VC-30", "round": 1, "verdict": "escalate", "plan": null, "changed": false, "telemetry": {"calls_ok": 7, "calls_invalid": 0, "calls_failed": 0, "retries": 7, "in_flight": 1, "completion_tokens": 637, "tokens_per_second": 6.9, "elapsed_seconds": 92.39}}
+
+data: {"type": "round_started", "sku": "VC-30", "round": 2, "leader": "฿118.00 off"}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 2, "rival": "Undercutter", "headline_cut_pct": 5.0, "voucher_baht": 30.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "271.05", "why": "I will undercut the shelf price slightly and offer a higher combined value through vouchers and free shipping to steal the conversion."}
+
+data: {"type": "rival_move", "sku": "NT-200", "round": 2, "rival": "Price matcher", "headline_cut_pct": 7.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "293.87", "why": "I match the competitor's final price of 331.50 via a direct discount and add free shipping to provide a superior perceived value."}
+
+data: {"type": "leader", "sku": "NT-200", "round": 2, "verdict": "approve", "plan": "฿58.50 off", "changed": false, "telemetry": {"calls_ok": 9, "calls_invalid": 0, "calls_failed": 0, "retries": 7, "in_flight": 1, "completion_tokens": 794, "tokens_per_second": 8.1, "elapsed_seconds": 98.31}}
+
+data: {"type": "sku_decided", "sku": "NT-200", "name": "Niacinamide 10% Toner 200 ml", "verdict": "approve", "invited_plan": "฿58.50 off", "invited_failed_checks": [], "invited_worst_total": "45421.56", "invited_expected_total": "55254.89", "chosen_plan": "฿58.50 off", "chosen_worst_total": "45421.56", "chosen_expected_total": "55254.89", "chosen_worst_margin": "0.4229", "dont_join_total": "17695.71", "protected": "0.00", "generic_plan": "฿58.50 off", "generic_worst_total_all_scenarios": "45421.56", "scenarios": 7, "rounds_played": 2, "plans_searched": 183}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 1, "rival": "Undercutter", "headline_cut_pct": 10.0, "voucher_baht": 50.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "404.10", "why": "I will drop my headline price to ฿495 to beat their ฿501.50 and stack a voucher to make the final price irresistible."}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 1, "rival": "Price matcher", "headline_cut_pct": 9.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "459.59", "why": "I will match their final price of 501.50 via a headline discount and add free shipping to steal the conversion."}
+
+data: {"type": "leader", "sku": "HB-30", "round": 1, "verdict": "approve", "plan": "฿88.50 off", "changed": false, "telemetry": {"calls_ok": 11, "calls_invalid": 0, "calls_failed": 0, "retries": 7, "in_flight": 2, "completion_tokens": 959, "tokens_per_second": 9.0, "elapsed_seconds": 106.08}}
+
+data: {"type": "round_started", "sku": "HB-30", "round": 2, "leader": "฿88.50 off"}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 2, "rival": "Price matcher", "headline_cut_pct": 20.0, "voucher_baht": 72.0, "free_shipping_baht": 0, "gift_value_baht": 0, "effective_rival_price": "400.00", "why": "Matching the competitor's final price of 472 baht exactly to neutralize their price advantage."}
+
+data: {"type": "rival_move", "sku": "VC-30", "round": 2, "rival": "Undercutter", "headline_cut_pct": 15.0, "voucher_baht": 50.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "411.50", "why": "I will drop my headline price to ฿400 and add a voucher to ensure the final checkout price is significantly lower than ฿472."}
+
+data: {"type": "leader", "sku": "VC-30", "round": 2, "verdict": "escalate", "plan": null, "changed": false, "telemetry": {"calls_ok": 13, "calls_invalid": 0, "calls_failed": 0, "retries": 7, "in_flight": 1, "completion_tokens": 1094, "tokens_per_second": 10.0, "elapsed_seconds": 109.94}}
+
+data: {"type": "sku_decided", "sku": "VC-30", "name": "Vitamin C Bright Serum 30 ml", "verdict": "escalate", "invited_plan": "฿118.00 off", "invited_failed_checks": ["below the Margin Floor"], "invited_worst_total": "7369.32", "invited_expected_total": "10012.54", "chosen_plan": null, "chosen_worst_total": "6239.50", "chosen_expected_total": null, "chosen_worst_margin": null, "dont_join_total": "6239.50", "protected": "-1129.82", "generic_plan": "฿118.00 off", "generic_worst_total_all_scenarios": "7369.32", "scenarios": 7, "rounds_played": 2, "plans_searched": 13}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 2, "rival": "Undercutter", "headline_cut_pct": 5.0, "voucher_baht": 50.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "431.55", "why": "Undercutting the shelf price slightly and adding a high-value voucher and free shipping to make the final landing price significantly lower than the competitor."}
+
+data: {"type": "rival_move", "sku": "HB-30", "round": 2, "rival": "Price matcher", "headline_cut_pct": 9.0, "voucher_baht": 0.0, "free_shipping_baht": 40.0, "gift_value_baht": 0.0, "effective_rival_price": "459.59", "why": "I will match the competitor's final price of ฿501.50 through a headline discount and add free shipping to offer better overall value."}
+
+data: {"type": "leader", "sku": "HB-30", "round": 2, "verdict": "approve", "plan": "฿88.50 off", "changed": false, "telemetry": {"calls_ok": 15, "calls_invalid": 0, "calls_failed": 0, "retries": 7, "in_flight": 0, "completion_tokens": 1259, "tokens_per_second": 10.6, "elapsed_seconds": 118.75}}
+
+data: {"type": "sku_decided", "sku": "HB-30", "name": "Hydra Barrier Serum 30 ml", "verdict": "approve", "invited_plan": "฿88.50 off", "invited_failed_checks": [], "invited_worst_total": "40159.50", "invited_expected_total": "50458.24", "chosen_plan": "฿88.50 off", "chosen_worst_total": "40159.50", "chosen_expected_total": "50458.24", "chosen_worst_margin": "0.3906", "dont_join_total": "15847.19", "protected": "0.00", "generic_plan": "฿88.50 off", "generic_worst_total_all_scenarios": "40159.50", "scenarios": 7, "rounds_played": 2, "plans_searched": 73}
+
+data: {"type": "run_done", "results": [{"sku": "HB-30", "name": "Hydra Barrier Serum 30 ml", "verdict": "approve", "invited_plan": "฿88.50 off", "invited_failed_checks": [], "invited_worst_total": "40159.50", "invited_expected_total": "50458.24", "chosen_plan": "฿88.50 off", "chosen_worst_total": "40159.50", "chosen_expected_total": "50458.24", "chosen_worst_margin": "0.3906", "dont_join_total": "15847.19", "protected": "0.00", "generic_plan": "฿88.50 off", "generic_worst_total_all_scenarios": "40159.50", "scenarios": 7, "rounds_played": 2, "plans_searched": 73}, {"sku": "NT-200", "name": "Niacinamide 10% Toner 200 ml", "verdict": "approve", "invited_plan": "฿58.50 off", "invited_failed_checks": [], "invited_worst_total": "45421.56", "invited_expected_total": "55254.89", "chosen_plan": "฿58.50 off", "chosen_worst_total": "45421.56", "chosen_expected_total": "55254.89", "chosen_worst_margin": "0.4229", "dont_join_total": "17695.71", "protected": "0.00", "generic_plan": "฿58.50 off", "generic_worst_total_all_scenarios": "45421.56", "scenarios": 7, "rounds_played": 2, "plans_searched": 183}, {"sku": "VC-30", "name": "Vitamin C Bright Serum 30 ml", "verdict": "escalate", "invited_plan": "฿118.00 off", "invited_failed_checks": ["below the Margin Floor"], "invited_worst_total": "7369.32", "invited_expected_total": "10012.54", "chosen_plan": null, "chosen_worst_total": "6239.50", "chosen_expected_total": null, "chosen_worst_margin": null, "dont_join_total": "6239.50", "protected": "-1129.82", "generic_plan": "฿118.00 off", "generic_worst_total_all_scenarios": "7369.32", "scenarios": 7, "rounds_played": 2, "plans_searched": 13}], "margin_protected": "-1129.82", "telemetry": {"calls_ok": 15, "calls_invalid": 0, "calls_failed": 0, "retries": 7, "in_flight": 0, "completion_tokens": 1259, "tokens_per_second": 10.6, "elapsed_seconds": 118.75}}
+

@@ -80,7 +80,7 @@ async def test_a_deeper_rival_move_never_improves_the_worst_case():
     harmless = await run(FakeModelServer(moves=[{"headline_cut_pct": 0, "why": "hold"}]))
     deep = await run(FakeModelServer(moves=[{"headline_cut_pct": 35, "voucher_baht": 20, "why": "all in"}]))
 
-    assert float(result(deep)["chosen_worst_total"]) <= float(result(harmless)["chosen_worst_total"])
+    assert float(result(deep)["invited_worst_total"]) <= float(result(harmless)["invited_worst_total"])
 
 
 async def test_model_output_that_is_not_json_is_rejected_and_counted():

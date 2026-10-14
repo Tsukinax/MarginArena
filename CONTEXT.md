@@ -39,7 +39,7 @@ One way a Seller can make an offer more attractive: a price cut, a shop voucher 
 _Avoid_: Promo type, tactic, lever
 
 **Margin Protected**:
-How much more profit, in the worst case, a Seller keeps by following MarginArena's Verdicts than by joining every invited SKU exactly as invited.
+How much more profit, in the worst case, a Seller keeps by following MarginArena's Approve and Revise Verdicts than by joining those SKUs exactly as invited. Escalated SKUs are left out, because a person decides them.
 _Avoid_: Savings, profit uplift, money saved
 
 **Evidence Link**:

@@ -161,7 +161,6 @@ async def _sku_arena(
     generic_plan = (generic_verdict.chosen or generic_verdict.as_invited).plan
     generic_under_all = evaluate_sku(sku, generic_plan, [], scenarios, shop.profile, terms, settings).as_invited
     chosen = verdict.chosen
-    kept = chosen.worst_total if chosen else verdict.dont_join_total
     result = {
         "sku": sku.id,
         "name": sku.name,
@@ -171,13 +170,16 @@ async def _sku_arena(
         "invited_worst_total": str(verdict.as_invited.worst_total),
         "invited_expected_total": str(verdict.as_invited.expected_total),
         "chosen_plan": _label(chosen.plan) if chosen else None,
-        "chosen_worst_total": str(kept),
+        "chosen_worst_total": str(chosen.worst_total) if chosen else None,
         "chosen_expected_total": str(chosen.expected_total) if chosen else None,
         "chosen_worst_margin": str(chosen.worst_margin) if chosen else None,
         "dont_join_total": str(verdict.dont_join_total),
-        "protected": str(kept - verdict.as_invited.worst_total),
+        "invited_worst_margin": str(verdict.as_invited.worst_margin),
+        # Escalate hands the decision to a person: no Margin Protected and no red-team gain are claimed.
+        "protected": str(chosen.worst_total - verdict.as_invited.worst_total) if chosen else "0",
         "generic_plan": _label(generic_plan),
         "generic_worst_total_all_scenarios": str(generic_under_all.worst_total),
+        "red_team_gain": str(chosen.worst_total - generic_under_all.worst_total) if chosen else None,
         "scenarios": len(scenarios),
         "rounds_played": rounds_played,
         "plans_searched": len(plans) + 1,

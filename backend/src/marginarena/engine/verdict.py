@@ -99,10 +99,8 @@ def evaluate_invitation(
         )
         for item in items
     )
-    protected = sum(
-        ((v.chosen.worst_total if v.chosen else v.dont_join_total) - v.as_invited.worst_total for v in verdicts),
-        Decimal("0"),
-    )
+    # Escalate hands the decision to a person, so it counts toward neither side.
+    protected = sum((v.chosen.worst_total - v.as_invited.worst_total for v in verdicts if v.chosen), Decimal("0"))
     return InvitationResult(verdicts=verdicts, margin_protected=protected)
 
 
