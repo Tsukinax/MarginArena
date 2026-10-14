@@ -18,3 +18,6 @@ backend/.data/
 
 # The droplet startup script holds the vLLM API key (infra/droplet/kit.py prepare)
 infra/droplet/.generated/
+
+# The Evolus kit saves raw workspace answers here (infra/evolus/evolus_kit.py plan)
+infra/evolus/.plan/

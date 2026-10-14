@@ -81,7 +81,7 @@ Every error is `EvolusProblemDetails {title, status, detail, errorCode, traceId,
 ## What this means for MarginArena
 
 - **Evolus can call our engine.** A Web API definition attached to the Campaign Desk agent does this, so we don't depend on custom MCP. This settles ticket 06's open question.
-- **The setup is reproducible:** `scripts/evolus_setup.py` creates the library, extractor, agent, web API and workflow from code. It needs a **User API Key** in `.env`.
+- **The setup is reproducible:** `infra/evolus/evolus_kit.py` creates the library, extractor, agent, web API and workflow from code. It needs a **User API Key** in `.env`.
 - **The workflow must be created with `isActive: true`**, or execute calls fail with `409`.
 - **Upload library documents with `language=en`**, because the default is Italian.
 - **Look up step types at runtime** from `step-catalog`; don't hard-code the integers.
