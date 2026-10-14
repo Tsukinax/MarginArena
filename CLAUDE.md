@@ -33,6 +33,7 @@ LLMs propose and explain; the engine computes every number (ADR 0001). AI explor
   - `search.candidate_plans` expands non-numeric Plan Ideas into every numeric Promo Plan, clipped by Brand Price Rules.
 - `arena.py`: per SKU, Strategists return Plan Ideas → the engine searches → three generic Counter-moves set the first leader → each round Rivals red-team the leader and the engine re-selects over every Scenario found; it stops once the leader holds. It streams SSE events and returns results as dicts of decimal strings, including the proof-6 `red_team_gain`.
 - `llm.py`: one OpenAI-compatible JSON client for both inference routes (ADR 0002). Output is schema-validated plus an `accept` check; invalid output is rejected and counted, never repaired. The route is the first healthy of `mi300x` (only when `VLLM_BASE_URL` is set) then `token-factory`.
+- `explainer.py` (`POST /api/explain`): turns one decided SKU into a fact sheet, asks the model for a short explanation in English or Thai, and rejects any draft citing a number that is not in the fact sheet (`unsupported_numbers`; rounding is allowed). One rewrite, then a numbers-only template. The check proves numbers, not which label they sit next to.
 - `api.py`: `create_app` takes `llm_settings`, `routes`, `llm_transport` and `sleep`, which is how tests inject a fake model server. Runs on Token Factory are capped and default to the demo trio NT-200, VC-30, SM-10 (Q55).
 - `sample/`: the fictional Glow Lab BKK shop (12 skincare SKUs, HydraLab clause 4.2), with elasticity from `engine/data/elasticity.json`.
 - `web/src/`: React 19 + Vite, four steps (Invitation, Arena, Verdicts, Confirm) and the "How we decided" drawer. `api.ts` mirrors the backend's event and result shapes, so change both together. The UI formats money strings and leaves every calculation to the engine.
@@ -45,9 +46,9 @@ New code is test-first, at three seams only (spec.md, "Testing Decisions"):
 
 1. Engine public functions, with realistic inputs and the expected numbers worked by hand in a comment (`backend/tests/engine/test_verdict.py` is the reference style).
 2. The HTTP API, running the real client, Arena and engine against a model server faked at the network edge (`FakeModelServer` with `httpx.MockTransport` and `sleep=no_sleep` in `backend/tests/api/test_arena_api.py`).
-3. The explainer's numeric-consistency check: an explanation whose numbers don't match the engine is rejected.
+3. The explainer's number check, `unsupported_numbers` (`backend/tests/explainer/`).
 
-Live checks against the real vLLM endpoint or Evolus are scripts that write to `evidence/`, not unit tests.
+Live checks against a real model or Evolus are scripts that write to `evidence/`, not unit tests (for example `backend/scripts/check_explainer.py`).
 
 ## Rules that protect the submission
 

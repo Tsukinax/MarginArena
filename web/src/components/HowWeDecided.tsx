@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { baht, pct, verdictWord, type SkuResult } from '../api'
+import Explainer from './Explainer'
 
 type Props = { result: SkuResult; onClose: () => void }
 
@@ -30,6 +31,7 @@ export default function HowWeDecided({ result: r, onClose }: Props) {
         </button>
         <p className={`pill pill--${r.skip ? 'skip' : r.verdict}`}>{verdictWord(r.verdict, r.skip)}</p>
         <h2>{r.name}</h2>
+        <Explainer result={r} />
 
         <table className="compare">
           <thead>

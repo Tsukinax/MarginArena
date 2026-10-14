@@ -907,6 +907,108 @@ button:disabled {
   color: var(--neg);
 }
 
+/* "In plain words": the Verdict explained in English or Thai, every number checked by the engine */
+.explain {
+  margin: 0 0 18px;
+  padding: 14px 16px 12px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--profit);
+  border-radius: 10px;
+  background: #fbfcfd;
+}
+
+.explain--revise {
+  border-left-color: var(--amber);
+}
+
+.explain--escalate {
+  border-left-color: var(--violet);
+}
+
+.explain--skip {
+  border-left-color: #6b7280;
+}
+
+.explain-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.drawer .explain-head h3 {
+  margin: 0;
+}
+
+.seg {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.seg button {
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.seg button:lang(th) {
+  font-family: 'IBM Plex Sans Thai', 'Public Sans', sans-serif;
+}
+
+.seg button[aria-pressed='true'] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.seg button:disabled:not([aria-pressed='true']) {
+  opacity: 0.5;
+}
+
+.explain-hint,
+.explain-meta p {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.explain-wait {
+  margin: 12px 0 4px;
+  font-size: 14px;
+  color: var(--muted);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.explain-text {
+  margin: 12px 0 0;
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+.explain-text:lang(th) {
+  font-family: 'IBM Plex Sans Thai', 'Public Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+.explain-ok {
+  color: var(--profit);
+  font-weight: 700;
+}
+
+.explain-meta del {
+  color: var(--neg);
+  font-weight: 600;
+  text-decoration-thickness: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
 .wf-row {
   display: grid;
   grid-template-columns: 170px 1fr 80px;

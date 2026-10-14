@@ -144,10 +144,10 @@ def _system(language: Language) -> str:
     return (
         "You explain one MarginArena Verdict to a small online Seller in Thailand. "
         f"Write in {WRITE_IN[language]}: 3 to 5 short sentences on what to do, why, and the hardest Counter-move "
-        "the plan was tested against. Use only numbers that appear in FACTS, written with digits, and name what each "
-        "number measures with its label from FACTS. You may round a number, but never add, subtract, multiply or "
-        "estimate a new one. Keep these words in English: Approve, "
-        "Revise, Skip, Escalate, Promo Plan, Margin Floor, Counter-move, Campaign. "
+        "the plan was tested against. Use only numbers that appear in FACTS, written with digits, and say what each "
+        "number measures by translating its label in FACTS. You may round a number, but never add, subtract, "
+        "multiply or estimate a new one. Keep these words in English: Approve, Revise, Skip, Escalate, Promo Plan, "
+        "Margin Floor, Counter-move, Campaign. "
         'Reply with JSON only: {"explanation": "<your text>"}'
     )
 
