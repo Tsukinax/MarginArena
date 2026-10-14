@@ -66,6 +66,8 @@ class CampaignTerms:
     buyer_paid_shipping: Decimal = ZERO
     traffic_lift: Decimal = Decimal("1")
     """How much more traffic joining the Campaign brings, before any price effect."""
+    required_discount: Decimal = ZERO
+    """The Campaign Invitation's minimum price cut, as a fraction of list price."""
     cross_price_sensitivity: Decimal = Decimal("0.6")
     """Assumption, shown to the Seller and overridable: how strongly a Rival's effective price cut pulls demand away."""
 
@@ -115,3 +117,33 @@ class CampaignOutcome:
     unit: UnitEconomics
     units: int
     total_profit: Decimal
+
+
+@dataclass(frozen=True)
+class SellerSettings:
+    margin_floor: Decimal
+    approve_tolerance: Decimal = Decimal("0.05")
+    """Joining as invited is approved when the best plan earns at most this much more (relative)."""
+
+
+@dataclass(frozen=True)
+class PlanEvaluation:
+    plan: PromoPlan
+    outcomes: tuple[CampaignOutcome, ...]
+    """One outcome per Counter-move, in the order given."""
+    meets_invitation: bool
+    worst_margin: Decimal
+    worst_total: Decimal
+    expected_total: Decimal
+    eligible: bool
+
+
+@dataclass(frozen=True)
+class SkuVerdict:
+    sku: Sku
+    verdict: str
+    """approve | revise | escalate"""
+    chosen: PlanEvaluation | None
+    as_invited: PlanEvaluation
+    candidates: tuple[PlanEvaluation, ...]
+    dont_join_total: Decimal
