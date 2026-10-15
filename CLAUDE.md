@@ -28,7 +28,7 @@ Dev servers: `preview_start` with `api` (FastAPI on :8008, reads `.env`) and `we
 LLMs propose and explain; the engine computes every number (ADR 0001). AI explores what is open-ended, math solves what is closed (ADR 0004).
 
 - `backend/src/marginarena/engine/`: pure functions over frozen dataclasses, money as `Decimal` rounded to the satang, no I/O. The pipeline is `fees.unit_economics` → `demand.campaign_outcome` → `verdict.evaluate_sku` → `verdict.evaluate_invitation`.
-  - Fees: each fee is computed excluding VAT and rounded, then VAT is added. That order is what reproduces both marketplaces' published worked examples.
+  - Fees: each fee is computed excluding VAT and rounded, then VAT is added. That order reproduces Lazada's published worked example and our hand-worked Shopee example (Shopee publishes none).
   - Demand: baseline × traffic lift × (buyer price / list price)^elasticity × share retained against a cheaper Rival, floored and capped at stock. The price ratio is capped at 1, so elasticity applies to price cuts only.
   - Verdict: Scenarios are every Counter-move × {point elasticity, both band edges}. Maximin picks among eligible plans; Skip is a Revise; Margin Protected leaves out Escalate. Full rules: spec.md, "Robust selection" and "Verdict".
   - `search.candidate_plans` expands non-numeric Plan Ideas into every numeric Promo Plan, clipped by Brand Price Rules.
