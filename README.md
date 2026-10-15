@@ -70,7 +70,10 @@ These are model-based estimates for a fictional shop; every figure comes from th
 
 - **Margin Protected: ฿5,434.46.** Following the 12 Verdicts of the recorded run keeps ฿5,434.46 more profit in the
   worst case than joining every product exactly as invited (the escalated product is left out:
-  `evidence/runs/token-factory-sample-12sku.sse`).
+  `evidence/runs/token-factory-sample-12sku.sse`). Of it, ฿1,648.50 comes from skipping RN-30 and SM-10, and
+  ฿3,785.96 (70%) from SS-50's Revise, which rests on a labelled sample Seller override (elasticity −2.62 instead of
+  the pooled −1.49). At the pooled fit, SS-50 stays an Approve
+  ([q56-red-team.md](.scratch/marginarena/research/q56-red-team.md)).
 - **No plan breaks a check.** Under the same Scenarios, joining as invited breaks a check on 2 products and matching
   the competitor on 3; MarginArena's plans break none ([evidence/policy-comparison.md](evidence/policy-comparison.md)).
 - **An AI Rival changed a decision.** Live on Token Factory, a Rival's Counter-move turned SS-50's Approve into a Revise
