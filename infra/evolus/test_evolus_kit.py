@@ -80,6 +80,7 @@ class FakeWorkspace:
         self.documents: dict[str, list[dict]] = {}
         self.agents: list[dict] = []
         self.agent_memories: dict[str, list[str]] = {}
+        self.structures: dict[str, list[dict]] = {}
         self.workflows: list[dict] = []
         self.requests: list[httpx.Request] = []
 
@@ -94,6 +95,7 @@ class FakeWorkspace:
         )
         docs = re.fullmatch(r"/memories/([^/]+)/documents", path)
         agent_memories = re.fullmatch(r"/agents/([^/]+)/memories", path)
+        structures = re.fullmatch(r"/agents/([^/]+)/json", path)
         workflow = re.fullmatch(r"/workflows/([^/]+)", path)
         steps = re.fullmatch(r"/workflows/([^/]+)/steps", path)
         if method == "GET" and path == "/memories":
@@ -114,6 +116,15 @@ class FakeWorkspace:
             agent = {"agentId": f"agent-{len(self.agents) + 1}", **body}
             self.agents.append(agent)
             return httpx.Response(200, json={"agentId": agent["agentId"]})
+        if structures and method == "GET":
+            return httpx.Response(200, json=self.structures.get(structures[1], []))
+        if structures and method == "POST":
+            made = {
+                "id": f"structure-{sum(map(len, self.structures.values())) + 1}",
+                **body,
+            }
+            self.structures.setdefault(structures[1], []).append(made)
+            return httpx.Response(200, json=made)
         if agent_memories and method == "GET":
             ids = self.agent_memories.get(agent_memories[1], [])
             rows = [{"agentId": agent_memories[1], "memoryId": i} for i in ids]
@@ -208,6 +219,33 @@ def test_apply_with_our_model_builds_the_campaign_desk_and_the_verdict_workflow(
     env = (tmp_path / ".env").read_text()
     assert f"EVOLUS_AGENT_ID={ids['agent']}" in env
     assert f"EVOLUS_WORKFLOW_ID={ids['workflow']}" in env
+
+
+def test_apply_with_our_model_builds_the_campaign_invitation_extractor(tmp_path):
+    workspace = FakeWorkspace()
+
+    ids = apply(workspace, tmp_path, model="own/Gemma", fallback="own/Qwen")
+
+    reader = next(a for a in workspace.agents if a["agentId"] == ids["reader"])
+    (structure,) = workspace.structures[ids["reader"]]
+    assert (reader["name"], reader["isExtractor"], reader["modelKey"]) == (
+        evolus_kit.READER,
+        True,
+        "own/Gemma",
+    )
+    assert reader["fallbackModelKeys"] == ["own/Qwen"]
+    assert structure["id"] == ids["invitation_structure"]
+    assert (structure["title"], structure["canUseOCR"]) == ("Campaign Invitation", True)
+    assert set(json.loads(structure["structure"])) == {
+        "marketplace",
+        "campaign",
+        "slot",
+        "registration_closes",
+        "items",
+    }
+    env = (tmp_path / ".env").read_text()
+    assert f"EVOLUS_READER_ID={ids['reader']}" in env
+    assert f"EVOLUS_INVITATION_STRUCTURE_ID={ids['invitation_structure']}" in env
 
 
 def test_apply_twice_creates_nothing_new_and_leaves_other_libraries_alone(tmp_path):

@@ -13,7 +13,7 @@ Run from the repo root with the keys from .env:
           workspace's own models from "Your models") the Campaign Desk agent and the Verdict workflow; --fallback
           names the model the agent falls back to. Saves the IDs to .env. Ask the user before every run.
 
-The Campaign Invitation extractor comes next. API notes: docs/api-guide/evolus-api.md.
+With --model it also builds the Campaign Invitation extractor. API notes: docs/api-guide/evolus-api.md.
 """
 
 from __future__ import annotations
@@ -41,6 +41,35 @@ AGENT_PROMPT = (
     "Campaign rules, the HydraLab reseller agreement) to say where a fee or a rule comes from. Answer in the "
     "language you are asked in, briefly."
 )
+READER = "MarginArena Invitation Reader"
+READER_PROMPT = (
+    "You read marketplace Campaign Invitations and copy what they say into the output structure, exactly as "
+    "written. Never compute, convert or guess a number."
+)
+# The extractor's schema: an example JSON with every key it must return (Evolus checks the top-level keys).
+INVITATION_STRUCTURE = {
+    "title": "Campaign Invitation",
+    "userPrompt": (
+        "Read this Campaign Invitation. Copy the marketplace, the campaign, the slot and the registration closing "
+        "date as written. For every product row copy the SKU, the product name, the list price and the minimum "
+        "discount in percent as a number (15% is 15). Leave a field empty when the document does not show it."
+    ),
+    "structure": json.dumps(
+        {
+            "marketplace": "",
+            "campaign": "",
+            "slot": "",
+            "registration_closes": "",
+            "items": [
+                {"sku": "", "product": "", "list_price": "", "minimum_discount_pct": 0}
+            ],
+        }
+    ),
+    "canUseOCR": True,
+    "maxCorrections": 2,
+}
+# One of the platform's OCR models for documents (MCP list_application_ocr_models on 15 Oct).
+READER_OCR = "codedesign_documentintelligence"
 WORKFLOW = "MarginArena Verdict"
 # Runs after the Seller confirms. The input is the confirmed Verdicts as JSON; the scripts only sort and pass
 # through the engine's figures, they compute none.
@@ -169,6 +198,9 @@ def apply(
         if model:
             ids["agent"] = _agent(client, headers, model, fallback, ids["library"])
             ids["workflow"] = _workflow(client, headers["app"], ids["agent"])
+            ids["reader"], ids["invitation_structure"] = _reader(
+                client, headers, model, fallback
+            )
     for name, value in ids.items():
         _set_env(env_file, f"EVOLUS_{name.upper()}_ID", value)
     return ids
@@ -213,6 +245,46 @@ def _agent(
         )
         print("  knowledge library: attached")
     return agent
+
+
+def _reader(
+    client: httpx.Client, headers: dict, model: str, fallback: str | None
+) -> tuple[str, str]:
+    """The Campaign Invitation extractor: an extractor agent on our model, and its output structure."""
+    agents = _ok(client.get("/agents", headers=headers["app"])).json()
+    found = [a for a in agents if a.get("name") == READER]
+    if found:
+        reader = found[0].get("agentId") or found[0]["id"]
+        print(f"extractor {READER!r}: found")
+    else:
+        body = {
+            "name": READER,
+            "prompt": READER_PROMPT,
+            "language": "en",
+            "modelKey": model,
+            "isExtractor": True,
+            "ocrModelKey": READER_OCR,
+        }
+        if fallback:
+            body["fallbackModelKeys"] = [fallback]
+        made = _ok(client.post("/agents", json=body, headers=headers["app"])).json()
+        reader = made["agentId"]
+        print(f"extractor {READER!r}: created on {model}")
+    title = INVITATION_STRUCTURE["title"]
+    structures = _ok(
+        client.get(f"/agents/{reader}/json", headers=headers["user"])
+    ).json()
+    found = [s for s in structures if s.get("title") == title]
+    if found:
+        structure = found[0]["id"]
+        print(f"  output structure {title!r}: found")
+    else:
+        made = client.post(
+            f"/agents/{reader}/json", json=INVITATION_STRUCTURE, headers=headers["user"]
+        )
+        structure = _ok(made).json()["id"]
+        print(f"  output structure {title!r}: created")
+    return reader, structure
 
 
 def _workflow(client: httpx.Client, headers: dict[str, str], agent: str) -> str:
