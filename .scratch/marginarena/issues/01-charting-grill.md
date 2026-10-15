@@ -170,4 +170,5 @@ Round 15 (15 Oct, with the user):
   - The credit needs days of approval, so the user chose not to request it.
   - Consequences: no GPU session; AMD evidence comes from recorded Token Factory runs; the UI's claim about checking all 12 SKUs on our own MI300X goes.
   - Resolved the same day: another team asked in Discord whether Token Factory meets the Evolus track's "own vLLM endpoint" rule, and the AMD mentor answered (14 Oct, 07:13 ICT) that it "perfectly satisfies this requirement". The Evolus agent runs on Token Factory under "Your models" (alias `tf-gemma`).
-- The next question is Q58.
+- **Q58** – When Token Factory's Gemma has no workers (500 "no_available_workers", seen on 15 Oct), live runs and the Evolus agent fall back to Qwen3.8-27B on the same route, and the app says so. Gemma stays the model every run starts with. The user chose this on 15 Oct.
+- The next question is Q59.

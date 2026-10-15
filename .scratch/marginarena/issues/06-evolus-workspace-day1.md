@@ -43,3 +43,10 @@ Create the workspace through https://app.evolus.ai/join/AMDACT3, put the API key
   --fallback own/Qwen3.8-27B` built the Campaign Desk agent and the Verdict workflow (the API wants step types as the
   catalog's numbers). The Confirm step runs it; one run is in `evidence/evolus-verdict-workflow.md` (10.55 s, 0.0
   credits). The extractor is next.
+- 15 Oct, evening: `apply` also built the Campaign Invitation extractor ("MarginArena Invitation Reader", output
+  structure "Campaign Invitation"; IDs `EVOLUS_READER_ID` and `EVOLUS_INVITATION_STRUCTURE_ID`). The platform OCR
+  failed (502 from `generic-ocr`), so OCR is off and the extractor reads the sample PDF's own text: 12 of 12 minimum
+  discounts read correctly (`evidence/evolus-invitation-extractor.md`). The app's Invitation step runs it
+  (`POST /api/invitation/read`). On the live site it still answered 503 ("missing") after the user added the two IDs
+  in Vercel and a redeploy; the user is checking the names and the Production target. Open from the day-1 list: the
+  status code Evolus returns when rate-limited.
