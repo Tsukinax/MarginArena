@@ -57,6 +57,10 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
             {started && started.type === 'run_started'
               ? `${started.model} on ${started.route === 'mi300x' ? 'AMD Instinct MI300X' : 'AMD Token Factory'}${
                   started.recorded_at ? ` · recorded ${recordedDate(started.recorded_at)}, replayed` : ''
+                }${
+                  telemetry?.model && telemetry.model !== started.model
+                    ? ` · ${started.model} had no workers, so ${telemetry.model} answered`
+                    : ''
                 }`
               : 'Connecting…'}
           </span>

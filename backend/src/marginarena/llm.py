@@ -18,6 +18,9 @@ from pydantic import BaseModel, ValidationError
 
 RETRY_STATUSES = {429, 500, 502, 503}
 MAX_ATTEMPTS = 4
+# Per-model request quirks on Token Factory (docs/api-guide/tokenfactory-guide.md): Qwen3.8-27B thinks at xhigh unless
+# told otherwise, which spends its token budget before it answers.
+MODEL_PARAMS = {"Qwen3.8-27B": {"reasoning_effort": "low"}}
 
 
 @dataclass(frozen=True)
@@ -29,6 +32,8 @@ class LLMSettings:
     model: str
     requests_per_minute: int = 20
     concurrency: int = 8
+    fallback_model: str | None = None
+    """Answers in place of `model` once the route reports that model has no workers; the run reports the switch."""
 
     @classmethod
     def routes_from_env(cls) -> tuple[LLMSettings, ...]:
@@ -39,6 +44,7 @@ class LLMSettings:
             api_key=os.environ.get("TOKEN_FACTORY_API_KEY", ""),
             model=os.environ.get("TOKEN_FACTORY_MODEL", "Gemma-4-31B-IT"),
             requests_per_minute=15,  # the account limit is 20/min; leave headroom for other callers
+            fallback_model=os.environ.get("TOKEN_FACTORY_FALLBACK_MODEL", "Qwen3.8-27B"),
         )
         if not os.environ.get("VLLM_BASE_URL"):
             return (token_factory,)
@@ -72,6 +78,8 @@ async def first_healthy(
 
 @dataclass
 class Telemetry:
+    model: str = ""
+    """The model answering now: the route's model, or its fallback after a switch."""
     calls_ok: int = 0
     calls_invalid: int = 0
     calls_failed: int = 0
@@ -83,6 +91,7 @@ class Telemetry:
     def snapshot(self) -> dict:
         elapsed = max(time.monotonic() - self.started, 1e-9)
         return {
+            "model": self.model,
             "calls_ok": self.calls_ok,
             "calls_invalid": self.calls_invalid,
             "calls_failed": self.calls_failed,
@@ -102,7 +111,8 @@ class LLMClient:
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
     ) -> None:
         self.settings = settings
-        self.telemetry = Telemetry()
+        self.model = settings.model
+        self.telemetry = Telemetry(model=settings.model)
         self._http = httpx.AsyncClient(
             base_url=settings.base_url.rstrip("/"),
             headers={"Authorization": f"Bearer {settings.api_key}"},
@@ -126,7 +136,6 @@ class LLMClient:
         `accept` checks rules that depend on context (for example, limits relative to a price).
         """
         body = {
-            "model": self.settings.model,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
             "response_format": {"type": "json_object"},
             "temperature": 0.8,
@@ -155,7 +164,8 @@ class LLMClient:
             await self._wait_for_turn()
             self.telemetry.in_flight += 1
             try:
-                response = await self._http.post("/chat/completions", json=body)
+                request = {**body, "model": self.model, **MODEL_PARAMS.get(self.model, {})}
+                response = await self._http.post("/chat/completions", json=request)
             except httpx.HTTPError:
                 response = None
             finally:
@@ -164,11 +174,26 @@ class LLMClient:
                 return response.json()
             if response is not None and response.status_code not in RETRY_STATUSES:
                 return None
+            if self._fall_back(response):
+                continue  # straight to the fallback model: retrying a model with no workers only waits
             if attempt + 1 < MAX_ATTEMPTS:
                 self.telemetry.retries += 1
                 retry_after = response.headers.get("Retry-After") if response is not None else None
                 await self._sleep(float(retry_after) if retry_after else 2.0**attempt)
         return None
+
+    def _fall_back(self, response: httpx.Response | None) -> bool:
+        """Switches the rest of the run to the fallback model when the route says the model has no workers."""
+        fallback = self.settings.fallback_model
+        if (
+            not fallback
+            or self.model == fallback
+            or response is None
+            or b"no_available_workers" not in response.content
+        ):
+            return False
+        self.model = self.telemetry.model = fallback
+        return True
 
     async def _wait_for_turn(self) -> None:
         """Space request starts evenly so the route's requests-per-minute limit is never exceeded."""

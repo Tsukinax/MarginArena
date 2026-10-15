@@ -159,7 +159,7 @@ def create_app(
             explanation = await explain(request.result, request.language, llm)
         finally:
             await llm.aclose()
-        return {**explanation, "route": s.route, "model": s.model}
+        return {**explanation, "route": s.route, "model": llm.model}
 
     @app.post("/api/confirm")
     async def confirm(request: ConfirmRequest) -> dict:

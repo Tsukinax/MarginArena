@@ -34,6 +34,8 @@ export type Shop = {
 }
 
 export type Telemetry = {
+  /** The model answering now: the run's model, or its fallback once the route said that model had no workers. */
+  model: string
   calls_ok: number
   calls_invalid: number
   calls_failed: number

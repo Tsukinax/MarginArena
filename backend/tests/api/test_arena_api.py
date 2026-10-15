@@ -147,6 +147,37 @@ async def test_out_of_range_rival_move_is_rejected():
     assert events[-1]["telemetry"]["calls_invalid"] == 1
 
 
+async def test_when_gemma_has_no_workers_the_run_falls_back_to_qwen_and_says_so():
+    # 15 Oct: Token Factory answered every Gemma call with 500 "no_available_workers" while Qwen3.8-27B answered.
+    seen: list[dict] = []
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        seen.append(body)
+        if body["model"] == "Gemma-4-31B-IT":
+            return httpx.Response(500, json={"error": {"message": '503 {"code":"no_available_workers"}'}})
+        server = FakeModelServer()
+        return server.handle(request)
+
+    settings = LLMSettings(
+        route="token-factory",
+        base_url="http://model.test/v1",
+        api_key="t",
+        model="Gemma-4-31B-IT",
+        fallback_model="Qwen3.8-27B",
+    )
+    app = create_app(llm_settings=settings, llm_transport=httpx.MockTransport(handle), sleep=no_sleep)
+    payload = {"shop": "glow-lab-bkk", "skus": ["NT-200"], "rounds": 1, "rivals": 1, "strategists": 1}
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        async with client.stream("POST", "/api/arena", json=payload) as response:
+            events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
+
+    telemetry = events[-1]["telemetry"]
+    assert (telemetry["calls_ok"], telemetry["model"]) == (2, "Qwen3.8-27B")
+    assert [b["model"] for b in seen].count("Gemma-4-31B-IT") == 1  # no retries on a model with no workers
+    assert all(b["reasoning_effort"] == "low" for b in seen if b["model"] == "Qwen3.8-27B")
+
+
 async def test_busy_model_server_is_retried():
     server = FakeModelServer(failures=[429, 503])
 
