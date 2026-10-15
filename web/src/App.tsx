@@ -15,6 +15,7 @@ export default function App() {
   const [events, setEvents] = useState<ArenaEvent[]>([])
   const [phase, setPhase] = useState<Phase>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [recorded, setRecorded] = useState(false)
   const abort = useRef<AbortController | null>(null)
 
   useEffect(() => {
@@ -30,10 +31,13 @@ export default function App() {
     abort.current = new AbortController()
     setEvents([])
     setError(null)
+    setRecorded(recorded)
     setPhase('running')
     setStep(1)
+    let received = 0
     try {
       await runArena(recorded ? { recorded: true } : {}, (e) => {
+        received++
         setEvents((prev) => [...prev, e])
         if (e.type === 'error') setError(e.message)
       }, abort.current.signal)
@@ -41,7 +45,8 @@ export default function App() {
     } catch (e) {
       if ((e as Error).name !== 'AbortError') {
         setError((e as Error).message)
-        setPhase('error')
+        setPhase(received ? 'error' : 'idle')
+        if (!received) setStep(0) // refused before it started: back to the buttons, where the recorded run waits
       }
     }
   }
@@ -108,7 +113,7 @@ export default function App() {
         {step === 2 && done && done.type === 'run_done' && (
           <VerdictsStep results={results} marginProtected={done.margin_protected} onNext={() => setStep(3)} />
         )}
-        {step === 3 && <ConfirmStep results={results} shop={shop} />}
+        {step === 3 && <ConfirmStep results={results} shop={shop} recorded={recorded} />}
       </main>
     </div>
   )

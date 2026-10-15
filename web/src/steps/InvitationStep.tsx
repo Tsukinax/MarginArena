@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { baht, pct, readInvitation, type InvitationReading, type Shop } from '../api'
 
 type Props = { shop: Shop | null; route: string | null; onStart: (recorded: boolean) => void }
@@ -7,6 +7,10 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
   const [reading, setReading] = useState<InvitationReading | null>(null)
   const [readState, setReadState] = useState<'idle' | 'reading' | 'error'>('idle')
   const [readError, setReadError] = useState<string | null>(null)
+  useEffect(() => {
+    // The reading the live site made on 15 Oct shows at once; a live reading can take minutes.
+    readInvitation(true).then(setReading, () => setReading(null))
+  }, [])
   if (!shop) return <p className="muted">Loading the sample invitation…</p>
   const fallback = route !== 'mi300x'
   const count = fallback ? Math.min(4, shop.invited.length) : shop.invited.length
@@ -17,7 +21,7 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
     setReadState('reading')
     setReadError(null)
     try {
-      setReading(await readInvitation())
+      setReading(await readInvitation(false))
       setReadState('idle')
     } catch (e) {
       setReadError((e as Error).message)
@@ -40,13 +44,18 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
           Open the invitation (PDF)
         </a>
         <button type="button" className="secondary" disabled={readState === 'reading'} onClick={read}>
-          {readState === 'reading' ? 'Evolus is reading it…' : 'Read it with the Evolus extractor'}
+          {readState === 'reading'
+            ? 'Evolus is reading it…'
+            : reading?.recorded
+              ? 'Read it again live with Evolus'
+              : 'Read it with the Evolus extractor'}
         </button>
         {readState === 'reading' && <span className="small">From 40 seconds to 3 minutes, depending on AMD Token Factory.</span>}
         {reading && (
           <span className="small">
-            Evolus read {reading.read.items.length} products
-            {reading.cached ? ` (this server's reading from ${new Date(reading.read_at).toLocaleTimeString('en-GB')})` : ''}:{' '}
+            {reading.recorded
+              ? `The Evolus extractor read this PDF on ${new Date(reading.read_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Bangkok' })} (recorded, run ${reading.execution_id?.slice(0, 8)}): `
+              : `Evolus read ${reading.read.items.length} products${reading.cached ? ` (this server's reading from ${new Date(reading.read_at).toLocaleTimeString('en-GB')})` : ''}: `}
             {reading.matches
               ? 'every minimum discount matches the table below.'
               : `${misread.length + reading.extra_skus.length} do not match: ${[...misread, ...reading.extra_skus].join(', ')}.`}

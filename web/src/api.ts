@@ -193,7 +193,8 @@ export async function runArena(
     body: JSON.stringify({ shop: 'glow-lab-bkk', ...body }),
     signal,
   })
-  if (!r.ok || !r.body) throw new Error(`The Arena could not start (${r.status}).`)
+  if (!r.ok || !r.body)
+    throw new Error((await r.json().catch(() => null))?.detail ?? `The Arena could not start (${r.status}).`)
   const reader = r.body.pipeThrough(new TextDecoderStream()).getReader()
   let buffer = ''
   for (;;) {
@@ -221,7 +222,8 @@ export async function explainVerdict(result: SkuResult, language: Language): Pro
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ result, language }),
   })
-  if (!r.ok) throw new Error(`The explanation could not be written (${r.status}).`)
+  if (!r.ok)
+    throw new Error((await r.json().catch(() => null))?.detail ?? `The explanation could not be written (${r.status}).`)
   return r.json()
 }
 
@@ -233,11 +235,18 @@ export type InvitationReading = {
   matches: boolean
   execution_id: string | null
   read_at: string
+  /** True for the reading the live site made on 15 Oct, replayed without calling Evolus. */
+  recorded: boolean
   cached: boolean
 }
 
-export async function readInvitation(): Promise<InvitationReading> {
-  const r = await fetch('/api/invitation/read', { method: 'POST' })
+/** The recorded reading answers at once; a live reading asks the Evolus extractor and can take minutes. */
+export async function readInvitation(recorded = false): Promise<InvitationReading> {
+  const r = await fetch('/api/invitation/read', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recorded }),
+  })
   if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? `The invitation could not be read (${r.status}).`)
   return r.json()
 }
@@ -261,6 +270,16 @@ export type WorkflowResult = {
 
 export type Confirmation = { status: string | null; result: WorkflowResult | string | null }
 
+/** The Verdict workflow's run on the recorded Arena's Verdicts (15 Oct), shown when a live run cannot start. */
+export type RecordedWorkflowRun = {
+  execution_id: string
+  completed_at: string
+  seconds: number
+  credits: number
+  result: WorkflowResult
+  recorded: true
+}
+
 /** Starts the Evolus Verdict workflow on the confirmed Verdicts; the server refuses any it did not sign. */
 export async function confirmVerdicts(results: SkuResult[]): Promise<string> {
   const r = await fetch('/api/confirm', {
@@ -270,6 +289,12 @@ export async function confirmVerdicts(results: SkuResult[]): Promise<string> {
   })
   if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? `The workflow could not start (${r.status}).`)
   return (await r.json()).execution_id
+}
+
+export async function getRecordedConfirmation(): Promise<RecordedWorkflowRun> {
+  const r = await fetch('/api/confirm/recorded')
+  if (!r.ok) throw new Error(`The recorded Evolus run could not be loaded (${r.status}).`)
+  return r.json()
 }
 
 export async function getConfirmation(executionId: string): Promise<Confirmation> {

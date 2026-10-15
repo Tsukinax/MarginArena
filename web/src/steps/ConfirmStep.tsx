@@ -1,11 +1,25 @@
 import { useState } from 'react'
-import { baht, confirmVerdicts, getConfirmation, type Shop, type SkuResult, type WorkflowResult } from '../api'
+import {
+  baht,
+  confirmVerdicts,
+  getConfirmation,
+  getRecordedConfirmation,
+  type Shop,
+  type SkuResult,
+  type WorkflowResult,
+} from '../api'
 
-type Props = { results: SkuResult[]; shop: Shop | null }
+/** `recorded`: the Verdicts come from the recorded Arena, so the workflow's recorded run on them can stand in. */
+type Props = { results: SkuResult[]; shop: Shop | null; recorded: boolean }
 type Run =
   | { state: 'idle' }
   | { state: 'running'; executionId?: string; status?: string | null }
-  | { state: 'done'; executionId: string; result: WorkflowResult }
+  | {
+      state: 'done'
+      executionId: string
+      result: WorkflowResult
+      recorded?: { liveError: string; completedAt: string; seconds: number; credits: number }
+    }
   | { state: 'error'; message: string }
 
 const POLL_MS = 3000
@@ -18,7 +32,7 @@ function csv(rows: WorkflowResult['upload']): string {
   return [head, ...body].map((line) => line.join(',')).join('\n') + '\n'
 }
 
-export default function ConfirmStep({ results, shop }: Props) {
+export default function ConfirmStep({ results, shop, recorded }: Props) {
   const [run, setRun] = useState<Run>({ state: 'idle' })
   const joining = results.filter((r) => r.verdict !== 'escalate' && !r.skip)
   const skipped = results.filter((r) => r.skip)
@@ -26,8 +40,27 @@ export default function ConfirmStep({ results, shop }: Props) {
 
   const start = async () => {
     setRun({ state: 'running' })
+    let executionId: string
     try {
-      const executionId = await confirmVerdicts(results)
+      executionId = await confirmVerdicts(results)
+    } catch (e) {
+      // Only when the live run cannot start, and only for the recorded Arena's Verdicts, does its recorded run stand in.
+      const message = (e as Error).message
+      if (!recorded) return setRun({ state: 'error', message })
+      try {
+        const saved = await getRecordedConfirmation()
+        setRun({
+          state: 'done',
+          executionId: saved.execution_id,
+          result: saved.result,
+          recorded: { liveError: message, completedAt: saved.completed_at, seconds: saved.seconds, credits: saved.credits },
+        })
+      } catch {
+        setRun({ state: 'error', message })
+      }
+      return
+    }
+    try {
       for (let i = 0; i < MAX_POLLS; i++) {
         const c = await getConfirmation(executionId)
         setRun({ state: 'running', executionId, status: c.status })
@@ -91,7 +124,20 @@ export default function ConfirmStep({ results, shop }: Props) {
       )}
       {run.state === 'done' && (
         <div className="workflow-result">
-          <h2>Carried out by the Evolus workflow "MarginArena Verdict"</h2>
+          <h2>Carried out by the Evolus workflow "MarginArena Verdict"{run.recorded ? ' (recorded run)' : ''}</h2>
+          {run.recorded && (
+            <p className="small">
+              The live run could not start: {run.recorded.liveError.replace(/([^.!?])$/, '$1.')} Below is the
+              workflow's run on these same Verdicts on{' '}
+              {new Date(run.recorded.completedAt).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                timeZone: 'Asia/Bangkok',
+              })}
+              : {run.recorded.seconds} seconds, {run.recorded.credits} Evolus credits.
+            </p>
+          )}
           <p className="small">Run {run.executionId}. The file's columns are MarginArena's; Seller Centre's template is not public.</p>
           <table className="sku-table">
             <thead>
