@@ -39,6 +39,11 @@ Every number in the draft is an engine figure from the input: ฿118.00 off as i
 6,239.50 worst case without joining. The run does not report whether Gemma or its Qwen fallback answered; Gemma on
 Token Factory had no workers earlier that hour.
 
+The Confirm step shows this run, labelled as recorded, when a live run cannot start after the recorded replay (for
+example once the event workspace has expired). It was fetched read-only from the execution record and is saved in
+`backend/src/marginarena/sample/recorded/evolus-verdict-workflow.json`; a test checks it against the recorded Arena's
+Verdicts.
+
 ## Limits
 
 - The bulk-upload columns are MarginArena's; Seller Centre's template is not public.

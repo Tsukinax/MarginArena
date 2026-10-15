@@ -15,10 +15,14 @@ Token Factory, behind the extractor's model, may see sample data only.
 |---|---|---|---|---|
 | 1 | `ask-file` from a script | `5f4e9050-7fc8-f111-bf5b-000d3aae6dc8` (audit `3d64956b-7fc8-f111-bf5b-000d3aae6dc8`) | 35.7 s | all 5 header fields and all 12 product rows read correctly |
 | 2 | "Read it with the Evolus extractor" in the web app (`POST /api/invitation/read`) | `d22f3ac1-7fc8-f111-bf5b-000d3aae6dc8` (audit `6187fbfc-7fc8-f111-bf5b-000d3aae6dc8`), read at 10:05:49Z | about 2 minutes | 12 of 12 minimum discounts match the invitation the Arena checks |
-| 3 | `POST /api/invitation/read` on the live site (https://marginarena.vercel.app, functions in `hkg1`), called with curl | `e2424803-85c8-f111-bf5b-000d3aae6dc8` (audit `c825aa58-85c8-f111-bf5b-000d3aae6dc8`), read at 10:44:10Z | 147.85 s, as curl measured it | 12 of 12 minimum discounts match |
+| 3 | `POST /api/invitation/read` on the live site (https://marginarena.vercel.app, functions in `hkg1`), called with curl | `e2424803-85c8-f111-bf5b-000d3aae6dc8` (audit `c825aa58-85c8-f111-bf5b-000d3aae6dc8`), read at 10:44:10Z | 147.85 s, as curl measured it (146.06 s in the execution record, 10:41:44Z to 10:44:10Z) | 12 of 12 minimum discounts match |
 
 The app checks every discount it reads against the sample invitation and flags any difference
 (`backend/tests/api/test_invitation_api.py`).
+
+The app shows run 3's reading at once, labelled as recorded: it was fetched read-only from the execution record and
+is saved in `backend/src/marginarena/sample/recorded/evolus-invitation-reading.json`. "Read it again live with
+Evolus" calls the extractor.
 
 ## What did not work
 
