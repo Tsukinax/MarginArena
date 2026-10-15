@@ -64,7 +64,7 @@ class LLMSettings:
 async def served_models(route: LLMSettings, transport: httpx.AsyncBaseTransport | None = None) -> set[str] | None:
     """The model IDs the route serves now (its /models catalogue), or None when the catalogue can't be read."""
     try:
-        async with httpx.AsyncClient(transport=transport, timeout=10) as client:
+        async with httpx.AsyncClient(transport=transport, timeout=4) as client:  # never stall the page that asks
             response = await client.get(
                 route.base_url.rstrip("/") + "/models", headers={"Authorization": f"Bearer {route.api_key}"}
             )

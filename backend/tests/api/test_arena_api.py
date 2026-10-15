@@ -234,9 +234,16 @@ async def test_a_model_the_route_no_longer_serves_switches_the_run_to_the_fallba
         async with client.stream("POST", "/api/arena", json=LIVE) as response:
             events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
 
+        health = (await client.get("/api/health")).json()
+        async with client.stream("POST", "/api/arena", json=LIVE) as response:
+            again = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
+
     telemetry = events[-1]["telemetry"]
     assert (telemetry["calls_ok"], telemetry["calls_failed"], telemetry["model"]) == (2, 0, "DeepSeek-V4-Flash")
     assert [b["model"] for b in seen].count("Gemma-4-31B-IT") == 1
+    # The refusal is remembered for a while, so the sidebar and the next run name the model that will answer.
+    assert health["model"] == "DeepSeek-V4-Flash"
+    assert again[0]["model"] == "DeepSeek-V4-Flash"
 
 
 async def test_busy_model_server_is_retried():

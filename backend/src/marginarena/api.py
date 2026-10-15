@@ -57,6 +57,7 @@ CONFIRMS_PER_HOUR, CONFIRMS_PER_HOUR_ALL = 4, 20
 EXPLANATIONS_PER_HOUR, EXPLANATIONS_PER_HOUR_ALL = 40, 200
 POLLS_PER_HOUR = 300  # the Confirm step asks Evolus for its run's status every 3 seconds
 LIVE_RUN_LEASE_SECONDS = 600  # frees Token Factory for the next live run even if one never reports back
+REFUSED_MODEL_SECONDS = 600  # after the route refuses the main model, runs start on the fallback for this long
 
 
 class ArenaRequest(BaseModel):
@@ -158,12 +159,20 @@ def create_app(
             lease.update(until=0.0, owner=None)
 
     catalogue: dict = {"read_at": None, "ids": None}  # the route's model catalogue, read at most once a minute
+    refused: dict = {"model": None, "until": 0.0}  # a model the route just would not serve, skipped for a while
+
+    def remember(s: LLMSettings, llm: LLMClient) -> None:
+        """After a run or an explanation that had to switch models, later ones start on the fallback for a while."""
+        if llm.model != s.model:
+            refused.update(model=s.model, until=time.monotonic() + REFUSED_MODEL_SECONDS)
 
     async def settings() -> LLMSettings:
         """The route, starting on its fallback model when the route's catalogue no longer lists the main one."""
         s = llm_settings or await first_healthy(routes or LLMSettings.routes_from_env(), llm_transport)
         if not s.fallback_model:
             return s
+        if refused["model"] == s.model and time.monotonic() < refused["until"]:
+            return replace(s, model=s.fallback_model)
         if catalogue["read_at"] is None or time.monotonic() - catalogue["read_at"] > 60:
             catalogue.update(read_at=time.monotonic(), ids=await served_models(s, llm_transport))
         ids = catalogue["ids"]
@@ -221,6 +230,7 @@ def create_app(
                 await run_arena(shop, skus, rounds, rivals, strategists, llm, emit)
             finally:
                 await llm.aclose()
+                remember(s, llm)
                 release(owner)
 
         async def produce() -> None:
@@ -257,6 +267,7 @@ def create_app(
             explanation = await explain(request.result, request.language, llm)
         finally:
             await llm.aclose()
+            remember(s, llm)
         answer = {**explanation, "route": s.route, "model": llm.model}
         if answer["source"] == "model":  # a template stands in only until the model answers
             explained[written] = answer
