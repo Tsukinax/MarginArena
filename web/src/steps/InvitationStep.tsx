@@ -42,7 +42,7 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
         <button type="button" className="secondary" disabled={readState === 'reading'} onClick={read}>
           {readState === 'reading' ? 'Evolus is reading it…' : 'Read it with the Evolus extractor'}
         </button>
-        {readState === 'reading' && <span className="small">About 40 seconds, on our model through AMD Token Factory.</span>}
+        {readState === 'reading' && <span className="small">From 40 seconds to 3 minutes, depending on AMD Token Factory.</span>}
         {reading && (
           <span className="small">
             Evolus read {reading.read.items.length} products

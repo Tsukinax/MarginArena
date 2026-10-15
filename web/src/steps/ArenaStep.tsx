@@ -71,8 +71,8 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
             <dd>{calls}</dd>
           </div>
           <div>
-            <dt>Tokens per second</dt>
-            <dd>{telemetry ? telemetry.tokens_per_second.toLocaleString('en-US') : '–'}</dd>
+            <dt>Tokens written</dt>
+            <dd>{telemetry ? telemetry.completion_tokens.toLocaleString('en-US') : '–'}</dd>
           </div>
           <div>
             <dt>Rejected answers</dt>

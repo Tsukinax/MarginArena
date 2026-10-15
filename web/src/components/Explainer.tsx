@@ -53,8 +53,8 @@ export default function Explainer({ result }: { result: SkuResult }) {
 
       {language === null && (
         <p className="explain-hint">
-          Gemma writes a short explanation on AMD. Every number in it is checked against the pricing engine before you
-          see it.
+          Gemma writes a short explanation on AMD Token Factory, and the note under it names the model that answered.
+          Every number in it is checked against the pricing engine before you see it.
         </p>
       )}
       {writing && <p className="explain-wait">Gemma is writing{writing === 'th' ? ' in Thai' : ''}…</p>}
