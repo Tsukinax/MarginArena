@@ -10,8 +10,10 @@ from decimal import Decimal
 import httpx
 import pytest
 
+from marginarena import api
 from marginarena.api import create_app
-from marginarena.llm import LLMSettings
+from marginarena.explainer import MAX_DRAFTS
+from marginarena.llm import MAX_ATTEMPTS, LLMSettings
 
 SETTINGS = LLMSettings(route="token-factory", base_url="http://model.test/v1", api_key="test", model="Gemma-4-31B-IT")
 THAI = re.compile(r"[ก-ฺเ-๎]")  # Thai letters and marks; the baht sign ฿ is U+0E3F
@@ -183,3 +185,67 @@ async def test_the_template_answers_when_the_model_server_is_down():
     response = await explain_with(result, "th", lambda _request: httpx.Response(503))
 
     assert response["source"] == "template"
+
+
+async def test_each_verdict_is_written_once_per_language():
+    # Judges flip between English and Thai; asking again for the same Verdict and language reuses the explanation.
+    result = await decided("SM-10")
+    calls: list[httpx.Request] = []
+
+    def model(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return answer({"explanation": f"Skip: ไม่เข้าร่วมยังได้กำไร ฿{result['dont_join_total']} ในกรณีแย่ที่สุด"})
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(model), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        first = (await client.post("/api/explain", json={"result": result, "language": "th"})).json()
+        again = (await client.post("/api/explain", json={"result": result, "language": "th"})).json()
+
+    assert again == first
+    assert len(calls) == 1
+
+
+async def test_a_template_is_not_kept_so_the_next_request_asks_the_model_again():
+    result = await decided("SM-10")
+    calls: list[httpx.Request] = []
+    draft = f"Skip: ไม่เข้าร่วมยังได้กำไร ฿{result['dont_join_total']} ในกรณีแย่ที่สุด"
+
+    def down_then_up(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        down = len(calls) <= MAX_DRAFTS * MAX_ATTEMPTS  # every try of every draft fails, so the template answers
+        return httpx.Response(503) if down else answer({"explanation": draft})
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(down_then_up), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        sources = []
+        for _ in range(3):
+            sources.append(
+                (await client.post("/api/explain", json={"result": result, "language": "th"})).json()["source"]
+            )
+            sources.append(len(calls))
+
+    assert sources[0] == "template"
+    assert sources[2] == "model" and sources[3] > sources[1]
+    assert sources[4] == "model" and sources[5] == sources[3]
+
+
+async def test_each_language_is_written_once_and_only_model_calls_use_the_quota(monkeypatch):
+    monkeypatch.setattr(api, "EXPLANATIONS_PER_HOUR", 2)
+    result, other = await decided("VC-30"), await decided("SM-10")
+    calls: list[httpx.Request] = []
+
+    def model(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return answer({"explanation": "Escalate: กำไรต่อชิ้นต่ำกว่า Margin Floor 10%"})
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(model), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        codes = [
+            (await client.post("/api/explain", json={"result": result, "language": language})).status_code
+            for language in ("th", "th", "en", "en")
+        ]
+        refused = await client.post("/api/explain", json={"result": other, "language": "th"})
+
+    assert codes == [200, 200, 200, 200]
+    assert len(calls) == 2  # one Thai and one English draft; the repeats came from the cache
+    assert refused.status_code == 429

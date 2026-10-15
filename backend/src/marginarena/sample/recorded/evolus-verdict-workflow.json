@@ -1,0 +1,116 @@
+{
+  "note": "The Evolus Verdict workflow's run on the 12 Verdicts of the recorded Arena (evidence/evolus-verdict-workflow.md), fetched read-only from the execution record. Shown when a live run cannot start.",
+  "execution_id": "4d903564-7cc8-f111-bf5b-000d3aae6dc8",
+  "requested_at": "2026-10-15T09:40:01Z",
+  "completed_at": "2026-10-15T09:40:12Z",
+  "seconds": 10.55,
+  "status": "Completed",
+  "credits": 0.0,
+  "step_ms": {
+    "1": 0,
+    "2": 77,
+    "3": 10205,
+    "4": 0,
+    "5": 0
+  },
+  "result": {
+    "shop": "Glow Lab BKK",
+    "campaign": "11.11 Big Sale",
+    "upload": [
+      {
+        "sku": "HB-30",
+        "product": "Hydra Barrier Serum 30 ml",
+        "promo_plan": "฿88.50 off",
+        "campaign_price": "501.50",
+        "voucher": "0.00",
+        "verdict": "approve"
+      },
+      {
+        "sku": "NT-200",
+        "product": "Niacinamide 10% Toner 200 ml",
+        "promo_plan": "฿58.50 off",
+        "campaign_price": "331.50",
+        "voucher": "0.00",
+        "verdict": "approve"
+      },
+      {
+        "sku": "SS-50",
+        "product": "Daily Sunscreen SPF50+ 50 ml",
+        "promo_plan": "฿157.50 off",
+        "campaign_price": "292.50",
+        "voucher": "0.00",
+        "verdict": "revise"
+      },
+      {
+        "sku": "CN-50",
+        "product": "Ceramide Night Cream 50 g",
+        "promo_plan": "฿103.50 off",
+        "campaign_price": "586.50",
+        "voucher": "0.00",
+        "verdict": "approve"
+      },
+      {
+        "sku": "AC-150",
+        "product": "Gentle Amino Cleanser 150 ml",
+        "promo_plan": "฿43.50 off",
+        "campaign_price": "246.50",
+        "voucher": "0.00",
+        "verdict": "approve"
+      },
+      {
+        "sku": "CG-80",
+        "product": "Centella Repair Gel 80 g",
+        "promo_plan": "฿52.50 off",
+        "campaign_price": "297.50",
+        "voucher": "0.00",
+        "verdict": "approve"
+      },
+      {
+        "sku": "LM-15",
+        "product": "Lip Sleeping Mask 15 g",
+        "promo_plan": "฿50.00 off",
+        "campaign_price": "200.00",
+        "voucher": "0.00",
+        "verdict": "approve"
+      },
+      {
+        "sku": "CM-100",
+        "product": "Oil-Control Clay Mask 100 g",
+        "promo_plan": "฿48.00 off",
+        "campaign_price": "272.00",
+        "voucher": "0.00",
+        "verdict": "approve"
+      },
+      {
+        "sku": "TK-4",
+        "product": "Travel Kit, 4 minis",
+        "promo_plan": "฿124.75 off",
+        "campaign_price": "374.25",
+        "voucher": "0.00",
+        "verdict": "approve"
+      }
+    ],
+    "escalations": [
+      {
+        "sku": "VC-30",
+        "product": "Vitamin C Bright Serum 30 ml",
+        "invited_plan": "฿118.00 off",
+        "failed_checks": [
+          "below the Margin Floor"
+        ],
+        "worst_case_as_invited": "7369.32",
+        "worst_case_not_joining": "6239.50"
+      }
+    ],
+    "skipped": [
+      "RN-30",
+      "SM-10"
+    ],
+    "counts": {
+      "joining": 9,
+      "escalations": 1,
+      "skipped": 2
+    },
+    "approval_request": "Subject: Approval Required: 11.11 Big Sale Campaign Escalation\n\nDear Shop Owner,\n\nWe have one product that requires your decision for the 11.11 Big Sale. The Vitamin C Bright Serum 30 ml (VC-30) was escalated because it is below the Margin Floor. With the invited plan of ฿118.00 off, the worst case is 7369.32 compared to 6239.50 if not joining. Please let us know if you approve this product for the campaign."
+  }
+}

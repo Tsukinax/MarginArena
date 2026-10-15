@@ -8,6 +8,8 @@ import hmac
 import json
 import os
 import secrets
+import time
+from collections import deque
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
@@ -15,7 +17,7 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi import Path as PathParam
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -39,6 +41,21 @@ REPLAY_SECONDS = 20
 EVOLUS_URL = "https://api.evolus.ai/api/v1"
 # The fictional sample invitation (backend/scripts/make_sample_invitation.py), the only document the extractor is sent.
 SAMPLE_INVITATION = Path(__file__).resolve().parent / "sample" / "glow-lab-bkk-invitation.pdf"
+# Evolus runs fetched read-only from their execution records (evidence/evolus-*.md): the live site's reading of the
+# sample invitation, and the Verdict workflow's run on the recorded Arena's Verdicts. A live read can take minutes,
+# and the event workspace expires before judging may end, so these are shown, labelled as recorded.
+RECORDED_READING = Path(__file__).resolve().parent / "sample" / "recorded" / "evolus-invitation-reading.json"
+RECORDED_WORKFLOW = Path(__file__).resolve().parent / "sample" / "recorded" / "evolus-verdict-workflow.json"
+# Each server process limits the calls that spend shared quota: Token Factory allows 20 requests a minute per account,
+# and every Evolus call leaves an execution in the event workspace. The limits are per client address and, with the
+# _ALL ceilings, for everyone together. They hold per process: Vercel may run several. Recorded runs and readings are
+# never limited.
+LIVE_RUNS_PER_HOUR, LIVE_RUNS_PER_HOUR_ALL = 4, 20
+LIVE_READS_PER_HOUR, LIVE_READS_PER_HOUR_ALL = 4, 10
+CONFIRMS_PER_HOUR, CONFIRMS_PER_HOUR_ALL = 4, 20
+EXPLANATIONS_PER_HOUR, EXPLANATIONS_PER_HOUR_ALL = 40, 200
+POLLS_PER_HOUR = 300  # the Confirm step asks Evolus for its run's status every 3 seconds
+LIVE_RUN_LEASE_SECONDS = 600  # frees Token Factory for the next live run even if one never reports back
 
 
 class ArenaRequest(BaseModel):
@@ -59,8 +76,39 @@ class ExplainRequest(BaseModel):
 
 
 class ConfirmRequest(BaseModel):
-    results: list[dict] = Field(min_length=1)
+    results: list[dict] = Field(min_length=1, max_length=12)
     """The decided SKUs the Seller confirms, exactly as the Arena returned them."""
+
+
+class ReadRequest(BaseModel):
+    recorded: bool = False
+    """Replay the reading the live site made on 15 Oct, labelled "recorded", instead of calling Evolus."""
+
+
+class Quota:
+    """At most `per_hour` uses for each client address, and `all_per_hour` for everyone, in any hour."""
+
+    def __init__(self, per_hour: int, all_per_hour: int | None = None) -> None:
+        self.per_hour = per_hour
+        self.all_per_hour = all_per_hour
+        self.uses: dict[str, deque[float]] = {}
+
+    def take(self, address: str) -> bool:
+        if not self._take(address, self.per_hour):
+            return False
+        return self.all_per_hour is None or self._take("", self.all_per_hour)
+
+    def _take(self, key: str, limit: int) -> bool:
+        now = time.monotonic()
+        if len(self.uses) > 10_000:  # forget addresses that have not called for an hour
+            self.uses = {k: u for k, u in self.uses.items() if now - u[-1] < 3600}
+        uses = self.uses.setdefault(key, deque())
+        while uses and now - uses[0] >= 3600:
+            uses.popleft()
+        if len(uses) >= limit:
+            return False
+        uses.append(now)
+        return True
 
 
 def create_app(
@@ -94,7 +142,19 @@ def create_app(
         client = httpx.AsyncClient(base_url=EVOLUS_URL, transport=evolus_transport, headers=headers, timeout=300)
         return client, [os.environ[name] for name in ids]
 
-    reading: dict = {}  # this process's last reading of the sample invitation: the same document reads the same
+    reading: dict = {}  # this process's last matching reading: the same document reads the same
+    live_runs = Quota(LIVE_RUNS_PER_HOUR, LIVE_RUNS_PER_HOUR_ALL)
+    live_reads = Quota(LIVE_READS_PER_HOUR, LIVE_READS_PER_HOUR_ALL)
+    confirms = Quota(CONFIRMS_PER_HOUR, CONFIRMS_PER_HOUR_ALL)
+    explanations = Quota(EXPLANATIONS_PER_HOUR, EXPLANATIONS_PER_HOUR_ALL)
+    polls = Quota(POLLS_PER_HOUR)
+    lease: dict = {"until": 0.0, "owner": None}  # while a live run holds Token Factory, another would stall both
+    explained: dict[tuple[str, str], dict] = {}  # each signed Verdict is written once per language
+    finished: dict[str, dict] = {}  # Evolus runs that completed or failed: their answer no longer changes
+
+    def release(owner: object | None) -> None:
+        if owner is not None and lease["owner"] is owner:  # a run that outlived its lease must not end the next one's
+            lease.update(until=0.0, owner=None)
 
     async def settings() -> LLMSettings:
         if llm_settings:
@@ -111,7 +171,19 @@ def create_app(
         return describe_shop(load_shop(shop_id))
 
     @app.post("/api/arena")
-    async def arena(request: ArenaRequest) -> StreamingResponse:
+    async def arena(request: ArenaRequest, http: Request) -> StreamingResponse:
+        owner = None  # the live run's hold on Token Factory; a recorded run holds nothing
+        if not request.recorded:
+            if time.monotonic() < lease["until"]:
+                raise HTTPException(
+                    429,
+                    "Another live run is using AMD Token Factory right now. "
+                    "Watch the recorded run, or try again in about two minutes.",
+                )
+            if not live_runs.take(_address(http)):
+                raise HTTPException(429, "Live runs are used up for this hour. The recorded run is always there.")
+            owner = object()
+            lease.update(until=time.monotonic() + LIVE_RUN_LEASE_SECONDS, owner=owner)
         s = await settings()
         shop = load_shop(request.shop)
         skus, rounds, rivals, strategists = request.skus, request.rounds, request.rivals, request.strategists
@@ -139,6 +211,7 @@ def create_app(
                 await run_arena(shop, skus, rounds, rivals, strategists, llm, emit)
             finally:
                 await llm.aclose()
+                release(owner)
 
         async def produce() -> None:
             try:
@@ -150,28 +223,44 @@ def create_app(
 
         async def stream():
             task = asyncio.create_task(produce())
-            while (event := await queue.get()) is not None:
-                yield f"data: {json.dumps(event, default=str, ensure_ascii=False)}\n\n"
-            await task
+            try:
+                while (event := await queue.get()) is not None:
+                    yield f"data: {json.dumps(event, default=str, ensure_ascii=False)}\n\n"
+                await task
+            finally:
+                task.cancel()  # a client that leaves ends its run, which frees Token Factory for the next
+                release(owner)
 
         return StreamingResponse(stream(), media_type="text/event-stream")
 
     @app.post("/api/explain")
-    async def explain_verdict(request: ExplainRequest) -> dict:
+    async def explain_verdict(request: ExplainRequest, http: Request) -> dict:
         check_signed(request.result)
+        written = (request.result["signature"], request.language)
+        if written in explained:
+            return explained[written]
+        if not explanations.take(_address(http)):
+            raise HTTPException(429, "Explanations are used up for this hour. Try again later.")
         s = await settings()
         llm = LLMClient(s, transport=llm_transport, sleep=sleep)
         try:
             explanation = await explain(request.result, request.language, llm)
         finally:
             await llm.aclose()
-        return {**explanation, "route": s.route, "model": llm.model}
+        answer = {**explanation, "route": s.route, "model": llm.model}
+        if answer["source"] == "model":  # a template stands in only until the model answers
+            explained[written] = answer
+        return answer
 
     @app.post("/api/confirm")
-    async def confirm(request: ConfirmRequest) -> dict:
+    async def confirm(request: ConfirmRequest, http: Request) -> dict:
         """Runs the Evolus Verdict workflow on the confirmed Verdicts (infra/evolus/evolus_kit.py builds it)."""
         for result in request.results:
             check_signed(result)
+        if len({r.get("sku") for r in request.results}) != len(request.results):
+            raise HTTPException(422, "Each product can be confirmed only once.")
+        if not confirms.take(_address(http)):
+            raise HTTPException(429, "Live Evolus runs are used up for this hour. Try again later.")
         shop = load_shop("glow-lab-bkk")
         verdicts = [_confirmed(r) for r in request.results]
         payload = {"shop": shop.name, "campaign": shop.invitation["campaign"], "verdicts": verdicts}
@@ -184,8 +273,18 @@ def create_app(
             raise HTTPException(502, f"The Evolus workflow did not start (HTTP {answer.status_code}).")
         return {"execution_id": answer.json()["executionId"]}
 
+    @app.get("/api/confirm/recorded")  # declared before /api/confirm/{execution_id}, which would also match it
+    async def recorded_confirmation() -> dict:
+        """The Verdict workflow's run on the recorded Arena's Verdicts, for when a live run cannot start."""
+        saved = json.loads(RECORDED_WORKFLOW.read_text())
+        return {**{k: v for k, v in saved.items() if k != "note"}, "recorded": True}
+
     @app.get("/api/confirm/{execution_id}")
-    async def confirmation(execution_id: str = PathParam(pattern=r"^[A-Za-z0-9-]{1,64}$")) -> dict:
+    async def confirmation(http: Request, execution_id: str = PathParam(pattern=r"^[A-Za-z0-9-]{1,64}$")) -> dict:
+        if execution_id in finished:
+            return finished[execution_id]
+        if not polls.take(_address(http)):
+            raise HTTPException(429, "Too many status checks from this address this hour. Try again later.")
         client, (flow,) = evolus("EVOLUS_WORKFLOW_ID")
         async with client:
             answer = await client.get(f"/workflows/{flow}/executions/{execution_id}")
@@ -197,17 +296,34 @@ def create_app(
             result = json.loads(output) if isinstance(output, str) else output
         except ValueError:
             result = output
-        return {"status": execution.get("status"), "result": result}
+        status = {"status": execution.get("status"), "result": result}
+        if status["status"] in ("Completed", "Failed"):
+            finished[execution_id] = status
+        return status
 
     @app.get("/api/invitation/sample.pdf")
     async def sample_invitation() -> FileResponse:
         return FileResponse(SAMPLE_INVITATION, media_type="application/pdf", filename=SAMPLE_INVITATION.name)
 
     @app.post("/api/invitation/read")
-    async def read_invitation() -> dict:
+    async def read_invitation(http: Request, request: ReadRequest | None = None) -> dict:
         """The Evolus extractor reads the sample invitation; each discount is checked against the one the Arena uses."""
+        if request and request.recorded:
+            saved = json.loads(RECORDED_READING.read_text())
+            return {
+                "read": saved["read"],
+                **_checked(saved["read"]),
+                "execution_id": saved["execution_id"],
+                "audit_id": saved["audit_id"],
+                "read_at": saved["completed_at"],
+                "seconds": saved["seconds"],
+                "recorded": True,
+                "cached": False,
+            }
         if reading:
             return {**reading, "cached": True}
+        if not live_reads.take(_address(http)):
+            raise HTTPException(429, "Live readings are used up for this hour. Try again later.")
         client, (reader, structure) = evolus("EVOLUS_READER_ID", "EVOLUS_INVITATION_STRUCTURE_ID")
         document = (SAMPLE_INVITATION.name, SAMPLE_INVITATION.read_bytes(), "application/pdf")
         async with client:
@@ -217,28 +333,17 @@ def create_app(
         if not answer.is_success:
             raise HTTPException(502, f"The Evolus extractor did not read the invitation (HTTP {answer.status_code}).")
         read = answer.json()
-        expected = {i.sku.id: i.required_discount * 100 for i in load_shop("glow-lab-bkk").invited}
-        found = {str(i.get("sku", "")).strip(): _number(i.get("minimum_discount_pct")) for i in read.get("items", [])}
-        checks = [
-            {
-                "sku": sku,
-                "read_discount_pct": None if found.get(sku) is None else f"{found[sku]:f}",
-                "expected_discount_pct": f"{pct.normalize():f}",
-                "matches": found.get(sku) == pct,
-            }
-            for sku, pct in expected.items()
-        ]
-        extra = sorted(set(found) - set(expected))
-        reading.update(
-            read=read,
-            checks=checks,
-            extra_skus=extra,
-            matches=all(c["matches"] for c in checks) and not extra,
-            execution_id=answer.headers.get("X-AskFile-Execution-Id"),
-            audit_id=answer.headers.get("X-AskFile-Audit-Id"),
-            read_at=datetime.now(UTC).isoformat(timespec="seconds"),
-        )
-        return {**reading, "cached": False}
+        result = {
+            "read": read,
+            **_checked(read),
+            "execution_id": answer.headers.get("X-AskFile-Execution-Id"),
+            "audit_id": answer.headers.get("X-AskFile-Audit-Id"),
+            "read_at": datetime.now(UTC).isoformat(timespec="seconds"),
+            "recorded": False,
+        }
+        if result["matches"]:  # a misreading is not kept, so the next request reads again
+            reading.update(result)
+        return {**result, "cached": False}
 
     web = web_dist or os.environ.get("WEB_DIST")
     if web:  # mounted last, so every /api route above still wins
@@ -261,6 +366,30 @@ async def _replay(path: Path, emit: Emit, sleep: Callable[[float], Awaitable[Non
         await sleep((at - previous) * scale)
         previous = at
         await emit(event)
+
+
+def _address(http: Request) -> str:
+    """The client's address: Vercel overwrites X-Forwarded-For with it, so it can't be spoofed there; without the
+    header (local runs) it is the socket's peer. A deployment behind another proxy should overwrite the header too."""
+    forwarded = http.headers.get("x-forwarded-for", "").split(",")[0].strip()
+    return forwarded or (http.client.host if http.client else "unknown")
+
+
+def _checked(read: dict) -> dict:
+    """Each minimum discount the extractor read, checked against the invitation the Arena uses."""
+    expected = {i.sku.id: i.required_discount * 100 for i in load_shop("glow-lab-bkk").invited}
+    found = {str(i.get("sku", "")).strip(): _number(i.get("minimum_discount_pct")) for i in read.get("items", [])}
+    checks = [
+        {
+            "sku": sku,
+            "read_discount_pct": None if found.get(sku) is None else f"{found[sku]:f}",
+            "expected_discount_pct": f"{pct.normalize():f}",
+            "matches": found.get(sku) == pct,
+        }
+        for sku, pct in expected.items()
+    ]
+    extra = sorted(set(found) - set(expected))
+    return {"checks": checks, "extra_skus": extra, "matches": all(c["matches"] for c in checks) and not extra}
 
 
 def _number(value) -> Decimal | None:

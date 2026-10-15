@@ -1,0 +1,88 @@
+{
+  "note": "The Evolus extractor's reading of the sample invitation PDF on the live site, 15 Oct 2026 (run 3 in evidence/evolus-invitation-extractor.md), fetched read-only from the execution record. Replayed so a judge sees it at once; 'Read it again live' calls Evolus.",
+  "execution_id": "e2424803-85c8-f111-bf5b-000d3aae6dc8",
+  "audit_id": "c825aa58-85c8-f111-bf5b-000d3aae6dc8",
+  "requested_at": "2026-10-15T10:41:44Z",
+  "completed_at": "2026-10-15T10:44:10Z",
+  "seconds": 146.06,
+  "read": {
+    "marketplace": "Shopee Thailand",
+    "campaign": "11.11 Big Sale",
+    "slot": "Shocking Sale, 11 Nov 00:00 to 23:59",
+    "registration_closes": "7 Nov 2026",
+    "items": [
+      {
+        "sku": "HB-30",
+        "product": "Hydra Barrier Serum 30 ml",
+        "list_price": "590",
+        "minimum_discount_pct": 15
+      },
+      {
+        "sku": "NT-200",
+        "product": "Niacinamide 10% Toner 200 ml",
+        "list_price": "390",
+        "minimum_discount_pct": 15
+      },
+      {
+        "sku": "SS-50",
+        "product": "Daily Sunscreen SPF50+ 50 ml",
+        "list_price": "450",
+        "minimum_discount_pct": 20
+      },
+      {
+        "sku": "CN-50",
+        "product": "Ceramide Night Cream 50 g",
+        "list_price": "690",
+        "minimum_discount_pct": 15
+      },
+      {
+        "sku": "VC-30",
+        "product": "Vitamin C Bright Serum 30 ml",
+        "list_price": "590",
+        "minimum_discount_pct": 20
+      },
+      {
+        "sku": "AC-150",
+        "product": "Gentle Amino Cleanser 150 ml",
+        "list_price": "290",
+        "minimum_discount_pct": 15
+      },
+      {
+        "sku": "RN-30",
+        "product": "Retinal 0.1% Night Serum 30 ml",
+        "list_price": "790",
+        "minimum_discount_pct": 25
+      },
+      {
+        "sku": "CG-80",
+        "product": "Centella Repair Gel 80 g",
+        "list_price": "350",
+        "minimum_discount_pct": 15
+      },
+      {
+        "sku": "LM-15",
+        "product": "Lip Sleeping Mask 15 g",
+        "list_price": "250",
+        "minimum_discount_pct": 20
+      },
+      {
+        "sku": "SM-10",
+        "product": "Hyaluronic Sheet Mask x10",
+        "list_price": "399",
+        "minimum_discount_pct": 20
+      },
+      {
+        "sku": "CM-100",
+        "product": "Oil-Control Clay Mask 100 g",
+        "list_price": "320",
+        "minimum_discount_pct": 15
+      },
+      {
+        "sku": "TK-4",
+        "product": "Travel Kit, 4 minis",
+        "list_price": "499",
+        "minimum_discount_pct": 25
+      }
+    ]
+  }
+}

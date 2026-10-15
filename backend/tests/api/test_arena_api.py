@@ -4,6 +4,7 @@ The real LLM client, Arena orchestrator and engine run unchanged; only the OpenA
 model server is replaced by an httpx MockTransport.
 """
 
+import asyncio
 import json
 from decimal import Decimal
 from pathlib import Path
@@ -286,3 +287,113 @@ async def test_fallback_demo_shows_every_kind_of_verdict():
     assert started["skus"] == ["NT-200", "SS-50", "VC-30", "SM-10"]
     assert by_sku["SM-10"]["verdict"] == "revise"
     assert by_sku["SM-10"]["skip"] is True
+
+
+LIVE = {"shop": "glow-lab-bkk", "skus": ["NT-200"], "rounds": 1, "rivals": 1, "strategists": 1}
+
+
+async def test_while_a_live_run_holds_token_factory_a_second_is_turned_away_but_the_replay_still_plays():
+    # Token Factory allows 20 requests a minute per account, so two live runs at once would only stall each other.
+    server = FakeModelServer()
+    entered, release = asyncio.Event(), asyncio.Event()
+
+    async def held(request: httpx.Request) -> httpx.Response:
+        entered.set()
+        await release.wait()
+        return server.handle(request)
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(held), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        first = asyncio.create_task(client.post("/api/arena", json=LIVE))
+        await asyncio.wait_for(entered.wait(), timeout=5)
+        try:
+            second = await asyncio.wait_for(
+                client.post("/api/arena", json=LIVE, headers={"X-Forwarded-For": "203.0.113.9"}), timeout=5
+            )
+            replay = await asyncio.wait_for(client.post("/api/arena", json={"recorded": True}), timeout=5)
+        finally:
+            release.set()
+        finished = await asyncio.wait_for(first, timeout=5)
+        after = await client.post("/api/arena", json=LIVE, headers={"X-Forwarded-For": "203.0.113.9"})
+
+    assert second.status_code == 429
+    assert "recorded run" in second.json()["detail"]
+    assert replay.status_code == 200 and '"run_done"' in replay.text
+    assert finished.status_code == 200 and '"run_done"' in finished.text
+    assert after.status_code == 200
+
+
+async def test_one_address_gets_only_a_few_live_runs_an_hour():
+    server = FakeModelServer()
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(server.handle), sleep=no_sleep)
+
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        codes = [(await client.post("/api/arena", json=LIVE)).status_code for _ in range(api.LIVE_RUNS_PER_HOUR + 1)]
+        elsewhere = await client.post("/api/arena", json=LIVE, headers={"X-Forwarded-For": "198.51.100.7"})
+        replay = await client.post("/api/arena", json={"recorded": True})
+
+    assert codes == [200] * api.LIVE_RUNS_PER_HOUR + [429]
+    assert elsewhere.status_code == 200
+    assert replay.status_code == 200
+
+
+async def test_a_client_that_leaves_ends_its_live_run_and_frees_token_factory():
+    # A judge who reloads or presses "Start over" while a live run looks frozen must be able to run live again at once.
+    server = FakeModelServer()
+    first_call, release = asyncio.Event(), asyncio.Event()
+
+    async def first_run_hangs(request: httpx.Request) -> httpx.Response:
+        if not first_call.is_set():
+            first_call.set()
+            await release.wait()  # never set: only cancelling the run ends this call
+        return server.handle(request)
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(first_run_hangs), sleep=no_sleep)
+    sent: list[dict] = []
+    started = asyncio.Event()
+    body = json.dumps(LIVE).encode()
+    scope = {
+        "type": "http", "asgi": {"version": "3.0", "spec_version": "2.3"}, "http_version": "1.1", "method": "POST",
+        "scheme": "http", "path": "/api/arena", "raw_path": b"/api/arena", "query_string": b"", "root_path": "",
+        "headers": [(b"content-type", b"application/json"), (b"host", b"test")], "client": ("192.0.2.1", 1),
+        "server": ("test", 80),
+    }  # fmt: skip
+    messages = [{"type": "http.request", "body": body, "more_body": False}]
+
+    async def receive() -> dict:
+        if messages:
+            return messages.pop(0)
+        await started.wait()
+        return {"type": "http.disconnect"}  # the judge leaves once the run has started
+
+    async def send(message: dict) -> None:
+        sent.append(message)
+        if message["type"] == "http.response.body" and b"run_started" in message.get("body", b""):
+            started.set()
+
+    await asyncio.wait_for(app(scope, receive, send), timeout=5)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        again = await asyncio.wait_for(
+            client.post("/api/arena", json=LIVE, headers={"X-Forwarded-For": "198.51.100.7"}), timeout=5
+        )
+
+    assert again.status_code == 200 and '"run_done"' in again.text
+
+
+async def test_a_live_run_that_fails_frees_token_factory_for_the_next():
+    server = FakeModelServer()
+    calls: list[httpx.Request] = []
+
+    def breaks_once(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        if len(calls) == 1:
+            raise RuntimeError("the model server broke")
+        return server.handle(request)
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(breaks_once), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        failed = await client.post("/api/arena", json=LIVE)
+        again = await client.post("/api/arena", json=LIVE, headers={"X-Forwarded-For": "198.51.100.7"})
+
+    assert '"type": "error"' in failed.text
+    assert again.status_code == 200 and '"run_done"' in again.text

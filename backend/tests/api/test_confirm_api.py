@@ -9,6 +9,7 @@ import re
 import httpx
 import pytest
 
+from marginarena import api
 from marginarena.api import create_app
 from marginarena.llm import LLMSettings
 
@@ -81,6 +82,86 @@ async def test_confirm_refuses_verdicts_changed_after_the_arena():
 
     assert started.status_code == 403
     assert evolus.requests == []
+
+
+async def test_the_recorded_workflow_run_is_there_when_evolus_is_not(monkeypatch):
+    # The event workspace expires (31 Oct or 15 Nov) before judging may end. The run of the recorded Arena's 12
+    # Verdicts on 15 Oct (evidence/evolus-verdict-workflow.md) stays viewable without calling Evolus.
+    monkeypatch.delenv("EVOLUS_API_KEY")
+    evolus = FakeEvolus()
+    app = create_app(llm_settings=SETTINGS, evolus_transport=httpx.MockTransport(evolus.handle), sleep=no_sleep)
+
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        body = (await client.get("/api/confirm/recorded")).json()
+
+    assert evolus.requests == []
+    assert body["recorded"] is True
+    assert body["execution_id"] == "4d903564-7cc8-f111-bf5b-000d3aae6dc8"
+    assert (body["seconds"], body["credits"]) == (10.55, 0.0)
+    assert len(body["result"]["upload"]) == 9
+    assert [e["sku"] for e in body["result"]["escalations"]] == ["VC-30"]
+    assert sorted(body["result"]["skipped"]) == ["RN-30", "SM-10"]
+
+
+async def test_one_address_can_start_the_workflow_only_a_few_times_an_hour():
+    # Each run leaves an execution in the event workspace and has the agent call the model.
+    evolus = FakeEvolus()
+    app = create_app(llm_settings=SETTINGS, evolus_transport=httpx.MockTransport(evolus.handle), sleep=no_sleep)
+
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        async with client.stream("POST", "/api/arena", json={"recorded": True}) as response:
+            events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
+        results = events[-1]["results"]
+        codes = [
+            (await client.post("/api/confirm", json={"results": results})).status_code
+            for _ in range(api.CONFIRMS_PER_HOUR + 1)
+        ]
+
+    assert codes == [200] * api.CONFIRMS_PER_HOUR + [429]
+    assert len(evolus.requests) == api.CONFIRMS_PER_HOUR
+
+
+async def test_the_recorded_workflow_run_is_the_one_on_the_recorded_arenas_verdicts():
+    # The Confirm step shows this run "on these same Verdicts" only after the recorded replay, so it must match them.
+    evolus = FakeEvolus()
+    app = create_app(llm_settings=SETTINGS, evolus_transport=httpx.MockTransport(evolus.handle), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        async with client.stream("POST", "/api/arena", json={"recorded": True}) as response:
+            events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
+        recorded = (await client.get("/api/confirm/recorded")).json()["result"]
+
+    results = events[-1]["results"]
+    joining = [r for r in results if r["verdict"] != "escalate" and not r["skip"]]
+    assert [(u["sku"], u["promo_plan"], u["campaign_price"], u["voucher"]) for u in recorded["upload"]] == [
+        (r["sku"], r["chosen_plan"], r["waterfall"]["selling_price"], r["waterfall"]["voucher"]) for r in joining
+    ]
+    assert [(e["sku"], e["worst_case_as_invited"], e["worst_case_not_joining"]) for e in recorded["escalations"]] == [
+        (r["sku"], r["invited_worst_total"], r["dont_join_total"]) for r in results if r["verdict"] == "escalate"
+    ]
+    assert recorded["skipped"] == [r["sku"] for r in results if r["skip"]]
+
+
+async def test_a_product_confirmed_twice_is_refused():
+    evolus = FakeEvolus()
+
+    twice, _ = await confirm(evolus, lambda results: results[:1] * 2)
+
+    assert twice.status_code == 422
+    assert evolus.requests == []
+
+
+async def test_a_finished_evolus_run_is_reported_without_asking_evolus_again():
+    evolus = FakeEvolus()
+
+    async def poll_twice() -> list[httpx.Response]:
+        app = create_app(llm_settings=SETTINGS, evolus_transport=httpx.MockTransport(evolus.handle), sleep=no_sleep)
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+            return [await client.get("/api/confirm/ex-1") for _ in range(2)]
+
+    first, second = await poll_twice()
+
+    assert first.json() == second.json() == {"status": "Completed", "result": WORKFLOW_RESULT}
+    assert len(evolus.requests) == 1
 
 
 async def test_confirming_nothing_is_refused_without_starting_a_workflow():
