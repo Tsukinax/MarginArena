@@ -81,3 +81,12 @@ async def test_confirm_refuses_verdicts_changed_after_the_arena():
 
     assert started.status_code == 403
     assert evolus.requests == []
+
+
+async def test_confirming_nothing_is_refused_without_starting_a_workflow():
+    evolus = FakeEvolus()
+
+    started, _ = await confirm(evolus, lambda results: [])
+
+    assert started.status_code == 422
+    assert evolus.requests == []

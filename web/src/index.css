@@ -1172,3 +1172,12 @@ button:disabled {
   padding: 14px 18px;
   max-width: 75ch;
 }
+
+/* Step 1: the Evolus extractor reads the invitation PDF */
+.read-invitation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 0 0 24px;
+}

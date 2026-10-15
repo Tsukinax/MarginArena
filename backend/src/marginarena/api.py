@@ -9,13 +9,15 @@ import json
 import os
 import secrets
 from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi import Path as PathParam
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -35,7 +37,8 @@ PROCESS_KEY = secrets.token_bytes(32)
 RECORDED_RUN = Path(__file__).resolve().parent / "sample" / "recorded" / "token-factory-sample-12sku.sse"
 REPLAY_SECONDS = 20
 EVOLUS_URL = "https://api.evolus.ai/api/v1"
-EVOLUS_KEYS = ("EVOLUS_API_KEY", "EVOLUS_APPLICATION_ID", "EVOLUS_WORKFLOW_ID")
+# The fictional sample invitation (backend/scripts/make_sample_invitation.py), the only document the extractor is sent.
+SAMPLE_INVITATION = Path(__file__).resolve().parent / "sample" / "glow-lab-bkk-invitation.pdf"
 
 
 class ArenaRequest(BaseModel):
@@ -56,7 +59,7 @@ class ExplainRequest(BaseModel):
 
 
 class ConfirmRequest(BaseModel):
-    results: list[dict]
+    results: list[dict] = Field(min_length=1)
     """The decided SKUs the Seller confirms, exactly as the Arena returned them."""
 
 
@@ -82,13 +85,16 @@ def create_app(
         if not isinstance(signature, str) or not hmac.compare_digest(signature, _signature(result, key)):
             raise HTTPException(403, "Only a Verdict this server's Arena produced, unchanged, can be used.")
 
-    def evolus() -> tuple[httpx.AsyncClient, str]:
-        missing = [name for name in EVOLUS_KEYS if not os.environ.get(name)]
+    def evolus(*ids: str) -> tuple[httpx.AsyncClient, list[str]]:
+        """A client for the Evolus workspace, and the values of the resource IDs named in `ids`."""
+        missing = [name for name in ("EVOLUS_API_KEY", "EVOLUS_APPLICATION_ID", *ids) if not os.environ.get(name)]
         if missing:
             raise HTTPException(503, f"Evolus is not set up on this server: {', '.join(missing)} missing.")
         headers = {"X-ApiKey": os.environ["EVOLUS_API_KEY"], "X-Application-Id": os.environ["EVOLUS_APPLICATION_ID"]}
-        client = httpx.AsyncClient(base_url=EVOLUS_URL, transport=evolus_transport, headers=headers, timeout=60)
-        return client, os.environ["EVOLUS_WORKFLOW_ID"]
+        client = httpx.AsyncClient(base_url=EVOLUS_URL, transport=evolus_transport, headers=headers, timeout=300)
+        return client, [os.environ[name] for name in ids]
+
+    reading: dict = {}  # this process's last reading of the sample invitation: the same document reads the same
 
     async def settings() -> LLMSettings:
         if llm_settings:
@@ -169,7 +175,7 @@ def create_app(
         shop = load_shop("glow-lab-bkk")
         verdicts = [_confirmed(r) for r in request.results]
         payload = {"shop": shop.name, "campaign": shop.invitation["campaign"], "verdicts": verdicts}
-        client, flow = evolus()
+        client, (flow,) = evolus("EVOLUS_WORKFLOW_ID")
         async with client:
             answer = await client.post(
                 f"/workflows/{flow}/execute", files={"input": (None, json.dumps(payload, ensure_ascii=False))}
@@ -180,7 +186,7 @@ def create_app(
 
     @app.get("/api/confirm/{execution_id}")
     async def confirmation(execution_id: str = PathParam(pattern=r"^[A-Za-z0-9-]{1,64}$")) -> dict:
-        client, flow = evolus()
+        client, (flow,) = evolus("EVOLUS_WORKFLOW_ID")
         async with client:
             answer = await client.get(f"/workflows/{flow}/executions/{execution_id}")
         if not answer.is_success:
@@ -192,6 +198,47 @@ def create_app(
         except ValueError:
             result = output
         return {"status": execution.get("status"), "result": result}
+
+    @app.get("/api/invitation/sample.pdf")
+    async def sample_invitation() -> FileResponse:
+        return FileResponse(SAMPLE_INVITATION, media_type="application/pdf", filename=SAMPLE_INVITATION.name)
+
+    @app.post("/api/invitation/read")
+    async def read_invitation() -> dict:
+        """The Evolus extractor reads the sample invitation; each discount is checked against the one the Arena uses."""
+        if reading:
+            return {**reading, "cached": True}
+        client, (reader, structure) = evolus("EVOLUS_READER_ID", "EVOLUS_INVITATION_STRUCTURE_ID")
+        document = (SAMPLE_INVITATION.name, SAMPLE_INVITATION.read_bytes(), "application/pdf")
+        async with client:
+            answer = await client.post(
+                f"/agents/{reader}/json/{structure}/ask-file", params={"useWebhook": "false"}, files={"file": document}
+            )
+        if not answer.is_success:
+            raise HTTPException(502, f"The Evolus extractor did not read the invitation (HTTP {answer.status_code}).")
+        read = answer.json()
+        expected = {i.sku.id: i.required_discount * 100 for i in load_shop("glow-lab-bkk").invited}
+        found = {str(i.get("sku", "")).strip(): _number(i.get("minimum_discount_pct")) for i in read.get("items", [])}
+        checks = [
+            {
+                "sku": sku,
+                "read_discount_pct": None if found.get(sku) is None else f"{found[sku]:f}",
+                "expected_discount_pct": f"{pct.normalize():f}",
+                "matches": found.get(sku) == pct,
+            }
+            for sku, pct in expected.items()
+        ]
+        extra = sorted(set(found) - set(expected))
+        reading.update(
+            read=read,
+            checks=checks,
+            extra_skus=extra,
+            matches=all(c["matches"] for c in checks) and not extra,
+            execution_id=answer.headers.get("X-AskFile-Execution-Id"),
+            audit_id=answer.headers.get("X-AskFile-Audit-Id"),
+            read_at=datetime.now(UTC).isoformat(timespec="seconds"),
+        )
+        return {**reading, "cached": False}
 
     web = web_dist or os.environ.get("WEB_DIST")
     if web:  # mounted last, so every /api route above still wins
@@ -214,6 +261,13 @@ async def _replay(path: Path, emit: Emit, sleep: Callable[[float], Awaitable[Non
         await sleep((at - previous) * scale)
         previous = at
         await emit(event)
+
+
+def _number(value) -> Decimal | None:
+    try:
+        return Decimal(str(value)) if value is not None and str(value).strip() != "" else None
+    except InvalidOperation:
+        return None
 
 
 def _confirmed(r: dict) -> dict:

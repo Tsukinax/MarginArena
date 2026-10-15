@@ -56,6 +56,7 @@ Every number in this README comes from the engine or from these files:
 | Thai and English explanations checked number by number | [evidence/explainer-token-factory.md](evidence/explainer-token-factory.md) |
 | Four pricing policies under the same Scenarios, and Gemma's own arithmetic checked by the engine | [evidence/policy-comparison.md](evidence/policy-comparison.md) |
 | The Evolus Verdict workflow carrying out confirmed Verdicts | [evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md) |
+| The Evolus extractor reading the Campaign Invitation PDF | [evidence/evolus-invitation-extractor.md](evidence/evolus-invitation-extractor.md) |
 | Recorded Arena runs, as streamed | [evidence/runs/](evidence/runs/) |
 
 Why the engine and not the model computes the numbers: given the same facts and formulas, Gemma's own Campaign profit
@@ -72,7 +73,10 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
 
 ## Evolus
 
-When the Seller confirms, MarginArena hands the Verdicts to an Evolus workflow, which carries them out: it sorts them,
+An Evolus document extractor reads the Campaign Invitation PDF (the sample's, the only document the demo sends) and the
+app checks every discount it read against the invitation the Arena uses
+([evidence/evolus-invitation-extractor.md](evidence/evolus-invitation-extractor.md)). When the Seller confirms,
+MarginArena hands the Verdicts to an Evolus workflow, which carries them out: it sorts them,
 writes the bulk-upload file, and has the Campaign Desk agent draft the shop owner's approval request for escalated
 products, citing the brand agreement and fee rules from its knowledge library. The agent runs on our own model
 connection (Gemma-4-31B-IT on AMD Token Factory), so the run uses no Evolus credits

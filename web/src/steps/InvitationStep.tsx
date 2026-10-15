@@ -1,11 +1,29 @@
-import { baht, pct, type Shop } from '../api'
+import { useState } from 'react'
+import { baht, pct, readInvitation, type InvitationReading, type Shop } from '../api'
 
 type Props = { shop: Shop | null; route: string | null; onStart: (recorded: boolean) => void }
 
 export default function InvitationStep({ shop, route, onStart }: Props) {
+  const [reading, setReading] = useState<InvitationReading | null>(null)
+  const [readState, setReadState] = useState<'idle' | 'reading' | 'error'>('idle')
+  const [readError, setReadError] = useState<string | null>(null)
   if (!shop) return <p className="muted">Loading the sample invitation…</p>
   const fallback = route !== 'mi300x'
   const count = fallback ? Math.min(4, shop.invited.length) : shop.invited.length
+  const checks = new Map(reading?.checks.map((c) => [c.sku, c]))
+  const misread = reading?.checks.filter((c) => !c.matches).map((c) => c.sku) ?? []
+
+  const read = async () => {
+    setReadState('reading')
+    setReadError(null)
+    try {
+      setReading(await readInvitation())
+      setReadState('idle')
+    } catch (e) {
+      setReadError((e as Error).message)
+      setReadState('error')
+    }
+  }
 
   return (
     <section className="panel">
@@ -17,6 +35,29 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
         Before you join, MarginArena checks every product against what rivals could do, using your costs and this
         year's marketplace fees. You confirm before anything happens.
       </p>
+      <div className="read-invitation">
+        <a href="/api/invitation/sample.pdf" target="_blank" rel="noreferrer">
+          Open the invitation (PDF)
+        </a>
+        <button type="button" className="secondary" disabled={readState === 'reading'} onClick={read}>
+          {readState === 'reading' ? 'Evolus is reading it…' : 'Read it with the Evolus extractor'}
+        </button>
+        {readState === 'reading' && <span className="small">About 40 seconds, on our model through AMD Token Factory.</span>}
+        {reading && (
+          <span className="small">
+            Evolus read {reading.read.items.length} products
+            {reading.cached ? ` (this server's reading from ${new Date(reading.read_at).toLocaleTimeString('en-GB')})` : ''}:{' '}
+            {reading.matches
+              ? 'every minimum discount matches the table below.'
+              : `${misread.length + reading.extra_skus.length} do not match: ${[...misread, ...reading.extra_skus].join(', ')}.`}
+          </span>
+        )}
+        {readError && (
+          <span className="error" role="alert">
+            {readError}
+          </span>
+        )}
+      </div>
 
       <div className="invite-grid">
         <dl className="facts">
@@ -80,6 +121,11 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
             <th scope="col" className="num">Your cost</th>
             <th scope="col" className="num">Stock</th>
             <th scope="col" className="num">Discount asked</th>
+            {reading && (
+              <th scope="col" className="num">
+                Read by Evolus
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -94,6 +140,11 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
               <td className="num">{baht(s.cost)}</td>
               <td className="num">{s.stock}</td>
               <td className="num">{pct(s.required_discount)}</td>
+              {reading && (
+                <td className={`num ${checks.get(s.id)?.matches ? '' : 'neg'}`}>
+                  {checks.get(s.id)?.read_discount_pct ?? '–'}% {checks.get(s.id)?.matches ? '✓' : '✗'}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

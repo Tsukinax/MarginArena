@@ -225,6 +225,23 @@ export async function explainVerdict(result: SkuResult, language: Language): Pro
   return r.json()
 }
 
+/** The Evolus extractor's reading of the sample invitation PDF, each discount checked against the Arena's. */
+export type InvitationReading = {
+  read: { campaign: string; slot: string; registration_closes: string; items: { sku: string }[] }
+  checks: { sku: string; read_discount_pct: string | null; expected_discount_pct: string; matches: boolean }[]
+  extra_skus: string[]
+  matches: boolean
+  execution_id: string | null
+  read_at: string
+  cached: boolean
+}
+
+export async function readInvitation(): Promise<InvitationReading> {
+  const r = await fetch('/api/invitation/read', { method: 'POST' })
+  if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? `The invitation could not be read (${r.status}).`)
+  return r.json()
+}
+
 /** What the Evolus Verdict workflow returns (infra/evolus/evolus_kit.py, step "Assemble the result"). */
 export type WorkflowResult = {
   shop: string
