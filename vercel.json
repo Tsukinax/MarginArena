@@ -1,11 +1,29 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": [
+    "hkg1"
+  ],
   "services": {
-    "web": { "root": "web/" },
-    "api": { "root": "backend/", "entrypoint": "app:app" }
+    "web": {
+      "root": "web/"
+    },
+    "api": {
+      "root": "backend/",
+      "entrypoint": "app:app"
+    }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": { "service": "api" } },
-    { "source": "/(.*)", "destination": { "service": "web" } }
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    }
   ]
 }
