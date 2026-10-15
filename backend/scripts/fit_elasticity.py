@@ -196,7 +196,7 @@ Reproduce: `cd backend && uv run --group fit python scripts/fit_elasticity.py`, 
 
 - **Data:** FreshRetailNet-50K, Dingdong Ltd., CC BY 4.0, revision `{REVISION[:12]}`, checked by SHA-256. It is real online fresh-grocery orders from 18 Chinese cities in 2024. We use it as an e-commerce starting point: Sellers can override any SKU.
 - **Sample:** {len(in_stock):,} store × SKU × day rows that were fully in stock and had positive sales.
-- **Pooled elasticity: {beta:.2f}** (cluster-robust SE {se:.2f}). A 10% price cut lifts unit sales by about {abs(beta) * 10:.0f}%.
+- **Pooled elasticity: {beta:.2f}** (cluster-robust SE {se:.2f}). A 10% price cut lifts unit sales by about {(0.9**beta - 1) * 100:.0f}% (0.9^β, as the engine's demand model computes it).
 - **Category elasticities:** {len(cats)} categories with at least {MIN_SERIES_PER_CATEGORY} series, after shrinkage. The p10–p90 band is {band[0]:.2f} to {band[1]:.2f} (μ {mu:.2f}, τ {tau:.2f}).
 
 ## Holdout (the dataset's own eval week)
