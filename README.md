@@ -55,6 +55,7 @@ Every number in this README comes from the engine or from these files:
 | An AI Rival turning SS-50's Approve into a Revise, live on Token Factory | [evidence/red-team-token-factory.md](evidence/red-team-token-factory.md) |
 | Thai and English explanations checked number by number | [evidence/explainer-token-factory.md](evidence/explainer-token-factory.md) |
 | Four pricing policies under the same Scenarios, and Gemma's own arithmetic checked by the engine | [evidence/policy-comparison.md](evidence/policy-comparison.md) |
+| The Evolus Verdict workflow carrying out confirmed Verdicts | [evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md) |
 | Recorded Arena runs, as streamed | [evidence/runs/](evidence/runs/) |
 
 Why the engine and not the model computes the numbers: given the same facts and formulas, Gemma's own Campaign profit
@@ -71,9 +72,14 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
 
 ## Evolus
 
-`infra/evolus/evolus_kit.py` sets up the Evolus workspace from code: `plan` only reads, and `apply` creates what is
-missing, finding each resource by name first. So far it creates the Campaign Desk knowledge library (fees and the
-sample brand agreement). See [infra/evolus/README.md](infra/evolus/README.md).
+When the Seller confirms, MarginArena hands the Verdicts to an Evolus workflow, which carries them out: it sorts them,
+writes the bulk-upload file, and has the Campaign Desk agent draft the shop owner's approval request for escalated
+products, citing the brand agreement and fee rules from its knowledge library. The agent runs on our own model
+connection (Gemma-4-31B-IT on AMD Token Factory), so the run uses no Evolus credits
+([evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md)). Nothing is sent or registered.
+
+`infra/evolus/evolus_kit.py` builds all of it from code: `plan` only reads, and `apply` creates what is missing,
+finding each resource by name first. See [infra/evolus/README.md](infra/evolus/README.md).
 
 ## Assumptions and limits
 

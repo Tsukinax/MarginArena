@@ -38,3 +38,8 @@ Create the workspace through https://app.evolus.ai/join/AMDACT3, put the API key
   under "Your models" (alias `tf-gemma`, added by the user); after the GPU session the MI300X model becomes the main
   model and Token Factory its labelled fallback. The Verdict workflow drafts the approval request with the `email` AI
   Tool and sends nothing.
+- 15 Oct, later: the user connected "tf-gemma on AMD" under "Your models" (Gemma-4-31B-IT and Qwen3.8-27B on Token
+  Factory; Gemma had no workers at the time, so its test failed and Qwen's passed). `apply --model own/Gemma-4-31B-IT
+  --fallback own/Qwen3.8-27B` built the Campaign Desk agent and the Verdict workflow (the API wants step types as the
+  catalog's numbers). The Confirm step runs it; one run is in `evidence/evolus-verdict-workflow.md` (10.55 s, 0.0
+  credits). The extractor is next.
