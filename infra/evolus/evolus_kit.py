@@ -3,15 +3,16 @@
 Run from the repo root with the keys from .env:
   uv run --project backend --env-file .env python infra/evolus/evolus_kit.py plan
 
-  uv run --project backend --env-file .env python infra/evolus/evolus_kit.py apply
+  uv run --project backend --env-file .env python infra/evolus/evolus_kit.py apply [--model own/<alias>]
 
   plan    read-only: what the workspace holds now, the workflow step catalog and the keys' scopes.
           Prints a summary and saves the raw answers to infra/evolus/.plan/latest.json (gitignored).
   apply   writes: creates what MarginArena needs, finding each resource by name first, so a rerun creates nothing
-          new. So far the knowledge library with every document in infra/evolus/library/. Saves the IDs to .env.
-          Ask the user before every run.
+          new: the knowledge library with every document in infra/evolus/library/, and with --model (one of the
+          workspace's own models from "Your models") the Campaign Desk agent and the Verdict workflow. Saves the IDs
+          to .env. Ask the user before every run.
 
-The extractor, the Campaign Desk agent and the Verdict workflow come next. API notes: docs/api-guide/evolus-api.md.
+The Campaign Invitation extractor comes next. API notes: docs/api-guide/evolus-api.md.
 """
 
 from __future__ import annotations
@@ -31,6 +32,66 @@ PLAN_DIR = HERE / ".plan"
 LIBRARY_DIR = HERE / "library"
 ENV_FILE = HERE.parents[1] / ".env"
 LIBRARY = "MarginArena Campaign Desk library"
+AGENT = "MarginArena Campaign Desk"
+AGENT_PROMPT = (
+    "You are the Campaign Desk of Glow Lab BKK, a Thai skincare Seller on Shopee Thailand. MarginArena's pricing "
+    "engine decides every Verdict on a Campaign Invitation and computes every number: never compute prices, fees or "
+    "profit yourself, and quote only numbers you are given. Use the knowledge library (Shopee Thailand fees and "
+    "Campaign rules, the HydraLab reseller agreement) to say where a fee or a rule comes from. Answer in the "
+    "language you are asked in, briefly."
+)
+WORKFLOW = "MarginArena Verdict"
+# Runs after the Seller confirms. The input is the confirmed Verdicts as JSON; the scripts only sort and pass
+# through the engine's figures, they compute none.
+SPLIT_SCRIPT = """
+const v = (data && data.verdicts) || [];
+const upload = v.filter(r => !r.skip && r.verdict !== 'escalate').map(r => ({
+  sku: r.sku, product: r.name, promo_plan: r.plan, campaign_price: r.selling_price, voucher: r.voucher,
+  verdict: r.verdict
+}));
+const escalations = v.filter(r => r.verdict === 'escalate').map(r => ({
+  sku: r.sku, product: r.name, invited_plan: r.invited_plan, failed_checks: r.failed_checks,
+  worst_case_as_invited: r.invited_worst_total, worst_case_not_joining: r.dont_join_total
+}));
+const skipped = v.filter(r => r.skip).map(r => r.sku);
+return {
+  shop: data.shop, campaign: data.campaign, upload, escalations, skipped,
+  counts: { joining: upload.length, escalations: escalations.length, skipped: skipped.length }
+};
+"""
+APPROVAL_PROMPT = (
+    "The JSON below is what MarginArena's engine decided for a Campaign Invitation. If its escalations list is "
+    "empty, reply exactly: No approval needed. Otherwise draft a short approval request email to the shop owner: a "
+    "subject line, then 3 to 6 sentences asking the owner to decide each escalated product and saying why it was "
+    "escalated (its failed checks). Quote only numbers that appear in the JSON. This is a draft; nothing is sent."
+)
+ASSEMBLE_SCRIPT = """
+const split = sources[0].data || {};
+const draft = ((sources[1] && sources[1].text) || '').trim();
+return {
+  shop: split.shop, campaign: split.campaign, upload: split.upload || [], escalations: split.escalations || [],
+  skipped: split.skipped || [], counts: split.counts || {},
+  approval_request: (split.escalations || []).length ? draft : null
+};
+"""
+# The bulk-upload columns are MarginArena's own: Seller Centre's template is not public.
+UPLOAD_FILE = {
+    "format": "csv",
+    "fileNamePattern": "marginarena-campaign-upload_{{timestamp}}.{{format}}",
+    "csv": {
+        "delimiter": ",",
+        "quoting": "minimal",
+        "rowsFrom": "upload",
+        "columns": [
+            {"name": "SKU", "from": "sku"},
+            {"name": "Product", "from": "product"},
+            {"name": "Campaign price (THB)", "from": "campaign_price"},
+            {"name": "Shop voucher (THB)", "from": "voucher"},
+            {"name": "Promo Plan", "from": "promo_plan"},
+            {"name": "Verdict", "from": "verdict"},
+        ],
+    },
+}
 # (label, path, which key). Web services, extractors, memories and skills need the personal User API Key.
 LOOKS = (
     ("agents", "/agents", "app"),
@@ -93,13 +154,119 @@ def apply(
     env: dict[str, str],
     transport: httpx.BaseTransport | None = None,
     env_file: Path = ENV_FILE,
+    model: str | None = None,
 ) -> dict[str, str]:
-    """Create what MarginArena needs, once: each resource is found by name before anything is created."""
+    """Create what MarginArena needs, once: each resource is found by name before anything is created.
+
+    `model` is the key of one of the workspace's own models ("own/<alias>"); without it only the library is made.
+    """
     headers = _headers(env)
     with httpx.Client(base_url=BASE_URL, transport=transport, timeout=60) as client:
         ids = {"library": _library(client, headers["user"])}
-    _set_env(env_file, "EVOLUS_LIBRARY_ID", ids["library"])
+        if model:
+            ids["agent"] = _agent(client, headers, model, ids["library"])
+            ids["workflow"] = _workflow(client, headers["app"], ids["agent"])
+    for name, value in ids.items():
+        _set_env(env_file, f"EVOLUS_{name.upper()}_ID", value)
     return ids
+
+
+def _agent(client: httpx.Client, headers: dict, model: str, library: str) -> str:
+    """The Campaign Desk agent on our own model, with the knowledge library attached."""
+    found = [
+        a
+        for a in _ok(client.get("/agents", headers=headers["app"])).json()
+        if a.get("name") == AGENT
+    ]
+    if found:
+        agent = found[0].get("agentId") or found[0]["id"]
+        print(f"agent {AGENT!r}: found")
+    else:
+        body = {
+            "name": AGENT,
+            "prompt": AGENT_PROMPT,
+            "language": "en",
+            "modelKey": model,
+            "isChatVisible": True,
+        }
+        agent = _ok(client.post("/agents", json=body, headers=headers["app"])).json()[
+            "agentId"
+        ]
+        print(f"agent {AGENT!r}: created on {model}")
+    attached = _ok(
+        client.get(f"/agents/{agent}/memories", headers=headers["user"])
+    ).json()
+    if library not in {m.get("id") for m in attached}:
+        _ok(
+            client.post(
+                f"/agents/{agent}/memories",
+                json={"memoryId": library},
+                headers=headers["user"],
+            )
+        )
+        print("  knowledge library: attached")
+    return agent
+
+
+def _workflow(client: httpx.Client, headers: dict[str, str], agent: str) -> str:
+    """The Verdict workflow, turned on at creation (a workflow that is off answers 409), with every step."""
+    found = [
+        w
+        for w in _ok(client.get("/workflows", headers=headers)).json()
+        if w.get("name") == WORKFLOW
+    ]
+    if found:
+        flow = found[0]["id"]
+        print(f"workflow {WORKFLOW!r}: found")
+    else:
+        body = {
+            "name": WORKFLOW,
+            "description": "Carries out the Verdicts a Seller confirmed in MarginArena.",
+            "isActive": True,
+        }
+        flow = _ok(client.post("/workflows", json=body, headers=headers)).json()["id"]
+        print(f"workflow {WORKFLOW!r}: created")
+    steps = [
+        {
+            "name": "Split the Verdicts",
+            "stepType": "Script",
+            "stepConfigJson": json.dumps({"script": SPLIT_SCRIPT}),
+        },
+        {
+            "name": "Bulk-upload file",
+            "stepType": "CreateFile",
+            "links": ["Split the Verdicts"],
+            "stepConfigJson": json.dumps(UPLOAD_FILE),
+        },
+        {
+            "name": "Approval request",
+            "stepType": "AgentCall",
+            "links": ["Split the Verdicts"],
+            "agentId": agent,
+            "prompt": APPROVAL_PROMPT,
+        },
+        {
+            "name": "Assemble the result",
+            "stepType": "Script",
+            "links": ["Split the Verdicts", "Approval request"],
+            "stepConfigJson": json.dumps({"script": ASSEMBLE_SCRIPT}),
+        },
+        {"name": "Result", "stepType": "Output", "links": ["Assemble the result"]},
+    ]
+    for step in steps:
+        existing = {
+            s["name"]: s["id"]
+            for s in _ok(client.get(f"/workflows/{flow}", headers=headers)).json()[
+                "steps"
+            ]
+        }
+        if step["name"] in existing:
+            continue
+        body = {k: v for k, v in step.items() if k != "links"}
+        body["inputStepIds"] = [existing[name] for name in step.get("links", [])]
+        _ok(client.post(f"/workflows/{flow}/steps", json=body, headers=headers))
+        print(f"  step {step['name']!r}: added")
+    return flow
 
 
 def _library(client: httpx.Client, headers: dict[str, str]) -> str:
@@ -198,14 +365,20 @@ def _redact(text: str, env: dict[str, str]) -> str:
 
 
 def main(argv: list[str]) -> None:
-    if argv[1:] not in (["plan"], ["apply"]):
+    command = argv[1:]
+    model = (
+        command[2]
+        if command[:2] == ["apply", "--model"] and len(command) == 3
+        else None
+    )
+    if command not in (["plan"], ["apply"]) and not model:
         raise SystemExit(__doc__)
     missing = [k for k in KEYS if not os.environ.get(k)]
     if missing:
         raise SystemExit(f"Missing in .env: {', '.join(missing)}")
     env = {k: os.environ[k] for k in KEYS}
     if argv[1] == "apply":
-        ids = apply(env)
+        ids = apply(env, model=model)
         print(
             f"Saved to {ENV_FILE.name}: "
             + ", ".join(f"{k} {v}" for k, v in ids.items())

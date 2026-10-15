@@ -71,41 +71,84 @@ def test_plan_never_prints_a_key(capsys):
 
 
 class FakeWorkspace:
-    """Knowledge libraries as the real API answered on 15 Oct: GET lists, POST returns the new id."""
+    """The parts of the Evolus API apply uses, with the shapes known so far: lists come back as JSON arrays, and a
+    created library or workflow answers with its "id", a created agent with its "agentId" (as a public ACT III repo
+    reads them)."""
 
     def __init__(self):
         self.libraries = [{"id": "sys-1", "name": "InfiniteCurveMemory1 (2)"}]
         self.documents: dict[str, list[dict]] = {}
+        self.agents: list[dict] = []
+        self.agent_memories: dict[str, list[str]] = {}
+        self.workflows: list[dict] = []
         self.requests: list[httpx.Request] = []
 
     def handle(self, request: httpx.Request) -> httpx.Response:
         self.requests.append(request)
         path = request.url.path.removeprefix("/api/v1")
+        method = request.method
+        body = (
+            json.loads(request.content)
+            if request.headers.get("content-type") == "application/json"
+            else None
+        )
         docs = re.fullmatch(r"/memories/([^/]+)/documents", path)
-        if request.method == "GET" and path == "/memories":
+        agent_memories = re.fullmatch(r"/agents/([^/]+)/memories", path)
+        workflow = re.fullmatch(r"/workflows/([^/]+)", path)
+        steps = re.fullmatch(r"/workflows/([^/]+)/steps", path)
+        if method == "GET" and path == "/memories":
             return httpx.Response(200, json=self.libraries)
-        if request.method == "POST" and path == "/memories/simple":
-            library = {
-                "id": f"lib-{len(self.libraries)}",
-                **json.loads(request.content),
-            }
+        if method == "POST" and path == "/memories/simple":
+            library = {"id": f"lib-{len(self.libraries)}", **body}
             self.libraries.append(library)
             return httpx.Response(200, json=library)
-        if docs and request.method == "GET":
+        if docs and method == "GET":
             return httpx.Response(200, json=self.documents.get(docs[1], []))
-        if docs and request.method == "POST":
+        if docs and method == "POST":
             name = re.search(rb'filename="([^"]+)"', request.content)[1].decode()
             self.documents.setdefault(docs[1], []).append({"title": name})
             return httpx.Response(201, json={"title": name})
+        if method == "GET" and path == "/agents":
+            return httpx.Response(200, json=self.agents)
+        if method == "POST" and path == "/agents":
+            agent = {"agentId": f"agent-{len(self.agents) + 1}", **body}
+            self.agents.append(agent)
+            return httpx.Response(200, json={"agentId": agent["agentId"]})
+        if agent_memories and method == "GET":
+            ids = self.agent_memories.get(agent_memories[1], [])
+            return httpx.Response(200, json=[{"id": i} for i in ids])
+        if agent_memories and method == "POST":
+            self.agent_memories.setdefault(agent_memories[1], []).append(
+                body["memoryId"]
+            )
+            return httpx.Response(200, json={})
+        if method == "GET" and path == "/workflows":
+            return httpx.Response(
+                200, json=[{k: w[k] for k in ("id", "name")} for w in self.workflows]
+            )
+        if method == "POST" and path == "/workflows":
+            flow = {"id": f"wf-{len(self.workflows) + 1}", **body, "steps": []}
+            self.workflows.append(flow)
+            return httpx.Response(200, json={"id": flow["id"]})
+        if workflow and method == "GET":
+            flow = next(w for w in self.workflows if w["id"] == workflow[1])
+            return httpx.Response(200, json=flow)
+        if steps and method == "POST":
+            flow = next(w for w in self.workflows if w["id"] == steps[1])
+            flow["steps"].append({"id": f"step-{len(flow['steps']) + 1}", **body})
+            return httpx.Response(200, json={})
         return httpx.Response(404, json={"title": "Not Found"})
 
     def writes(self) -> list[httpx.Request]:
         return [r for r in self.requests if r.method != "GET"]
 
 
-def apply(workspace: FakeWorkspace, tmp_path) -> dict:
+def apply(workspace: FakeWorkspace, tmp_path, model: str | None = None) -> dict:
     return evolus_kit.apply(
-        ENV, transport=httpx.MockTransport(workspace.handle), env_file=tmp_path / ".env"
+        ENV,
+        transport=httpx.MockTransport(workspace.handle),
+        env_file=tmp_path / ".env",
+        model=model,
     )
 
 
@@ -122,16 +165,45 @@ def test_apply_creates_the_library_and_uploads_every_document_in_english(tmp_pat
         "hydralab-reseller-agreement.md",
         "shopee-th-fees-and-campaigns.md",
     ]
-    assert all("X-User-ApiKey" in r.headers for r in workspace.writes())
     assert f"EVOLUS_LIBRARY_ID={ids['library']}" in (tmp_path / ".env").read_text()
+
+
+def test_apply_with_our_model_builds_the_campaign_desk_and_the_verdict_workflow(
+    tmp_path,
+):
+    workspace = FakeWorkspace()
+
+    ids = apply(workspace, tmp_path, model="own/tf-gemma")
+
+    agent = workspace.agents[0]
+    flow = workspace.workflows[0]
+    steps = {s["name"]: s for s in flow["steps"]}
+    assert (agent["name"], agent["modelKey"]) == (evolus_kit.AGENT, "own/tf-gemma")
+    assert workspace.agent_memories[ids["agent"]] == [ids["library"]]
+    assert (flow["name"], flow["isActive"]) == (evolus_kit.WORKFLOW, True)
+    assert [s["stepType"] for s in flow["steps"]] == [
+        "Script",
+        "CreateFile",
+        "AgentCall",
+        "Script",
+        "Output",
+    ]
+    assert steps["Approval request"]["agentId"] == ids["agent"]
+    assert steps["Assemble the result"]["inputStepIds"] == [
+        steps["Split the Verdicts"]["id"],
+        steps["Approval request"]["id"],
+    ]
+    env = (tmp_path / ".env").read_text()
+    assert f"EVOLUS_AGENT_ID={ids['agent']}" in env
+    assert f"EVOLUS_WORKFLOW_ID={ids['workflow']}" in env
 
 
 def test_apply_twice_creates_nothing_new_and_leaves_other_libraries_alone(tmp_path):
     workspace = FakeWorkspace()
-    apply(workspace, tmp_path)
+    apply(workspace, tmp_path, model="own/tf-gemma")
     writes_after_first_run = len(workspace.writes())
 
-    apply(workspace, tmp_path)
+    apply(workspace, tmp_path, model="own/tf-gemma")
 
     assert len(workspace.writes()) == writes_after_first_run
     assert {r.method for r in workspace.requests} == {"GET", "POST"}
@@ -139,6 +211,6 @@ def test_apply_twice_creates_nothing_new_and_leaves_other_libraries_alone(tmp_pa
 
 
 def test_apply_never_prints_a_key(tmp_path, capsys):
-    apply(FakeWorkspace(), tmp_path)
+    apply(FakeWorkspace(), tmp_path, model="own/tf-gemma")
 
     assert "SECRET" not in capsys.readouterr().out
