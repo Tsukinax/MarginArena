@@ -44,7 +44,9 @@ class LLMSettings:
             api_key=os.environ.get("TOKEN_FACTORY_API_KEY", ""),
             model=os.environ.get("TOKEN_FACTORY_MODEL", "Gemma-4-31B-IT"),
             requests_per_minute=15,  # the account limit is 20/min; leave headroom for other callers
-            fallback_model=os.environ.get("TOKEN_FACTORY_FALLBACK_MODEL", "Qwen3.8-27B"),
+            # DeepSeek-V4-Flash answers JSON without thinking first; Qwen3.8-27B spent our whole token budget thinking
+            # on 15 Oct, and Gemma-4-31B-IT left Token Factory's catalogue that night (Q58, Q59).
+            fallback_model=os.environ.get("TOKEN_FACTORY_FALLBACK_MODEL", "DeepSeek-V4-Flash"),
         )
         if not os.environ.get("VLLM_BASE_URL"):
             return (token_factory,)
@@ -57,6 +59,20 @@ class LLMSettings:
             concurrency=128,
         )
         return (mi300x, token_factory)
+
+
+async def served_models(route: LLMSettings, transport: httpx.AsyncBaseTransport | None = None) -> set[str] | None:
+    """The model IDs the route serves now (its /models catalogue), or None when the catalogue can't be read."""
+    try:
+        async with httpx.AsyncClient(transport=transport, timeout=10) as client:
+            response = await client.get(
+                route.base_url.rstrip("/") + "/models", headers={"Authorization": f"Bearer {route.api_key}"}
+            )
+        if response.status_code == 200:
+            return {m["id"] for m in response.json().get("data", [])}
+    except (httpx.HTTPError, ValueError, KeyError, TypeError):
+        pass
+    return None
 
 
 async def first_healthy(
@@ -172,10 +188,10 @@ class LLMClient:
                 self.telemetry.in_flight -= 1
             if response is not None and response.status_code == 200:
                 return response.json()
+            if self._fall_back(response):
+                continue  # straight to the fallback model: retrying a model that is not served only waits
             if response is not None and response.status_code not in RETRY_STATUSES:
                 return None
-            if self._fall_back(response):
-                continue  # straight to the fallback model: retrying a model with no workers only waits
             if attempt + 1 < MAX_ATTEMPTS:
                 self.telemetry.retries += 1
                 retry_after = response.headers.get("Retry-After") if response is not None else None
@@ -183,13 +199,17 @@ class LLMClient:
         return None
 
     def _fall_back(self, response: httpx.Response | None) -> bool:
-        """Switches the rest of the run to the fallback model when the route says the model has no workers."""
+        """Switches the rest of the run to the fallback model when the route says it can't serve the model now.
+
+        Token Factory answers 500 "no_available_workers" while a model is down, and 400 "Requested model ... not
+        supported" once it has left the catalogue.
+        """
         fallback = self.settings.fallback_model
         if (
             not fallback
             or self.model == fallback
             or response is None
-            or b"no_available_workers" not in response.content
+            or not (b"no_available_workers" in response.content or b"not supported" in response.content)
         ):
             return False
         self.model = self.telemetry.model = fallback

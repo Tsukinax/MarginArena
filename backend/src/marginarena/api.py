@@ -11,6 +11,7 @@ import secrets
 import time
 from collections import deque
 from collections.abc import Awaitable, Callable
+from dataclasses import replace
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -25,7 +26,7 @@ from pydantic import BaseModel, Field
 
 from marginarena.arena import Emit, run_arena
 from marginarena.explainer import Language, explain
-from marginarena.llm import LLMClient, LLMSettings, first_healthy
+from marginarena.llm import LLMClient, LLMSettings, first_healthy, served_models
 from marginarena.sample import describe_shop, load_shop
 
 # Token Factory's limits (20 requests/min per account) keep the fallback Arena small (spec, ADR 0002).
@@ -156,10 +157,19 @@ def create_app(
         if owner is not None and lease["owner"] is owner:  # a run that outlived its lease must not end the next one's
             lease.update(until=0.0, owner=None)
 
+    catalogue: dict = {"read_at": None, "ids": None}  # the route's model catalogue, read at most once a minute
+
     async def settings() -> LLMSettings:
-        if llm_settings:
-            return llm_settings
-        return await first_healthy(routes or LLMSettings.routes_from_env(), llm_transport)
+        """The route, starting on its fallback model when the route's catalogue no longer lists the main one."""
+        s = llm_settings or await first_healthy(routes or LLMSettings.routes_from_env(), llm_transport)
+        if not s.fallback_model:
+            return s
+        if catalogue["read_at"] is None or time.monotonic() - catalogue["read_at"] > 60:
+            catalogue.update(read_at=time.monotonic(), ids=await served_models(s, llm_transport))
+        ids = catalogue["ids"]
+        if ids is not None and s.model not in ids and s.fallback_model in ids:
+            return replace(s, model=s.fallback_model)
+        return s
 
     @app.get("/api/health")
     async def health() -> dict:

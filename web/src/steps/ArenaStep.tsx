@@ -59,7 +59,7 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
                   started.recorded_at ? ` · recorded ${recordedDate(started.recorded_at)}, replayed` : ''
                 }${
                   telemetry?.model && telemetry.model !== started.model
-                    ? ` · ${started.model} had no workers, so ${telemetry.model} answered`
+                    ? ` · ${started.model} was unavailable, so ${telemetry.model} answered`
                     : ''
                 }`
               : 'Connecting…'}
@@ -75,8 +75,8 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
             <dd>{telemetry ? telemetry.completion_tokens.toLocaleString('en-US') : '–'}</dd>
           </div>
           <div>
-            <dt>Rejected answers</dt>
-            <dd>{telemetry ? telemetry.calls_invalid : '–'}</dd>
+            <dt>Rejected or failed</dt>
+            <dd>{telemetry ? telemetry.calls_invalid + telemetry.calls_failed : '–'}</dd>
           </div>
           <div>
             <dt>Margin protected</dt>

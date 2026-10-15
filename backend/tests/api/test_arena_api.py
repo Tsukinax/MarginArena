@@ -153,6 +153,8 @@ async def test_when_gemma_has_no_workers_the_run_falls_back_to_qwen_and_says_so(
     seen: list[dict] = []
 
     def handle(request: httpx.Request) -> httpx.Response:
+        if request.method == "GET":  # the catalogue still lists Gemma: it is only out of workers
+            return httpx.Response(200, json={"data": [{"id": "Gemma-4-31B-IT"}, {"id": "Qwen3.8-27B"}]})
         body = json.loads(request.content)
         seen.append(body)
         if body["model"] == "Gemma-4-31B-IT":
@@ -177,6 +179,64 @@ async def test_when_gemma_has_no_workers_the_run_falls_back_to_qwen_and_says_so(
     assert (telemetry["calls_ok"], telemetry["model"]) == (2, "Qwen3.8-27B")
     assert [b["model"] for b in seen].count("Gemma-4-31B-IT") == 1  # no retries on a model with no workers
     assert all(b["reasoning_effort"] == "low" for b in seen if b["model"] == "Qwen3.8-27B")
+
+
+GEMMA_THEN_DEEPSEEK = LLMSettings(
+    route="token-factory",
+    base_url="http://model.test/v1",
+    api_key="t",
+    model="Gemma-4-31B-IT",
+    fallback_model="DeepSeek-V4-Flash",
+)
+
+
+def catalogue_without_gemma(seen: list[dict], listing_status: int = 200):
+    """Token Factory as it answered on 15 Oct, 23:00 ICT: Gemma-4-31B-IT was gone from its catalogue."""
+    server = FakeModelServer()
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        if request.method == "GET":
+            return httpx.Response(listing_status, json={"data": [{"id": "DeepSeek-V4-Flash"}, {"id": "Qwen3.8-27B"}]})
+        body = json.loads(request.content)
+        seen.append(body)
+        if body["model"] == "Gemma-4-31B-IT":
+            message = "Requested model Gemma-4-31B-IT not supported"
+            return httpx.Response(400, json={"error": {"message": message, "type": "invalid_request_error"}})
+        return server.handle(request)
+
+    return handle
+
+
+async def test_when_the_catalogue_no_longer_lists_gemma_the_run_starts_on_the_fallback_and_says_so():
+    seen: list[dict] = []
+    app = create_app(
+        llm_settings=GEMMA_THEN_DEEPSEEK,
+        llm_transport=httpx.MockTransport(catalogue_without_gemma(seen)),
+        sleep=no_sleep,
+    )
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        health = (await client.get("/api/health")).json()
+        async with client.stream("POST", "/api/arena", json=LIVE) as response:
+            events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
+
+    assert health == {"route": "token-factory", "model": "DeepSeek-V4-Flash"}
+    assert events[0]["model"] == "DeepSeek-V4-Flash"
+    assert events[-1]["telemetry"]["calls_ok"] == 2
+    assert {b["model"] for b in seen} == {"DeepSeek-V4-Flash"}
+
+
+async def test_a_model_the_route_no_longer_serves_switches_the_run_to_the_fallback():
+    # When the catalogue can't be read, the first "not supported" answer still moves the run to the fallback.
+    seen: list[dict] = []
+    handle = catalogue_without_gemma(seen, listing_status=503)
+    app = create_app(llm_settings=GEMMA_THEN_DEEPSEEK, llm_transport=httpx.MockTransport(handle), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        async with client.stream("POST", "/api/arena", json=LIVE) as response:
+            events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
+
+    telemetry = events[-1]["telemetry"]
+    assert (telemetry["calls_ok"], telemetry["calls_failed"], telemetry["model"]) == (2, 0, "DeepSeek-V4-Flash")
+    assert [b["model"] for b in seen].count("Gemma-4-31B-IT") == 1
 
 
 async def test_busy_model_server_is_retried():
