@@ -116,7 +116,8 @@ class FakeWorkspace:
             return httpx.Response(200, json={"agentId": agent["agentId"]})
         if agent_memories and method == "GET":
             ids = self.agent_memories.get(agent_memories[1], [])
-            return httpx.Response(200, json=[{"id": i} for i in ids])
+            rows = [{"agentId": agent_memories[1], "memoryId": i} for i in ids]
+            return httpx.Response(200, json=rows)
         if agent_memories and method == "POST":
             self.agent_memories.setdefault(agent_memories[1], []).append(
                 body["memoryId"]

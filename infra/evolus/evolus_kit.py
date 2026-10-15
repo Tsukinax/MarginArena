@@ -203,7 +203,7 @@ def _agent(
     attached = _ok(
         client.get(f"/agents/{agent}/memories", headers=headers["user"])
     ).json()
-    if library not in {m.get("id") for m in attached}:
+    if library not in {m.get("memoryId") for m in attached}:
         _ok(
             client.post(
                 f"/agents/{agent}/memories",
