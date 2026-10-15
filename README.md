@@ -4,10 +4,11 @@
 for every invited product, AI Rivals red-team the leading plan, and each product ends in a Verdict: Approve, Revise
 (including Skip) or Escalate.
 
-Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call starts on
-Gemma-4-31B-IT through AMD Token Factory. If Token Factory reports that Gemma has no workers, the run continues on
-Qwen3.8-27B on the same route and the app names the model that answered. Every Arena run and explanation recorded in
-[`evidence/`](evidence/) was answered by Gemma.
+Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call goes to
+Gemma-4-31B-IT through AMD Token Factory whenever Token Factory serves it. When it can't (Gemma had no workers for
+part of 15 Oct, and that night it left Token Factory's catalogue), the app uses DeepSeek-V4-Flash on the same route
+and names the model that answered. Every Arena run and explanation recorded in [`evidence/`](evidence/) was answered
+by Gemma.
 
 ## The problem
 
@@ -99,8 +100,11 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
   Gemma-4-31B-IT through **AMD Token Factory**, AMD's hosted model API. The organisers confirmed that Token Factory
   counts as the AMD component for ACT III ([ADR 0005](docs/adr/0005-token-factory-is-the-only-inference-route.md)).
   Token Factory does not say which GPUs serve it, so we make no claim about the hardware.
-- **When Gemma is unavailable:** if Token Factory answers that Gemma has no workers, the rest of the run uses
-  Qwen3.8-27B on the same route. The Arena header and each explanation name the model that answered.
+- **When Gemma is unavailable:** the app reads Token Factory's model catalogue before a run and starts on
+  DeepSeek-V4-Flash when Gemma is not listed; if a call answers that Gemma has no workers or is not served, the rest
+  of the run switches. The sidebar, the Arena header and each explanation name the model that answered. On 15 Oct at
+  about 23:00 ICT the catalogue no longer listed Gemma-4-31B-IT, and a live 4-SKU run on DeepSeek-V4-Flash answered
+  20 of 20 calls in 95.9 s (`evidence/runs/token-factory-sample-4sku-deepseek-fallback.sse`).
 - **Recorded runs on Token Factory** (sample data only). Figures are the last telemetry event of each stream in
   [`evidence/runs/`](evidence/runs/):
 
