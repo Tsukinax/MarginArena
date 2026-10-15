@@ -235,7 +235,12 @@ def test_apply_with_our_model_builds_the_campaign_invitation_extractor(tmp_path)
     )
     assert reader["fallbackModelKeys"] == ["own/Qwen"]
     assert structure["id"] == ids["invitation_structure"]
-    assert (structure["title"], structure["canUseOCR"]) == ("Campaign Invitation", True)
+    # 15 Oct: the platform OCR failed (502), and with OCR off the model reads a PDF's own text.
+    assert (structure["title"], structure["canUseOCR"]) == (
+        "Campaign Invitation",
+        False,
+    )
+    assert "ocrModelKey" not in reader
     assert set(json.loads(structure["structure"])) == {
         "marketplace",
         "campaign",

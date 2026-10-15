@@ -65,11 +65,10 @@ INVITATION_STRUCTURE = {
             ],
         }
     ),
-    "canUseOCR": True,
+    # On 15 Oct the platform OCR failed with 502; without OCR the model reads a PDF's own text (the sample's).
+    "canUseOCR": False,
     "maxCorrections": 2,
 }
-# One of the platform's OCR models for documents (MCP list_application_ocr_models on 15 Oct).
-READER_OCR = "codedesign_documentintelligence"
 WORKFLOW = "MarginArena Verdict"
 # Runs after the Seller confirms. The input is the confirmed Verdicts as JSON; the scripts only sort and pass
 # through the engine's figures, they compute none.
@@ -263,7 +262,6 @@ def _reader(
             "language": "en",
             "modelKey": model,
             "isExtractor": True,
-            "ocrModelKey": READER_OCR,
         }
         if fallback:
             body["fallbackModelKeys"] = [fallback]
