@@ -143,12 +143,18 @@ class FakeWorkspace:
         return [r for r in self.requests if r.method != "GET"]
 
 
-def apply(workspace: FakeWorkspace, tmp_path, model: str | None = None) -> dict:
+def apply(
+    workspace: FakeWorkspace,
+    tmp_path,
+    model: str | None = None,
+    fallback: str | None = None,
+) -> dict:
     return evolus_kit.apply(
         ENV,
         transport=httpx.MockTransport(workspace.handle),
         env_file=tmp_path / ".env",
         model=model,
+        fallback=fallback,
     )
 
 
@@ -173,12 +179,13 @@ def test_apply_with_our_model_builds_the_campaign_desk_and_the_verdict_workflow(
 ):
     workspace = FakeWorkspace()
 
-    ids = apply(workspace, tmp_path, model="own/tf-gemma")
+    ids = apply(workspace, tmp_path, model="own/Gemma", fallback="own/Qwen")
 
     agent = workspace.agents[0]
     flow = workspace.workflows[0]
     steps = {s["name"]: s for s in flow["steps"]}
-    assert (agent["name"], agent["modelKey"]) == (evolus_kit.AGENT, "own/tf-gemma")
+    assert (agent["name"], agent["modelKey"]) == (evolus_kit.AGENT, "own/Gemma")
+    assert agent["fallbackModelKeys"] == ["own/Qwen"]
     assert workspace.agent_memories[ids["agent"]] == [ids["library"]]
     assert (flow["name"], flow["isActive"]) == (evolus_kit.WORKFLOW, True)
     assert [s["stepType"] for s in flow["steps"]] == [

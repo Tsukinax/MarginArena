@@ -3,14 +3,15 @@
 Run from the repo root with the keys from .env:
   uv run --project backend --env-file .env python infra/evolus/evolus_kit.py plan
 
-  uv run --project backend --env-file .env python infra/evolus/evolus_kit.py apply [--model own/<alias>]
+  uv run --project backend --env-file .env python infra/evolus/evolus_kit.py apply [--model own/<alias>
+                                                                              [--fallback own/<alias>]]
 
   plan    read-only: what the workspace holds now, the workflow step catalog and the keys' scopes.
           Prints a summary and saves the raw answers to infra/evolus/.plan/latest.json (gitignored).
   apply   writes: creates what MarginArena needs, finding each resource by name first, so a rerun creates nothing
           new: the knowledge library with every document in infra/evolus/library/, and with --model (one of the
-          workspace's own models from "Your models") the Campaign Desk agent and the Verdict workflow. Saves the IDs
-          to .env. Ask the user before every run.
+          workspace's own models from "Your models") the Campaign Desk agent and the Verdict workflow; --fallback
+          names the model the agent falls back to. Saves the IDs to .env. Ask the user before every run.
 
 The Campaign Invitation extractor comes next. API notes: docs/api-guide/evolus-api.md.
 """
@@ -155,23 +156,27 @@ def apply(
     transport: httpx.BaseTransport | None = None,
     env_file: Path = ENV_FILE,
     model: str | None = None,
+    fallback: str | None = None,
 ) -> dict[str, str]:
     """Create what MarginArena needs, once: each resource is found by name before anything is created.
 
     `model` is the key of one of the workspace's own models ("own/<alias>"); without it only the library is made.
+    `fallback` is the model the agent turns to when `model` fails.
     """
     headers = _headers(env)
     with httpx.Client(base_url=BASE_URL, transport=transport, timeout=60) as client:
         ids = {"library": _library(client, headers["user"])}
         if model:
-            ids["agent"] = _agent(client, headers, model, ids["library"])
+            ids["agent"] = _agent(client, headers, model, fallback, ids["library"])
             ids["workflow"] = _workflow(client, headers["app"], ids["agent"])
     for name, value in ids.items():
         _set_env(env_file, f"EVOLUS_{name.upper()}_ID", value)
     return ids
 
 
-def _agent(client: httpx.Client, headers: dict, model: str, library: str) -> str:
+def _agent(
+    client: httpx.Client, headers: dict, model: str, fallback: str | None, library: str
+) -> str:
     """The Campaign Desk agent on our own model, with the knowledge library attached."""
     found = [
         a
@@ -189,6 +194,8 @@ def _agent(client: httpx.Client, headers: dict, model: str, library: str) -> str
             "modelKey": model,
             "isChatVisible": True,
         }
+        if fallback:
+            body["fallbackModelKeys"] = [fallback]
         agent = _ok(client.post("/agents", json=body, headers=headers["app"])).json()[
             "agentId"
         ]
@@ -366,19 +373,22 @@ def _redact(text: str, env: dict[str, str]) -> str:
 
 def main(argv: list[str]) -> None:
     command = argv[1:]
-    model = (
-        command[2]
-        if command[:2] == ["apply", "--model"] and len(command) == 3
-        else None
+    options = (
+        dict(zip(command[1::2], command[2::2], strict=False))
+        if command[:1] == ["apply"]
+        else {}
     )
-    if command not in (["plan"], ["apply"]) and not model:
+    model, fallback = options.get("--model"), options.get("--fallback")
+    if command not in (["plan"], ["apply"]) and not (
+        model and set(options) <= {"--model", "--fallback"}
+    ):
         raise SystemExit(__doc__)
     missing = [k for k in KEYS if not os.environ.get(k)]
     if missing:
         raise SystemExit(f"Missing in .env: {', '.join(missing)}")
     env = {k: os.environ[k] for k in KEYS}
     if argv[1] == "apply":
-        ids = apply(env, model=model)
+        ids = apply(env, model=model, fallback=fallback)
         print(
             f"Saved to {ENV_FILE.name}: "
             + ", ".join(f"{k} {v}" for k, v in ids.items())
