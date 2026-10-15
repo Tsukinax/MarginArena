@@ -260,6 +260,11 @@ def _workflow(client: httpx.Client, headers: dict[str, str], agent: str) -> str:
         },
         {"name": "Result", "stepType": "Output", "links": ["Assemble the result"]},
     ]
+    # The API takes a step type's number, which the catalog maps from its name.
+    catalog = _ok(client.get("/workflows/step-catalog", headers=headers)).json()[
+        "steps"
+    ]
+    types = {s["key"]: s["type"] for s in catalog}
     for step in steps:
         existing = {
             s["name"]: s["id"]
@@ -270,6 +275,7 @@ def _workflow(client: httpx.Client, headers: dict[str, str], agent: str) -> str:
         if step["name"] in existing:
             continue
         body = {k: v for k, v in step.items() if k != "links"}
+        body["stepType"] = types[step["stepType"]]
         body["inputStepIds"] = [existing[name] for name in step.get("links", [])]
         _ok(client.post(f"/workflows/{flow}/steps", json=body, headers=headers))
         print(f"  step {step['name']!r}: added")

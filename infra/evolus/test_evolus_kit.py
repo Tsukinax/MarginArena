@@ -122,6 +122,16 @@ class FakeWorkspace:
                 body["memoryId"]
             )
             return httpx.Response(200, json={})
+        if method == "GET" and path == "/workflows/step-catalog":
+            types = {"AgentCall": 1, "CreateFile": 5, "Output": 14, "Script": 19}
+            return httpx.Response(
+                200, json={"steps": [{"key": k, "type": n} for k, n in types.items()]}
+            )
+        if method == "POST" and steps and not isinstance(body.get("stepType"), int):
+            # The real API (15 Oct): "enum fields take their numeric value".
+            return httpx.Response(
+                400, json={"title": "The request is invalid", "status": 400}
+            )
         if method == "GET" and path == "/workflows":
             return httpx.Response(
                 200, json=[{k: w[k] for k in ("id", "name")} for w in self.workflows]
@@ -188,13 +198,7 @@ def test_apply_with_our_model_builds_the_campaign_desk_and_the_verdict_workflow(
     assert agent["fallbackModelKeys"] == ["own/Qwen"]
     assert workspace.agent_memories[ids["agent"]] == [ids["library"]]
     assert (flow["name"], flow["isActive"]) == (evolus_kit.WORKFLOW, True)
-    assert [s["stepType"] for s in flow["steps"]] == [
-        "Script",
-        "CreateFile",
-        "AgentCall",
-        "Script",
-        "Output",
-    ]
+    assert [s["stepType"] for s in flow["steps"]] == [19, 5, 1, 19, 14]
     assert steps["Approval request"]["agentId"] == ids["agent"]
     assert steps["Assemble the result"]["inputStepIds"] == [
         steps["Split the Verdicts"]["id"],
