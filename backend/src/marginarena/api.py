@@ -14,6 +14,7 @@ from typing import Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException
+from fastapi import Path as PathParam
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -33,6 +34,8 @@ PROCESS_KEY = secrets.token_bytes(32)
 # because a deploy of the backend alone can't see evidence/.
 RECORDED_RUN = Path(__file__).resolve().parent / "sample" / "recorded" / "token-factory-sample-12sku.sse"
 REPLAY_SECONDS = 20
+EVOLUS_URL = "https://api.evolus.ai/api/v1"
+EVOLUS_KEYS = ("EVOLUS_API_KEY", "EVOLUS_APPLICATION_ID", "EVOLUS_WORKFLOW_ID")
 
 
 class ArenaRequest(BaseModel):
@@ -52,12 +55,18 @@ class ExplainRequest(BaseModel):
     language: Language = "th"
 
 
+class ConfirmRequest(BaseModel):
+    results: list[dict]
+    """The decided SKUs the Seller confirms, exactly as the Arena returned them."""
+
+
 def create_app(
     llm_settings: LLMSettings | None = None,
     llm_transport: httpx.AsyncBaseTransport | None = None,
     sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
     routes: tuple[LLMSettings, ...] | None = None,
     web_dist: Path | None = None,
+    evolus_transport: httpx.AsyncBaseTransport | None = None,
 ) -> FastAPI:
     """`llm_settings` forces one route; otherwise the first healthy of `routes` (default: from the environment).
 
@@ -66,6 +75,20 @@ def create_app(
     """
     app = FastAPI(title="MarginArena")
     key = os.environ.get("RESULT_SIGNING_KEY", "").encode() or PROCESS_KEY
+
+    def check_signed(result: dict) -> None:
+        # Token Factory may see only our sample data, and every number used must be the engine's (ADR 0001).
+        signature = result.get("signature")
+        if not isinstance(signature, str) or not hmac.compare_digest(signature, _signature(result, key)):
+            raise HTTPException(403, "Only a Verdict this server's Arena produced, unchanged, can be used.")
+
+    def evolus() -> tuple[httpx.AsyncClient, str]:
+        missing = [name for name in EVOLUS_KEYS if not os.environ.get(name)]
+        if missing:
+            raise HTTPException(503, f"Evolus is not set up on this server: {', '.join(missing)} missing.")
+        headers = {"X-ApiKey": os.environ["EVOLUS_API_KEY"], "X-Application-Id": os.environ["EVOLUS_APPLICATION_ID"]}
+        client = httpx.AsyncClient(base_url=EVOLUS_URL, transport=evolus_transport, headers=headers, timeout=60)
+        return client, os.environ["EVOLUS_WORKFLOW_ID"]
 
     async def settings() -> LLMSettings:
         if llm_settings:
@@ -129,10 +152,7 @@ def create_app(
 
     @app.post("/api/explain")
     async def explain_verdict(request: ExplainRequest) -> dict:
-        # Token Factory may see only our sample data, and every number explained must be the engine's (ADR 0001).
-        signature = request.result.get("signature")
-        if not isinstance(signature, str) or not hmac.compare_digest(signature, _signature(request.result, key)):
-            raise HTTPException(403, "Only a Verdict this server's Arena produced, unchanged, can be explained.")
+        check_signed(request.result)
         s = await settings()
         llm = LLMClient(s, transport=llm_transport, sleep=sleep)
         try:
@@ -140,6 +160,38 @@ def create_app(
         finally:
             await llm.aclose()
         return {**explanation, "route": s.route, "model": s.model}
+
+    @app.post("/api/confirm")
+    async def confirm(request: ConfirmRequest) -> dict:
+        """Runs the Evolus Verdict workflow on the confirmed Verdicts (infra/evolus/evolus_kit.py builds it)."""
+        for result in request.results:
+            check_signed(result)
+        shop = load_shop("glow-lab-bkk")
+        verdicts = [_confirmed(r) for r in request.results]
+        payload = {"shop": shop.name, "campaign": shop.invitation["campaign"], "verdicts": verdicts}
+        client, flow = evolus()
+        async with client:
+            answer = await client.post(
+                f"/workflows/{flow}/execute", files={"input": (None, json.dumps(payload, ensure_ascii=False))}
+            )
+        if not answer.is_success:
+            raise HTTPException(502, f"The Evolus workflow did not start (HTTP {answer.status_code}).")
+        return {"execution_id": answer.json()["executionId"]}
+
+    @app.get("/api/confirm/{execution_id}")
+    async def confirmation(execution_id: str = PathParam(pattern=r"^[A-Za-z0-9-]{1,64}$")) -> dict:
+        client, flow = evolus()
+        async with client:
+            answer = await client.get(f"/workflows/{flow}/executions/{execution_id}")
+        if not answer.is_success:
+            raise HTTPException(502, f"Evolus did not report the run (HTTP {answer.status_code}).")
+        execution = answer.json()
+        output = execution.get("output")
+        try:
+            result = json.loads(output) if isinstance(output, str) else output
+        except ValueError:
+            result = output
+        return {"status": execution.get("status"), "result": result}
 
     web = web_dist or os.environ.get("WEB_DIST")
     if web:  # mounted last, so every /api route above still wins
@@ -162,6 +214,24 @@ async def _replay(path: Path, emit: Emit, sleep: Callable[[float], Awaitable[Non
         await sleep((at - previous) * scale)
         previous = at
         await emit(event)
+
+
+def _confirmed(r: dict) -> dict:
+    """One confirmed Verdict as the Evolus workflow reads it: the engine's figures, passed through unchanged."""
+    w = r["waterfall"]
+    return {
+        "sku": r["sku"],
+        "name": r["name"],
+        "verdict": r["verdict"],
+        "skip": r["skip"],
+        "plan": r["chosen_plan"],
+        "selling_price": w["selling_price"],
+        "voucher": w["voucher"],
+        "invited_plan": r["invited_plan"],
+        "failed_checks": r["invited_failed_checks"],
+        "invited_worst_total": r["invited_worst_total"],
+        "dont_join_total": r["dont_join_total"],
+    }
 
 
 def _signature(result: dict, key: bytes) -> str:

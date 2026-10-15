@@ -223,6 +223,42 @@ export async function explainVerdict(result: SkuResult, language: Language): Pro
   return r.json()
 }
 
+/** What the Evolus Verdict workflow returns (infra/evolus/evolus_kit.py, step "Assemble the result"). */
+export type WorkflowResult = {
+  shop: string
+  campaign: string
+  upload: {
+    sku: string
+    product: string
+    promo_plan: string
+    campaign_price: string
+    voucher: string
+    verdict: string
+  }[]
+  escalations: { sku: string; product: string }[]
+  skipped: string[]
+  approval_request: string | null
+}
+
+export type Confirmation = { status: string | null; result: WorkflowResult | string | null }
+
+/** Starts the Evolus Verdict workflow on the confirmed Verdicts; the server refuses any it did not sign. */
+export async function confirmVerdicts(results: SkuResult[]): Promise<string> {
+  const r = await fetch('/api/confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ results }),
+  })
+  if (!r.ok) throw new Error((await r.json().catch(() => null))?.detail ?? `The workflow could not start (${r.status}).`)
+  return (await r.json()).execution_id
+}
+
+export async function getConfirmation(executionId: string): Promise<Confirmation> {
+  const r = await fetch(`/api/confirm/${executionId}`)
+  if (!r.ok) throw new Error(`Evolus did not report the run (${r.status}).`)
+  return r.json()
+}
+
 export const baht = (x: string | number | null | undefined): string => {
   if (x === null || x === undefined || x === '') return '–'
   const n = typeof x === 'number' ? x : Number(x)

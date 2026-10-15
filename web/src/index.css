@@ -1147,3 +1147,28 @@ button:disabled {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Step 4: the Evolus workflow's result */
+.workflow-result {
+  margin-top: 28px;
+}
+
+.workflow-result h2 {
+  font-size: 17px;
+  margin: 24px 0 6px;
+}
+
+.workflow-result .secondary {
+  margin-top: 14px;
+}
+
+.draft {
+  white-space: pre-wrap;
+  font: inherit;
+  font-size: 14px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 14px 18px;
+  max-width: 75ch;
+}
