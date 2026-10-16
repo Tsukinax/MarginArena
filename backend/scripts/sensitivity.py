@@ -22,6 +22,7 @@ Writes evidence/sensitivity.json and evidence/sensitivity.md.
 from __future__ import annotations
 
 import json
+import random
 import sys
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -47,8 +48,70 @@ from marginarena.sample import load_shop  # noqa: E402
 LIFTS = (Decimal("1.0"), Decimal("1.5"), Decimal("2.0"), Decimal("2.5"), Decimal("3.0"))
 
 
-def decide(shop, item, moves, ideas, *, traffic_lift=None, override=True, ai_moves=True, ai_ideas=True) -> dict:
-    """One SKU's Verdict and its share of Margin Protected under the given assumptions."""
+def decide(shop, item, moves, ideas, *, rivals=None, ai_moves=True, **kwargs) -> dict:
+    """One SKU's Verdict and its share of Margin Protected under the given assumptions. `rivals` replaces the AI
+    Rivals' moves with other moves per SKU."""
+    sku, terms, seller, generic, plans, invited = setup(shop, item, ideas, **kwargs)
+    extra = (rivals or moves)[sku.id] if ai_moves or rivals else []
+    v = evaluate_sku(sku, invited, plans, [*generic, *extra], shop.profile, terms, seller)
+    kept = v.chosen.worst_total if v.chosen else v.dont_join_total if v.skip else None
+    return {
+        "sku": sku.id,
+        "verdict": "skip" if v.skip else v.verdict,
+        "kept": None if kept is None else str(kept),
+        "protected": None if kept is None else str(kept - v.as_invited.worst_total),
+    }
+
+
+def stress_cut(shop, item, ideas, extra: list[CounterMove]) -> Decimal:
+    """How far `extra` moves lower the worst case of the plan chosen against the generic moves (red_team_cut)."""
+    sku, terms, seller, generic, plans, invited = setup(shop, item, ideas)
+    first = evaluate_sku(sku, invited, plans, generic, shop.profile, terms, seller)
+    plan = first.chosen.plan if first.chosen else invited
+
+    def worst(scenarios: list[CounterMove]) -> Decimal:
+        return evaluate_sku(sku, plan, [], scenarios, shop.profile, terms, seller).as_invited.worst_total
+
+    return worst(generic) - worst([*generic, *extra])
+
+
+def box_corner(shop, item) -> list[CounterMove]:
+    """The deepest move a Rival may propose (arena.py's bounds: 40% off, a 20% voucher, ฿60 shipping, a 25% gift)."""
+    ref = reference(shop, item)
+    return [
+        CounterMove(
+            rival="Box corner",
+            rival_price_cut=Decimal("0.40"),
+            voucher=sat(ref * Decimal("0.20")),
+            free_shipping=Decimal("60"),
+            gift_value=sat(ref * Decimal("0.25")),
+        )
+    ]
+
+
+def random_rivals(shop, item, count: int = 4) -> list[CounterMove]:
+    """Moves drawn uniformly inside the same bounds, as many as the AI Rivals made per product (fixed seed)."""
+    rng = random.Random(f"{item.sku.id}-sensitivity")
+    ref = reference(shop, item)
+    return [
+        CounterMove(
+            rival="Random",
+            rival_price_cut=Decimal(rng.randint(0, 40)) / 100,
+            voucher=sat(ref * Decimal(rng.randint(0, 20)) / 100),
+            free_shipping=Decimal(rng.randint(0, 60)),
+            gift_value=sat(ref * Decimal(rng.randint(0, 25)) / 100),
+        )
+        for _ in range(count)
+    ]
+
+
+def reference(shop, item) -> Decimal:
+    snapshot = shop.rival_snapshot.get(item.sku.id)
+    return snapshot.reference_price if snapshot else item.sku.list_price
+
+
+def setup(shop, item, ideas, *, traffic_lift=None, override=True, ai_ideas=True):
+    """The SKU, terms, settings, generic moves, candidate plans and invited plan, as the Arena sets them up."""
     sku = item.sku
     seller_override = shop.elasticity_overrides.get(sku.id) if override else None
     if sku.id in shop.elasticity_overrides and not override:
@@ -64,11 +127,10 @@ def decide(shop, item, moves, ideas, *, traffic_lift=None, override=True, ai_mov
     )
     rules = tuple(r for r in shop.brand_rules if r.binds(sku))
     seller = SellerSettings(margin_floor=shop.margin_floor, brand_rules=rules)
-    scenarios = [
+    generic = [
         CounterMove(rival="Holder", rival_price_cut=Decimal("0")),
         CounterMove(rival="Matcher", rival_price_cut=item.required_discount),
         CounterMove(rival="Undercutter", rival_price_cut=item.required_discount + Decimal("0.05")),
-        *(moves[sku.id] if ai_moves else []),
     ]
     gifts = {g.name: g for g in shop.catalogue.values()}
     idea_objects = [PlanIdea(), PlanIdea(use_voucher=True)]
@@ -82,14 +144,7 @@ def decide(shop, item, moves, ideas, *, traffic_lift=None, override=True, ai_mov
         idea_objects.append(PlanIdea(use_voucher=use_voucher, gift=gift))
     invited = PromoPlan(mechanics=(PriceCut(amount=sat(sku.list_price * item.required_discount)),))
     plans = candidate_plans(sku, terms, idea_objects, rules)
-    v = evaluate_sku(sku, invited, plans, scenarios, shop.profile, terms, seller)
-    kept = v.chosen.worst_total if v.chosen else v.dont_join_total if v.skip else None
-    return {
-        "sku": sku.id,
-        "verdict": "skip" if v.skip else v.verdict,
-        "kept": None if kept is None else str(kept),
-        "protected": None if kept is None else str(kept - v.as_invited.worst_total),
-    }
+    return sku, terms, seller, generic, plans, invited
 
 
 def variant(name: str, rows: list[dict]) -> dict:
@@ -126,6 +181,26 @@ def main() -> None:
     variants.append(run("SS-50 at the pooled elasticity (no Seller override)", override=False))
     variants.append(run("Generic Counter-moves only (no AI Rivals)", ai_moves=False))
     variants.append(run("No AI at all (generic moves, default Plan Ideas)", ai_moves=False, ai_ideas=False))
+    corner = {i.sku.id: box_corner(shop, i) for i in shop.invited}
+    drawn = {i.sku.id: random_rivals(shop, i) for i in shop.invited}
+    variants.append(run("A box-corner Rival instead of the AI Rivals (deepest allowed move)", rivals=corner))
+    variants.append(run("Random Rivals instead of the AI Rivals (4 per product, fixed seed)", rivals=drawn))
+
+    stress = []
+    for item in shop.invited:
+        sku = item.sku.id
+        ai = stress_cut(shop, item, ideas, moves[sku])
+        recorded_cut = results[sku]["red_team_cut"]
+        if recorded_cut is not None and str(ai) != recorded_cut:
+            raise SystemExit(f"{sku}: red_team_cut {ai} differs from the recorded {recorded_cut}")
+        stress.append(
+            {
+                "sku": sku,
+                "ai_rivals": str(ai),
+                "box_corner": str(stress_cut(shop, item, ideas, corner[sku])),
+                "random": str(stress_cut(shop, item, ideas, drawn[sku])),
+            }
+        )
 
     cut = sum((Decimal(r["red_team_cut"]) for r in results.values() if r["red_team_cut"] is not None), Decimal("0"))
     gain = sum((Decimal(r["red_team_gain"]) for r in results.values() if r["red_team_gain"]), Decimal("0"))
@@ -137,8 +212,9 @@ def main() -> None:
         "red_team_gain_total": str(gain),
         "red_team_gain_skus": [s for s, r in results.items() if r["red_team_gain"] and Decimal(r["red_team_gain"]) > 0],
     }
-    (EVIDENCE / "sensitivity.json").write_text(json.dumps({"meta": meta, "variants": variants}, indent=1) + "\n")
-    write_report(variants, meta)
+    data = {"meta": meta, "variants": variants, "stress": stress}
+    (EVIDENCE / "sensitivity.json").write_text(json.dumps(data, indent=1) + "\n")
+    write_report(variants, meta, stress)
 
 
 def baht(x: str) -> str:
@@ -146,7 +222,7 @@ def baht(x: str) -> str:
     return f"{'−' if n < 0 else ''}฿{abs(n):,.2f}"
 
 
-def write_report(variants: list[dict], meta: dict) -> None:
+def write_report(variants: list[dict], meta: dict, stress: list[dict]) -> None:
     lines = [
         "# Evidence: how the Verdicts move with the assumptions (sensitivity)",
         "",
@@ -171,11 +247,22 @@ def write_report(variants: list[dict], meta: dict) -> None:
         )
     lines += [
         "",
-        "## What the AI Rivals found in the recorded run",
+        "## What the AI Rivals found in the recorded run, against two controls without AI",
         "",
-        f"- **Risk the generic stress test missed:** on {meta['red_team_cut_skus']} of 12 products the Rivals' "
+        f"- **Stress cases the generic moves missed:** on {meta['red_team_cut_skus']} of 12 products the Rivals' "
         f"Counter-moves lowered the worst case of the plan chosen against the generic moves, by "
         f"{baht(meta['red_team_cut_total'])} in total (the sum of each product's `red_team_cut`).",
+        "- **Controls:** the same cut for a box-corner Rival (one move at the deepest the Rivals may propose: 40% off, "
+        "a 20% voucher, ฿60 free shipping and a 25% gift) and for 4 random moves inside those bounds per product "
+        "(a fixed seed).",
+        "",
+        "| Product | AI Rivals | Box-corner Rival | Random Rivals |",
+        "|---|---|---|---|",
+        *[f"| {s['sku']} | {baht(s['ai_rivals'])} | {baht(s['box_corner'])} | {baht(s['random'])} |" for s in stress],
+        f"| **Total** | **{baht(str(sum(Decimal(s['ai_rivals']) for s in stress)))}** | "
+        f"**{baht(str(sum(Decimal(s['box_corner']) for s in stress)))}** | "
+        f"**{baht(str(sum(Decimal(s['random']) for s in stress)))}** |",
+        "",
         f"- **Decisions they changed:** {', '.join(meta['red_team_gain_skus']) or 'none'}, where the final plan keeps "
         f"{baht(meta['red_team_gain_total'])} more in the worst case than the plan chosen before the Rivals (the sum of "
         "`red_team_gain`). That change rests on SS-50's labelled Seller override (see the row without it above).",

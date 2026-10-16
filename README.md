@@ -4,8 +4,10 @@
 for every invited product, AI Rivals red-team the leading plan, and each product ends in a Verdict: Approve, Revise
 (including Skip) or Escalate.
 
-Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call runs on
-Gemma-4-31B-IT through **AMD Token Factory**; Evolus reads the Campaign Invitation and carries out the Verdicts.
+Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call goes to
+**AMD Token Factory**: Gemma-4-31B-IT answered every recorded Arena and explanation run, and a labelled
+DeepSeek-V4-Flash fallback answers only when Token Factory does not list Gemma. Evolus reads the Campaign Invitation
+and carries out the Verdicts.
 
 **Try it in one minute** at **https://marginarena.vercel.app** (no key, no sign-up):
 
@@ -85,9 +87,12 @@ These are model-based estimates for a fictional shop; every figure comes from th
   the pooled −1.49). At the pooled fit, SS-50 stays an Approve
   ([q56-red-team.md](.scratch/marginarena/research/q56-red-team.md)).
 - **How much rests on the assumptions** ([evidence/sensitivity.md](evidence/sensitivity.md)): Margin Protected is
-  ฿12,787.08 if joining brings no extra traffic (×1.0) and ฿4,581.05 at ×3.0; without the AI Rivals' Counter-moves the
-  engine alone finds ฿2,038.53. Across all 12 products the Rivals found moves that lower the worst case the generic
-  stress test reported by ฿76,929.86 in total.
+  ฿12,787.08 if joining brings no extra traffic (×1.0) and ฿4,581.05 at ×3.0.
+- **The Verdicts do not depend on who plays the Rival.** With a rule-based Rival that always makes the deepest move
+  allowed, or with random moves inside the same bounds, the Verdicts are the same 8 Approve, 1 Revise, 2 Skip and
+  1 Escalate (Margin Protected ฿4,005.56 and ฿4,113.36); with only the three generic moves, SS-50 stays an Approve
+  (฿2,038.53). Gemma's part is to propose plausible Counter-moves with a stated reason, not deeper ones: those two
+  controls lower the worst cases further than Gemma's moves do (same file).
 - **No plan breaks a check.** Under the same Scenarios, joining as invited breaks a check on 2 products and matching
   the competitor on 3; MarginArena's plans break none ([evidence/policy-comparison.md](evidence/policy-comparison.md)).
 - **An AI Rival changed a decision.** In the recorded 12-product run, the Rivals' Counter-moves changed SS-50's leading
@@ -162,7 +167,8 @@ app checks every discount it read against the invitation the Arena uses
 ([evidence/evolus-invitation-extractor.md](evidence/evolus-invitation-extractor.md)). When the Seller confirms,
 MarginArena hands the Verdicts to an Evolus workflow, which carries them out: it sorts them,
 writes the bulk-upload file, and has the Campaign Desk agent draft the shop owner's approval request for escalated
-products, citing the brand agreement and fee rules from its knowledge library. The agent runs on our own model
+products, using the engine's figures; the knowledge library with the fee rules and the brand agreement is attached
+to the agent. The agent runs on our own model
 connection (Gemma-4-31B-IT on AMD Token Factory), so the run uses no Evolus credits
 ([evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md)). Nothing is sent or registered.
 

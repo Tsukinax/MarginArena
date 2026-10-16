@@ -1,6 +1,6 @@
 {
  "meta": {
-  "measured": "2026-10-16T18:20:57+00:00",
+  "measured": "2026-10-16T18:58:58+00:00",
   "run": "evidence/runs/token-factory-sample-12sku.sse",
   "red_team_cut_total": "76929.86",
   "red_team_cut_skus": 12,
@@ -681,6 +681,248 @@
      "protected": "0.00"
     }
    ]
+  },
+  {
+   "name": "A box-corner Rival instead of the AI Rivals (deepest allowed move)",
+   "verdicts": {
+    "approve": 8,
+    "revise": 1,
+    "skip": 2,
+    "escalate": 1
+   },
+   "margin_protected": "4005.56",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "21744.90",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "23972.49",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "revise",
+     "kept": "48764.17",
+     "protected": "2831.30"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "6734.98",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "29879.40",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "2438.10",
+     "protected": "605.88"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "20584.00",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "20213.73",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "2157.90",
+     "protected": "568.38"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "13514.76",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "5316.15",
+     "protected": "0.00"
+    }
+   ]
+  },
+  {
+   "name": "Random Rivals instead of the AI Rivals (4 per product, fixed seed)",
+   "verdicts": {
+    "approve": 8,
+    "revise": 1,
+    "skip": 2,
+    "escalate": 1
+   },
+   "margin_protected": "4113.36",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "21744.90",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "23972.49",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "revise",
+     "kept": "51508.60",
+     "protected": "2939.10"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "6734.98",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "29879.40",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "2438.10",
+     "protected": "605.88"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "20584.00",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "20213.73",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "2157.90",
+     "protected": "568.38"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "14051.06",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "5316.15",
+     "protected": "0.00"
+    }
+   ]
+  }
+ ],
+ "stress": [
+  {
+   "sku": "HB-30",
+   "ai_rivals": "2546.70",
+   "box_corner": "21940.80",
+   "random": "21940.80"
+  },
+  {
+   "sku": "NT-200",
+   "ai_rivals": "4486.08",
+   "box_corner": "24112.68",
+   "random": "24112.68"
+  },
+  {
+   "sku": "SS-50",
+   "ai_rivals": "22203.20",
+   "box_corner": "40382.07",
+   "random": "37745.44"
+  },
+  {
+   "sku": "CN-50",
+   "ai_rivals": "2121.98",
+   "box_corner": "6734.98",
+   "random": "6734.98"
+  },
+  {
+   "sku": "VC-30",
+   "ai_rivals": "1426.32",
+   "box_corner": "4120.48",
+   "random": "4120.48"
+  },
+  {
+   "sku": "AC-150",
+   "ai_rivals": "6080.72",
+   "box_corner": "29984.24",
+   "random": "29984.24"
+  },
+  {
+   "sku": "RN-30",
+   "ai_rivals": "568.62",
+   "box_corner": "1358.37",
+   "random": "1358.37"
+  },
+  {
+   "sku": "CG-80",
+   "ai_rivals": "15695.30",
+   "box_corner": "20584.00",
+   "random": "20584.00"
+  },
+  {
+   "sku": "LM-15",
+   "ai_rivals": "17740.32",
+   "box_corner": "17740.32",
+   "random": "17740.32"
+  },
+  {
+   "sku": "SM-10",
+   "ai_rivals": "673.04",
+   "box_corner": "1389.04",
+   "random": "1389.04"
+  },
+  {
+   "sku": "CM-100",
+   "ai_rivals": "3003.28",
+   "box_corner": "13622.02",
+   "random": "13085.72"
+  },
+  {
+   "sku": "TK-4",
+   "ai_rivals": "384.30",
+   "box_corner": "3971.10",
+   "random": "3971.10"
   }
  ]
 }
