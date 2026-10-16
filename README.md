@@ -97,6 +97,9 @@ These are model-based estimates for a fictional shop; every figure comes from th
   1 Escalate (Margin Protected ฿4,005.56 and ฿4,113.36); with only the three generic moves, SS-50 stays an Approve
   (฿2,038.53). Gemma's part is to propose plausible Counter-moves with a stated reason, not deeper ones: those two
   controls lower the worst cases further than Gemma's moves do (same file).
+- **In percentages** (worst-case profit kept over joining as invited, from the engine's figures in
+  [evidence/policy-comparison.md](evidence/policy-comparison.md)): +32.8% on RN-30 and +34.2% on SM-10 by skipping
+  them, +5.9% on SS-50 (with its override), and +1.8% across the 11 products MarginArena decided.
 - **No plan breaks a check.** Under the same Scenarios, joining as invited breaks a check on 2 products and matching
   the competitor on 3; MarginArena's plans break none ([evidence/policy-comparison.md](evidence/policy-comparison.md)).
 - **An AI Rival changed a decision.** In the recorded 12-product run, the Rivals' Counter-moves changed SS-50's leading
