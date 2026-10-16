@@ -1,8 +1,9 @@
 """Benchmark Gemma-4-31B-IT on our MI300X droplet with vLLM's own `vllm bench serve`.
 
-The benchmark runs inside the vLLM container on the droplet, against 127.0.0.1, so the laptop's network is not
-measured. Each level sends short chat requests shaped like an Arena call (a 512-token prompt, a 128-token answer) at
-a fixed number in flight. Standard library only, like kit.py. Run after `kit.py provision` and `kit.py check`:
+The benchmark runs inside the vLLM container on the droplet, against vLLM on 127.0.0.1:8001 (bootstrap.sh), so the
+laptop's network is not measured. Each level sends short chat requests shaped like an Arena call (a 512-token prompt,
+a 128-token answer) at a fixed number in flight. Standard library only, like kit.py. Run after `kit.py provision` and
+`kit.py check`:
 
     python3 infra/droplet/bench.py
 
@@ -52,7 +53,7 @@ def level(ssh: list[str], model: str, concurrency: int) -> dict:
     out = f"/tmp/bench/c{concurrency}.json"
     script = (
         "mkdir -p /tmp/bench && OPENAI_API_KEY=\"$VLLM_API_KEY\" vllm bench serve --backend openai-chat "
-        f"--base-url http://127.0.0.1:8000 --endpoint /v1/chat/completions --model {model} "
+        f"--base-url http://127.0.0.1:8001 --endpoint /v1/chat/completions --model {model} "
         f"--dataset-name random --random-input-len {INPUT_LEN} --random-output-len {OUTPUT_LEN} --ignore-eos "
         f"--num-prompts {prompts} --max-concurrency {concurrency} "
         f"--save-result --result-dir /tmp/bench --result-filename c{concurrency}.json "

@@ -2,7 +2,7 @@
 
 MarginArena's own AI endpoint runs on one AMD Developer Cloud GPU droplet (one AMD Instinct MI300X). It serves Gemma-4-31B-IT with vLLM, behind HTTPS.
 
-**It costs $2.59 an hour from the moment it is created until it is destroyed, even while it is powered off.** So we create it for a work session and destroy it afterwards. The $100 credit buys about 38 hours in total. Nothing on the droplet needs saving: Claude rebuilds it from this folder in about 20 minutes.
+**It bills by the second from the moment it is created until it is destroyed, even while it is powered off** ($1.99 an hour for one MI300X in the console on 16 Oct 2026; earlier pages said $2.59). So we create it for a work session and destroy it afterwards. We have no $100 credit, so the card on file pays. A new account must first have its GPU limit raised ("Request Access" next to the greyed-out Create button). Nothing on the droplet needs saving: Claude rebuilds it from this folder in about 20 minutes.
 
 ## Once, before the first session
 
@@ -27,6 +27,9 @@ MarginArena's own AI endpoint runs on one AMD Developer Cloud GPU droplet (one A
 python3 infra/droplet/kit.py provision <IP>   # sets the droplet up over SSH: 15-25 min; writes VLLM_BASE_URL to .env
 python3 infra/droplet/kit.py check            # HTTPS, API key, blocked paths, closed ports, one test chat
 python3 infra/droplet/kit.py gate             # ticket 08 tool-calling test; writes evidence/gate-gemma-tool-calling.md
+python3 infra/droplet/bench.py                # vllm bench serve at 1-128 in flight; writes evidence/mi300x-benchmark.md
+uv run --project backend --env-file .env python backend/scripts/record_arena.py --expect-route mi300x     # full Arena, 12 SKUs
+uv run --project backend --env-file .env python backend/scripts/check_explainer.py --expect-route mi300x  # EN/TH explanations
 python3 infra/droplet/kit.py ssh -- docker logs --tail 100 gemma   # when something needs debugging
 ```
 
@@ -49,7 +52,7 @@ Then press **Test**.
 3. Check that the **GPU Droplets** list is empty. Also check that **Snapshots** and **Volumes** are empty: they would bill your card, not the credit.
 4. Tell Claude. Claude runs `kit.py forget`, so the app goes back to AMD Token Factory.
 
-Why destroy rather than power off? A powered-off GPU droplet still bills $2.59 an hour, which is $62 a day. Only destroying it stops the bill. When the credit runs out, AMD charges the card on file automatically.
+Why destroy rather than power off? A powered-off GPU droplet still bills the full hourly rate (about $48–62 a day). Only destroying it stops the bill.
 
 ## If something goes wrong
 

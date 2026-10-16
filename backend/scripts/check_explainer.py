@@ -2,7 +2,10 @@
 Thai and English, and record how many drafts passed the number check.
 
 Run from the repo root (Token Factory may only see sample data, which is all this uses):
-    uv run --project backend --env-file .env python backend/scripts/check_explainer.py
+    uv run --project backend --env-file .env python backend/scripts/check_explainer.py [--expect-route mi300x]
+
+With --expect-route it stops before the Arena runs unless that route is the healthy one, so it can't overwrite another
+route's evidence by accident.
 
 Writes evidence/explainer-<route>.json (everything) and evidence/explainer-<route>.md (the report).
 """
@@ -11,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -30,6 +34,8 @@ async def main() -> None:
     ) as client:
         health = (await client.get("/api/health")).json()
         print(f"route {health['route']}, model {health['model']}", flush=True)
+        if "--expect-route" in sys.argv and health["route"] != sys.argv[sys.argv.index("--expect-route") + 1]:
+            raise SystemExit("The healthy route is not the one expected; nothing was run.")
         started = time.monotonic()
         async with client.stream("POST", "/api/arena", json={"shop": "glow-lab-bkk"}) as response:
             events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]

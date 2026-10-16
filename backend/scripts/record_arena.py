@@ -2,7 +2,10 @@
 
 A live check, not a test: the model proposes different moves on every run. Run from the repo root (Token Factory may
 only see sample data, which is all this uses):
-    uv run --project backend --env-file .env python backend/scripts/record_arena.py
+    uv run --project backend --env-file .env python backend/scripts/record_arena.py [--expect-route mi300x]
+
+With --expect-route it stops before calling any model unless that route is the healthy one, so a droplet that fails its
+health probe can't silently record on Token Factory and overwrite the shipped replay.
 
 Each SKU gets the Arena a live run gets on that route: Token Factory's small one (api.FALLBACK_CAPS), or the full one
 on our own MI300X (3 Strategists, 6 Rivals, 3 rounds: api.ArenaRequest's defaults). Every invited SKU runs. Writes
@@ -14,6 +17,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -28,6 +32,8 @@ RUNS = Path(__file__).resolve().parents[2] / "evidence" / "runs"
 
 async def main() -> None:
     settings = await first_healthy(LLMSettings.routes_from_env())
+    if "--expect-route" in sys.argv and settings.route != sys.argv[sys.argv.index("--expect-route") + 1]:
+        raise SystemExit(f"The healthy route is {settings.route}, not the one expected; nothing was recorded.")
     shop = load_shop("glow-lab-bkk")
     started = time.monotonic()
     recorded_at = datetime.now(UTC).isoformat(timespec="seconds")
