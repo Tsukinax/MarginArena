@@ -146,6 +146,17 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
 
 ## Evolus
 
+**Model route.** The Evolus track asks for the main agent on an open model served on AMD infrastructure. Our Campaign
+Desk agent and extractor use Gemma-4-31B-IT on AMD Token Factory through Evolus "Your models". When another team asked
+in the event Discord whether Token Factory meets the track's own-vLLM-endpoint rule, an AMD mentor answered (14 Oct
+2026) that it "perfectly satisfies this requirement"; the lablab page also says event workspaces run on "an open model
+through a vLLM endpoint on AMD Developer Cloud, or any OpenAI-compatible provider"
+([ADR 0005](docs/adr/0005-token-factory-is-the-only-inference-route.md)).
+
+**In Evolus's own terms:** people stay in the loop when they are needed (Escalate goes to the shop owner, and nothing
+happens until the Seller confirms); every run leaves a trail (the workflow's execution record shows each step's output);
+and the exact sums come from code, not AI (the engine computes every number the workflow carries).
+
 An Evolus document extractor reads the Campaign Invitation PDF (the sample's, the only document the demo sends) and the
 app checks every discount it read against the invitation the Arena uses
 ([evidence/evolus-invitation-extractor.md](evidence/evolus-invitation-extractor.md)). When the Seller confirms,
