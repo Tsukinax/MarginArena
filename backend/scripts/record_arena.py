@@ -4,7 +4,8 @@ A live check, not a test: the model proposes different moves on every run. Run f
 only see sample data, which is all this uses):
     uv run --project backend --env-file .env python backend/scripts/record_arena.py
 
-Each SKU gets the same Arena as a live Token Factory run (api.FALLBACK_CAPS); only the number of SKUs differs. Writes
+Each SKU gets the Arena a live run gets on that route: Token Factory's small one (api.FALLBACK_CAPS), or the full one
+on our own MI300X (3 Strategists, 6 Rivals, 3 rounds: api.ArenaRequest's defaults). Every invited SKU runs. Writes
 evidence/runs/<route>-sample-12sku.sse with each event's seconds since the start as an SSE comment (": t=12.34"),
 which the replay uses for pacing, and the copy the app ships (api.RECORDED_RUN) when the route is Token Factory.
 """
@@ -17,7 +18,7 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
-from marginarena.api import FALLBACK_CAPS, RECORDED_RUN
+from marginarena.api import FALLBACK_CAPS, RECORDED_RUN, ArenaRequest
 from marginarena.arena import run_arena
 from marginarena.llm import LLMClient, LLMSettings, first_healthy
 from marginarena.sample import load_shop
@@ -42,17 +43,11 @@ async def main() -> None:
         if event["type"] in ("run_done", "error"):
             print(json.dumps(event.get("telemetry") or event), flush=True)
 
+    full = ArenaRequest()
+    caps = FALLBACK_CAPS if settings.route == "token-factory" else vars(full)
     llm = LLMClient(settings)
     try:
-        await run_arena(
-            shop,
-            None,
-            FALLBACK_CAPS["rounds"],
-            FALLBACK_CAPS["rivals"],
-            FALLBACK_CAPS["strategists"],
-            llm,
-            emit,
-        )
+        await run_arena(shop, None, caps["rounds"], caps["rivals"], caps["strategists"], llm, emit)
     finally:
         await llm.aclose()
     out = RUNS / f"{settings.route}-sample-12sku.sse"
