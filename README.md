@@ -211,6 +211,9 @@ finding each resource by name first. See [infra/evolus/README.md](infra/evolus/R
   did not list Gemma at all (the app now falls back to DeepSeek-V4-Flash); and on 14 Oct the first calls hung for over
   two minutes. The recorded
   run is therefore the default demo, labelled as recorded.
+- **On 17 Oct, Token Factory's chat calls hung from Vercel's Hong Kong region** (about 140 s, then the numbers-only
+  explanation), while the same calls from Thailand answered in seconds. Moving the API to Singapore fixed it: a live
+  4-product run then answered 20 of 20 calls with Gemma (`evidence/runs/token-factory-live-site-sin1-4sku.sse`).
 - **The Evolus platform OCR failed** (HTTP 502), so the extractor reads a PDF's own text. A scanned invitation would
   fail until OCR works again.
 - **A right number with the wrong label:** one Thai explanation said the plan was tested against 183 Promo Plans; the
