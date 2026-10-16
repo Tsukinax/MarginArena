@@ -112,6 +112,7 @@ Every number in this README comes from the engine or from these files:
 | Four pricing policies under the same Scenarios, and Gemma's own arithmetic checked by the engine | [evidence/policy-comparison.md](evidence/policy-comparison.md) |
 | The Evolus Verdict workflow carrying out confirmed Verdicts | [evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md) |
 | The Evolus extractor reading the Campaign Invitation PDF | [evidence/evolus-invitation-extractor.md](evidence/evolus-invitation-extractor.md) |
+| Every Evolus execution in the workspace, and two live runs from the live site on 17 Oct | [evidence/evolus-workspace-usage.md](evidence/evolus-workspace-usage.md) |
 | How the Verdicts move with traffic lift, the SS-50 override and the AI Rivals | [evidence/sensitivity.md](evidence/sensitivity.md) |
 | Recorded Arena runs, as streamed | [evidence/runs/](evidence/runs/) |
 
