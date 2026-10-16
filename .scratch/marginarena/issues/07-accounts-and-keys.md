@@ -23,3 +23,4 @@ The user's tasks:
   repo, so every push to `main` redeploys https://marginarena.vercel.app. The user sets its secrets in the Vercel
   dashboard: `TOKEN_FACTORY_API_KEY`, `RESULT_SIGNING_KEY` and the `EVOLUS_*` names in `.env.example`. Still open: when
   judges test the demos.
+- 16 Oct: the user confirmed judges review after the event ends and that the lablab form allows several tracks. AMD Developer Cloud: whether a card is on file is unconfirmed; the GPU limit is 0 until "Request Access" is approved. The user said they set "2" values on Vercel; which ones is not recorded yet.

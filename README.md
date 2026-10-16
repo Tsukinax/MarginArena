@@ -8,7 +8,7 @@ Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Busines
 Gemma-4-31B-IT through AMD Token Factory whenever Token Factory serves it. When it can't (Gemma had no workers for
 part of 15 Oct, and that night it left Token Factory's catalogue), the app uses DeepSeek-V4-Flash on the same route
 and names the model that answered. Every Arena run and explanation recorded in [`evidence/`](evidence/) was answered
-by Gemma.
+by Gemma, except the labelled fallback run `evidence/runs/token-factory-sample-4sku-deepseek-fallback.sse`.
 
 ## The problem
 
@@ -166,7 +166,9 @@ finding each resource by name first. See [infra/evolus/README.md](infra/evolus/R
 ## Failures we have seen, and the safeguards
 
 - **Token Factory is a free shared service with no uptime promise.** On 15 Oct Gemma had no workers for a while
-  (the run switches to Qwen3.8-27B and says so), and on 14 Oct the first calls hung for over two minutes. The recorded
+  (the run switched to a fallback model and said so); from that night until about 20:48 ICT on 16 Oct its catalogue
+  did not list Gemma at all (the app now falls back to DeepSeek-V4-Flash); and on 14 Oct the first calls hung for over
+  two minutes. The recorded
   run is therefore the default demo, labelled as recorded.
 - **The Evolus platform OCR failed** (HTTP 502), so the extractor reads a PDF's own text. A scanned invitation would
   fail until OCR works again.
