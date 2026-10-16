@@ -21,5 +21,5 @@ Two engine changes follow:
   - on how many SKUs;
   - whether the Arena's plan holds up.
 - **The "don't join" baseline is evaluated under the same Scenarios**, because Rivals act whether or not the Seller joins.
-- **Token Factory is used only with sample data.** Its terms forbid sending sensitive financial data, so real Seller costs go only to our own MI300X endpoint.
-- **The sample shop's live run is backed by a recorded MI300X run.** The UI labels it "recorded" and offers "Run live".
+- **Token Factory is used only with sample data.** Its terms forbid sending sensitive financial data, so real Seller costs would need a private endpoint.
+- **The sample shop's live run is backed by a recorded run.** The UI labels it "recorded" and offers "Run live". (Superseded in part by [ADR 0005](0005-token-factory-is-the-only-inference-route.md): the recorded run is on Token Factory, and no MI300X endpoint was used.)

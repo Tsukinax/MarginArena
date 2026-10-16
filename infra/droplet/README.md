@@ -1,6 +1,8 @@
 # The MI300X droplet: create it, use it, destroy it
 
-MarginArena's own AI endpoint runs on one AMD Developer Cloud GPU droplet (one AMD Instinct MI300X). It serves Gemma-4-31B-IT with vLLM, behind HTTPS.
+> **Optional, never run, and not used for the submission.** MarginArena runs on AMD Token Factory only ([ADR 0005](../../docs/adr/0005-token-factory-is-the-only-inference-route.md), Q60). This folder is kept as a tested path for running the same model on our own GPU; no number in `evidence/` comes from it.
+
+This kit would run MarginArena's own AI endpoint on one AMD Developer Cloud GPU droplet (one AMD Instinct MI300X), serving Gemma-4-31B-IT with vLLM behind HTTPS.
 
 **It bills by the second from the moment it is created until it is destroyed, even while it is powered off** ($1.99 an hour for one MI300X in the console on 16 Oct 2026; earlier pages said $2.59). So we create it for a work session and destroy it afterwards. We have no $100 credit, so the card on file pays. A new account must first have its GPU limit raised ("Request Access" next to the greyed-out Create button). Nothing on the droplet needs saving: Claude rebuilds it from this folder in about 20 minutes.
 

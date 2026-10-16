@@ -190,10 +190,13 @@ finding each resource by name first. See [infra/evolus/README.md](infra/evolus/R
   the repo holds only the fitted parameters), not marketplace skincare. SS-50 carries a
   labelled Seller override: the published mean elasticity, −2.62 (Bijmolt, Van Heerde and Pieters 2005), with a band of
   our own construction.
-- **Joining is assumed to bring 2.5× the Campaign traffic before any price effect**, against 1× for not joining. It
-  comes from Lazada reporting about 3.5× GMV in its March 2026 Birthday Campaign (a press report), divided by the
-  price effect of an average 20% cut at elasticity −1.49 (×1.39). No source measures it for 11.11, it moves every
-  Verdict, and the Seller can change it.
+- **Joining is assumed to bring 2.5× the Campaign traffic before any price effect**, against 1× for not joining. The
+  starting point is Lazada reporting about 3.5× GMV in its March 2026 Birthday Campaign (a press report). Our first
+  derivation divided that only by the unit effect of an average 20% cut at elasticity −1.49 (×1.39). GMV is units
+  times price, so taking out the 20% lower price as well (×0.8) gives about ×3.1 (our arithmetic). We kept ×2.5, which
+  makes not joining look better: at ×3.0, Margin Protected is ฿4,581.05 and the two Skips become Escalates
+  ([evidence/sensitivity.md](evidence/sensitivity.md)). No source measures the lift for 11.11, it moves every Verdict,
+  and the Seller can change it.
 - **Two assumptions have no source:** when a Rival ends up cheaper, the Seller keeps (Rival price ÷ our price)^1.0 of
   its buyers, and each Counter-move lasts the whole Campaign, which overstates a short flash sale.
 - **A gift is valued at 30% of its retail price** by buyers. This is an assumption the Seller can change.
