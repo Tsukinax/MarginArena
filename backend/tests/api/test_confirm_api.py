@@ -15,6 +15,20 @@ from marginarena.llm import LLMSettings
 
 SETTINGS = LLMSettings(route="token-factory", base_url="http://model.test/v1", api_key="test", model="Gemma-4-31B-IT")
 WORKFLOW_RESULT = {"upload": [{"sku": "NT-200"}], "approval_request": "Subject: VC-30 needs your call"}
+# What Evolus reported for the live run ffdb5077 on 17 Oct (evidence/evolus-workspace-usage.md): each step's time and
+# the credits the run used.
+EXECUTION = {
+    "status": "Completed",
+    "output": json.dumps(WORKFLOW_RESULT),
+    "stepStates": {
+        "1": {"status": "done", "durationMs": 3},
+        "2": {"status": "done", "durationMs": 18},
+        "3": {"status": "done", "durationMs": 2978},
+        "4": {"status": "done", "durationMs": 1},
+        "5": {"status": "done", "durationMs": 0},
+    },
+    "consumption": {"credits": 0.0, "pendingEntries": 0},
+}
 
 
 @pytest.fixture(autouse=True)
@@ -35,7 +49,7 @@ class FakeEvolus:
         if request.method == "POST" and request.url.path == "/api/v1/workflows/wf-1/execute":
             return httpx.Response(202, json={"executionId": "ex-1"})
         if request.method == "GET" and request.url.path == "/api/v1/workflows/wf-1/executions/ex-1":
-            return httpx.Response(200, json={"status": "Completed", "output": json.dumps(WORKFLOW_RESULT)})
+            return httpx.Response(200, json=EXECUTION)
         return httpx.Response(404, json={"title": "Not Found"})
 
     def sent_verdicts(self) -> list[dict]:
@@ -69,7 +83,15 @@ async def test_confirm_runs_the_evolus_verdict_workflow_on_the_confirmed_verdict
     assert len(verdicts) == 12
     assert verdicts["SS-50"]["verdict"] == "revise" and verdicts["SS-50"]["plan"] == "฿157.50 off"
     assert verdicts["VC-30"]["failed_checks"] == ["below the Margin Floor"]
-    assert done.json() == {"status": "Completed", "result": WORKFLOW_RESULT}
+    assert done.json()["status"] == "Completed" and done.json()["result"] == WORKFLOW_RESULT
+
+
+async def test_a_finished_run_shows_each_steps_time_and_the_credits_it_used():
+    # Evolus's own trail of the run, so the Seller (and a judge) sees what each step did and that it cost no credits.
+    _, done = await confirm(FakeEvolus())
+
+    assert done.json()["step_ms"] == {"1": 3, "2": 18, "3": 2978, "4": 1, "5": 0}
+    assert done.json()["credits"] == 0.0
 
 
 async def test_confirm_refuses_verdicts_changed_after_the_arena():
@@ -160,7 +182,8 @@ async def test_a_finished_evolus_run_is_reported_without_asking_evolus_again():
 
     first, second = await poll_twice()
 
-    assert first.json() == second.json() == {"status": "Completed", "result": WORKFLOW_RESULT}
+    assert first.json() == second.json()
+    assert first.json()["result"] == WORKFLOW_RESULT
     assert len(evolus.requests) == 1
 
 

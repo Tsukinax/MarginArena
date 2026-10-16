@@ -322,7 +322,14 @@ def create_app(
             result = json.loads(output) if isinstance(output, str) else output
         except ValueError:
             result = output
-        status = {"status": execution.get("status"), "result": result}
+        steps = execution.get("stepStates") or {}
+        status = {
+            "status": execution.get("status"),
+            "result": result,
+            # Evolus's own trail of the run: each step's time, and the credits it used (0 on our own model).
+            "step_ms": {n: s.get("durationMs") for n, s in steps.items()} if steps else None,
+            "credits": (execution.get("consumption") or {}).get("credits"),
+        }
         if status["status"] in ("Completed", "Failed"):
             finished[execution_id] = status
         return status
