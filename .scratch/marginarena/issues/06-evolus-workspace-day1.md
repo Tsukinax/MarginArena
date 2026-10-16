@@ -47,6 +47,6 @@ Create the workspace through https://app.evolus.ai/join/AMDACT3, put the API key
   structure "Campaign Invitation"; IDs `EVOLUS_READER_ID` and `EVOLUS_INVITATION_STRUCTURE_ID`). The platform OCR
   failed (502 from `generic-ocr`), so OCR is off and the extractor reads the sample PDF's own text: 12 of 12 minimum
   discounts read correctly (`evidence/evolus-invitation-extractor.md`). The app's Invitation step runs it
-  (`POST /api/invitation/read`). The live site answered 503 ("missing") until the deployment of `d0ca488`; then it
+  (`POST /api/invitation/read`). The live site answered 503 ("missing") until the deployment of `2eb9d52`; then it
   read 12 of 12 in 147.85 s (run 3 in the evidence). Open from the day-1 list: the status code Evolus returns when
   rate-limited.
