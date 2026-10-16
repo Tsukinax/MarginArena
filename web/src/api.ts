@@ -310,9 +310,10 @@ export const baht = (x: string | number | null | undefined): string => {
   return `${sign}฿${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
 
-export const USD_PER_THB = 0.029
+/** Bank of Thailand reference rate, 15 Oct 2026 (BOT statistics, report FM_FX_001_S3), for the "≈ $" shown beside baht. */
+export const THB_PER_USD = 33.541
 export const usd = (x: string | number): string =>
-  `≈ $${Math.round(Math.abs(Number(x)) * USD_PER_THB).toLocaleString('en-US')}`
+  `≈ $${Math.round(Math.abs(Number(x)) / THB_PER_USD).toLocaleString('en-US')}`
 
 export const pct = (x: string | number, digits = 0): string => `${(Number(x) * 100).toFixed(digits)}%`
 
