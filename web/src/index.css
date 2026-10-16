@@ -175,7 +175,7 @@ button:disabled {
 }
 
 .route-dot.is-amd {
-  background: #ed1c24;
+  background: var(--profit);
 }
 
 .rail-note {
@@ -1180,4 +1180,88 @@ button:disabled {
   align-items: center;
   gap: 10px 16px;
   margin: 0 0 24px;
+}
+
+/* Step 1: the problem and the recorded result, above the fold */
+.hero {
+  background: radial-gradient(ellipse at 85% 20%, var(--night-3) 0%, var(--night) 65%);
+  color: var(--chalk);
+  border-radius: 14px;
+  padding: 26px 30px 24px;
+  margin: 0 0 34px;
+}
+
+.hero-eyebrow {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.hero-problem {
+  margin: 0 0 18px;
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 70ch;
+}
+
+.hero-problem b {
+  color: #fff;
+}
+
+.hero-problem b.neg {
+  color: #ff9a9a;
+}
+
+.hero-result {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.hero-number {
+  margin: 0;
+  font: 900 54px/1 'Big Shoulders Display', 'Public Sans', sans-serif;
+  color: var(--gold);
+}
+
+.hero-what {
+  margin: 0;
+  flex: 1 1 380px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.hero-what small {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--dim);
+}
+
+.hero .primary {
+  background: var(--gold);
+  color: var(--night);
+}
+
+.secondary.on-dark {
+  color: var(--chalk);
+  border-color: var(--dim);
+}
+
+/* A product whose leading plan a Rival's Counter-move changed */
+.flip-note {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rival);
+}
+
+.group .flip-note {
+  color: #b8255f;
 }

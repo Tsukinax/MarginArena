@@ -31,6 +31,23 @@ export type Shop = {
   rival_snapshot: Record<string, { rival: string; reference_price: string }>
   /** Per-SKU elasticities the Seller set in place of the pooled fit, each with its own band and label (Q56). */
   elasticity_overrides: Record<string, { elasticity: string; band: [string, string]; text: string; source: string }>
+  /** The engine's ฿100 product costing ฿50 at this marketplace's fees: full price, 20% off and 30% off. */
+  fee_example: { list_price: string; cost: string; discount_pct: string; unit_profit: string }[]
+}
+
+/** The recorded run's headline, read by the backend from the run's own events. */
+export type RecordedSummary = {
+  recorded_at: string
+  route: string
+  model: string
+  products: number
+  margin_protected: string
+  verdicts: { approve: number; revise: number; skip: number; escalate: number }
+  /** Products whose leading plan a Rival's Counter-move changed. */
+  rival_changed: string[]
+  calls_ok: number
+  calls_failed: number
+  elapsed_seconds: number
 }
 
 export type Telemetry = {
@@ -175,6 +192,12 @@ export async function getHealth(): Promise<{ route: string; model: string }> {
   return r.json()
 }
 
+export async function getRecordedSummary(): Promise<RecordedSummary> {
+  const r = await fetch('/api/arena/recorded')
+  if (!r.ok) throw new Error(`Could not load the recorded run (${r.status}).`)
+  return r.json()
+}
+
 export async function getShop(id = 'glow-lab-bkk'): Promise<Shop> {
   const r = await fetch(`/api/shops/${id}`)
   if (!r.ok) throw new Error(`Could not load the sample shop (${r.status}).`)
@@ -308,6 +331,12 @@ export const baht = (x: string | number | null | undefined): string => {
   const n = typeof x === 'number' ? x : Number(x)
   const sign = n < 0 ? '−' : ''
   return `${sign}฿${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+}
+
+/** Baht to the satang, for small per-unit amounts where whole-baht rounding would hide the point (−฿0.55, not −฿1). */
+export const bahtExact = (x: string | number): string => {
+  const n = Number(x)
+  return `${n < 0 ? '−' : ''}฿${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 /** Bank of Thailand reference rate, 15 Oct 2026 (BOT statistics, report FM_FX_001_S3), for the "≈ $" shown beside baht. */

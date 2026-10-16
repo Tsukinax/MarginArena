@@ -61,7 +61,12 @@ export default function VerdictsStep({ results, marginProtected, onNext }: Props
               {rows.map((r) => (
                 <li key={r.sku}>
                   <button type="button" onClick={() => setOpen(r)}>
-                    <span className="row-name">{r.name}</span>
+                    <span className="row-name">
+                      {r.name}
+                      {Number(r.red_team_gain ?? 0) > 0 && (
+                        <small className="flip-note">A Rival's Counter-move changed this plan</small>
+                      )}
+                    </span>
                     <span className="row-plan">{r.chosen_plan ?? `Invited: ${r.invited_plan}`}</span>
                     <span className="row-num">
                       {r.skip

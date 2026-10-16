@@ -43,7 +43,17 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
     return null
   }, [events])
   const done = events.find((e) => e.type === 'run_done')
-  const selected = picked ?? skus.find((s) => !views.get(s)?.decided) ?? skus[0]
+  const recorded = Boolean(started && started.type === 'run_started' && started.recorded_at)
+  const moves = events.filter((e) => e.type === 'rival_move').length
+  const flipped = new Set(events.flatMap((e) => (e.type === 'leader' && e.changed ? [e.sku] : [])))
+  // Once the run ends, open the product where the Rivals changed the plan most (the engine's red_team_gain).
+  const biggestFlip =
+    done && done.type === 'run_done'
+      ? [...done.results]
+          .filter((r) => Number(r.red_team_gain ?? 0) > 0)
+          .sort((a, b) => Number(b.red_team_gain) - Number(a.red_team_gain))[0]?.sku
+      : undefined
+  const selected = picked ?? biggestFlip ?? skus.find((s) => !views.get(s)?.decided) ?? skus[0]
   const v = selected ? views.get(selected) : undefined
   const product = shop?.invited.find((s) => s.id === selected)
   const calls = telemetry ? telemetry.calls_ok + telemetry.calls_invalid + telemetry.calls_failed : 0
@@ -71,8 +81,8 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
             <dd>{calls}</dd>
           </div>
           <div>
-            <dt>Tokens written</dt>
-            <dd>{telemetry ? telemetry.completion_tokens.toLocaleString('en-US') : '–'}</dd>
+            <dt>Counter-moves found</dt>
+            <dd>{moves}</dd>
           </div>
           <div>
             <dt>Rejected or failed</dt>
@@ -107,8 +117,11 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
                     onClick={() => setPicked(s)}
                   >
                     <span className={`dot dot--${status}`} aria-hidden />
-                    <span className="fixture-name">{name}</span>
-                    <span className={`tag tag--${status}`}>{statusWord(status)}</span>
+                    <span className="fixture-name">
+                      {name}
+                      {flipped.has(s) && <small className="flip-note">A Rival changed the plan</small>}
+                    </span>
+                    <span className={`tag tag--${status}`}>{statusWord(status === 'live' && recorded ? 'replaying' : status)}</span>
                   </button>
                 </li>
               )
@@ -214,8 +227,10 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
         {done && done.type === 'run_done' && (
           <>
             <p>
-              Done in {done.telemetry.elapsed_seconds}s. Margin protected {baht(done.margin_protected)}{' '}
-              {usd(done.margin_protected)} in the worst case.
+              {recorded
+                ? `Recorded run: ${calls} model calls in ${done.telemetry.elapsed_seconds} s on AMD Token Factory, paced at 15 requests a minute under the account's limit of 20; replayed here in about 20 s.`
+                : `Done in ${done.telemetry.elapsed_seconds} s.`}{' '}
+              Margin protected {baht(done.margin_protected)} {usd(done.margin_protected)} in the worst case.
             </p>
             <button type="button" className="primary" onClick={onNext}>
               See the Verdicts
@@ -260,5 +275,5 @@ function commentary(e: ArenaEvent): string | null {
 }
 
 function statusWord(s: string) {
-  return ({ waiting: 'Waiting', live: 'Live', approve: 'Approve', revise: 'Revise', skip: 'Skip', escalate: 'Escalate' } as Record<string, string>)[s] ?? s
+  return ({ waiting: 'Waiting', live: 'Live', replaying: 'Replaying', approve: 'Approve', revise: 'Revise', skip: 'Skip', escalate: 'Escalate' } as Record<string, string>)[s] ?? s
 }
