@@ -5,8 +5,8 @@ for every invited product, AI Rivals red-team the leading plan, and each product
 (including Skip) or Escalate.
 
 Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call goes to
-**AMD Token Factory**: Gemma-4-31B-IT answered every recorded Arena and explanation run, and a labelled
-DeepSeek-V4-Flash fallback answers only when Token Factory does not list Gemma. Evolus reads the Campaign Invitation
+**AMD Token Factory**: Gemma-4-31B-IT answered every recorded Arena and explanation run except one labelled
+DeepSeek-V4-Flash fallback run, and that fallback answers only when Token Factory does not list Gemma. Evolus reads the Campaign Invitation
 and carries out the Verdicts.
 
 **Try it in one minute** at **https://marginarena.vercel.app** (no key, no sign-up):
@@ -104,6 +104,41 @@ These are model-based estimates for a fictional shop; every figure comes from th
   where the Revise keeps ฿3,728.85 more in the worst case
   ([evidence/red-team-token-factory.md](evidence/red-team-token-factory.md)). Both rest on the SS-50 override.
 
+## Business case
+
+All market figures are estimates or assumptions, with the arithmetic shown; sources are in
+[`.scratch/marginarena/research/thai-seller-market.md`](.scratch/marginarena/research/thai-seller-market.md).
+
+- **Who it is for:** a small Thai Shopee Seller who receives Campaign Invitations in Seller Centre and decides product
+  by product whether to join. About 1.2 million Thai MSME shops are on Shopee, and about 170,000 Sellers reached new
+  customers in the 9.9 (2026) Campaign (both are Shopee's own figures). A survey of more than 500 Thai SMEs, drawn from
+  a complaint database, put average net profit after fees at 2.3%.
+- **Why now:** Shopee and Lazada each raised their fees three times in 2026
+  ([marketplace-fees.md](.scratch/marginarena/research/marketplace-fees.md)), so every Campaign discount eats into a
+  thinner margin.
+- **Planned pricing (an assumption, not validated):** Free (1 Campaign a month, up to 10 products), Pro ฿390 a month,
+  Agency ฿1,990 a month (several shops, the Evolus workflow), and Enterprise for Mall stores and brands.
+- **Market in Thailand (estimates):** if every one of the 1.2M shops paid Pro, ≈฿5.62B a year (a ceiling, since it
+  counts shops); for the 170,000 Campaign-active Sellers, ≈฿795.6M a year; at 5% of them (an assumption), ≈฿39.8M a
+  year.
+- **What it is worth to one Seller (estimate):** on the sample shop, the two Skips alone keep ฿1,648.50 more in the
+  worst case ([evidence/sensitivity.md](evidence/sensitivity.md)), about 4.2 months of Pro.
+- **Why it needs AI, and why AI alone is not enough:** the AI does the language work (reading the Campaign Invitation,
+  proposing Plan Ideas and Counter-moves with a reason, explaining each Verdict in Thai or English, drafting the owner's
+  approval request); Gemma's own profit arithmetic was off by a median 61.69%
+  ([evidence/policy-comparison.md](evidence/policy-comparison.md)), so the engine computes every number.
+
+## Roadmap
+
+1. A pilot with Thai Sellers before 12.12 (we are looking for Sellers; none is running yet), so elasticity, traffic
+   lift and rival behaviour are measured on real sales.
+2. Rival Snapshot capture: read lookalike competitor listings from screenshots.
+3. A private model endpoint, so real Seller costs never go to a shared API.
+4. More Marketplace Profiles: Lazada (the LazMall fees already match Lazada's worked example), then TikTok Shop.
+5. Mall stores and brands, then other Southeast Asian markets with the same Campaign mechanics.
+
+Built solo from Thailand for the AMD Developer Hackathon ACT III.
+
 ## Evidence
 
 Every number in this README comes from the engine or from these files:
@@ -125,9 +160,10 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
 
 ## AMD
 
-- **What runs on AMD:** every Strategist, Rival and explanation call, and the Evolus agent and extractor, run on
-  Gemma-4-31B-IT through **AMD Token Factory**, AMD's hosted model API. The organisers confirmed that Token Factory
-  counts as the AMD component for ACT III ([ADR 0005](docs/adr/0005-token-factory-is-the-only-inference-route.md)).
+- **What runs on AMD:** every Strategist, Rival and explanation call goes to Gemma-4-31B-IT through **AMD Token
+  Factory**, AMD's hosted model API, and the Evolus agent and extractor use the same Token Factory connection
+  (Gemma-4-31B-IT with a Qwen3.8-27B fallback; Evolus does not record which one answered). The organisers confirmed
+  that Token Factory counts as the AMD component for ACT III ([ADR 0005](docs/adr/0005-token-factory-is-the-only-inference-route.md)).
   Token Factory does not say which GPUs serve it, so we make no claim about the hardware.
 - **Which model answered:** every Arena run and explanation recorded in [`evidence/`](evidence/) was answered by
   Gemma-4-31B-IT, except the labelled fallback run `evidence/runs/token-factory-sample-4sku-deepseek-fallback.sse`.
@@ -157,7 +193,8 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
 ## Evolus
 
 **Model route.** The Evolus track asks for the main agent on an open model served on AMD infrastructure. Our Campaign
-Desk agent and extractor use Gemma-4-31B-IT on AMD Token Factory through Evolus "Your models". When another team asked
+Desk agent and extractor use our AMD Token Factory connection through Evolus "Your models" (Gemma-4-31B-IT, with a
+Qwen3.8-27B fallback; Evolus does not record which one answered). When another team asked
 in the event Discord whether Token Factory meets the track's own-vLLM-endpoint rule, an AMD mentor answered (14 Oct
 2026) that it "perfectly satisfies this requirement"; the lablab page also says event workspaces run on "an open model
 through a vLLM endpoint on AMD Developer Cloud, or any OpenAI-compatible provider"

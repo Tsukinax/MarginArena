@@ -53,7 +53,7 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
             <p className="hero-what">
               more profit in the worst case for this sample shop when it follows MarginArena's Verdicts instead of
               joining as invited: {v.approve} Approve, {v.revise} Revise, {v.skip} Skip, and {v.escalate} Escalate
-              left to a person.
+              left to a person. Most of it comes from the sunscreen's Revise, which rests on a labelled Seller override.
               <small>
                 Recorded{' '}
                 {new Date(summary.recorded_at).toLocaleDateString('en-GB', {
