@@ -149,7 +149,7 @@ finding each resource by name first. See [infra/evolus/README.md](infra/evolus/R
 
 - **The sample shop is fictional.** Glow Lab BKK's costs, stock, baselines, brand agreement and Rival Snapshot are
   invented; the fees are Shopee Thailand's.
-- **Elasticity comes from online grocery data** (FreshRetailNet-50K by Dingdong Ltd., CC BY 4.0, from Chinese cities;
+- **Elasticity comes from online grocery data** ([FreshRetailNet-50K](https://huggingface.co/datasets/Dingdong-Inc/FreshRetailNet-50K) by Dingdong Ltd., [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), from Chinese cities; we fitted (modified) parameters from it;
   the repo holds only the fitted parameters), not marketplace skincare. SS-50 carries a
   labelled Seller override: the published mean elasticity, −2.62 (Bijmolt, Van Heerde and Pieters 2005), with a band of
   our own construction.
