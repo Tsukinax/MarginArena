@@ -22,3 +22,4 @@ Record the results; they are AMD evidence.
   streaming and reasoning; Gemma-4-31B-IT failed because Token Factory had no Gemma workers at the time (500
   "no_available_workers"). If a GPU session happens, run `kit.py gate` then.
 - 16 Oct: the user approved a GPU session (one MI300X, about 3 h). AMD Developer Cloud keeps "Create GPU Droplet" greyed until a limit increase ("Request Access") or credits are approved; status unknown at 21:00 ICT. The console priced it at $1.99/hr with the "ROCm Software" 10.1 image; the SSH key `marginarena-droplet` is uploaded. `infra/droplet/bench.py` (targets vLLM's port 8001; not yet run on hardware) follows `gate`, then `record_arena.py` and `check_explainer.py` with `--expect-route mi300x`. Run order: `handoff.md` section 5.
+- 17 Oct: cancelled (Q60). The organisers said standalone GPUs are not needed in ACT III; there will be no droplet, so this gate does not run.

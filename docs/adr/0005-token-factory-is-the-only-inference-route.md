@@ -21,3 +21,10 @@ The $100 credit needs days of approval, and the user chose not to request it (Q5
 - The live Arena stays small (Token Factory allows 20 requests a minute per account). Larger runs are recorded on Token Factory and labelled, in place of ADR 0004's recorded MI300X run.
 - Token Factory still receives sample data only.
 - The Evolus track's wording on lablab asks for the main agent on our own vLLM endpoint on AMD Developer Cloud. The AMD mentor answered that exact question in Discord on 14 Oct (07:13 ICT): Token Factory is the AMD-hosted vLLM endpoint given to participants and "perfectly satisfies this requirement". So the Evolus agent runs on Token Factory too.
+
+## Update, 17 Oct 2026 (Q60)
+
+The organisers stated in Discord that standalone GPUs "are not needed and not offered as a part of ACT III". A paid
+MI300X session the user approved on 16 Oct was cancelled; AMD Developer Cloud had not raised the account's GPU limit
+anyway. Token Factory remains the only route. When its catalogue drops Gemma, the app falls back to DeepSeek-V4-Flash
+on the same route (Q59).

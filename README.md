@@ -117,6 +117,7 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
   | `token-factory-sample-4sku-ss50-override.sse` | Gemma-4-31B-IT | 4 | 20 | 0 | 0 | 0 | 1,646 | 78.25 s |
   | `token-factory-sample-3sku.sse` | Gemma-4-31B-IT | 3 | 15 | 0 | 0 | 1 | 1,258 | 86.41 s |
   | `token-factory-sample-3sku-maximin.sse` | Gemma-4-31B-IT | 3 | 15 | 0 | 0 | 7 | 1,259 | 118.75 s |
+  | `token-factory-live-site-4sku.sse` (the live site, 17 Oct) | Gemma-4-31B-IT | 4 | 20 | 0 | 0 | 0 | 1,860 | 79.84 s |
 
   Wall time mostly reflects our own pacing (15 requests a minute, under Token Factory's limit of 20 per account), not
   the model's speed. The replay plays the 12-SKU run back in about 20 seconds.
