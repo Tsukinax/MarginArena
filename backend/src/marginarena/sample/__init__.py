@@ -7,7 +7,16 @@ from dataclasses import dataclass
 from decimal import Decimal
 from importlib import resources
 
-from marginarena.engine import BrandPriceRule, CampaignTerms, MarketplaceProfile, Sku, get_profile
+from marginarena.engine import (
+    BrandPriceRule,
+    CampaignTerms,
+    MarketplaceProfile,
+    PriceCut,
+    PromoPlan,
+    Sku,
+    get_profile,
+    unit_economics,
+)
 
 SHOPS = {"glow-lab-bkk": "glow_lab_bkk.json"}
 
@@ -179,4 +188,25 @@ def describe_shop(shop: Shop) -> dict:
             k: {"elasticity": str(o.elasticity), "band": [str(x) for x in o.band], "text": o.text, "source": o.source}
             for k, o in shop.elasticity_overrides.items()
         },
+        "fee_example": fee_example(shop.profile),
     }
+
+
+def fee_example(profile: MarketplaceProfile) -> list[dict]:
+    """The Seller's problem in numbers (README "The problem"): a ฿100 product costing ฿50, at full price, 20% off and
+    30% off, at this marketplace's fees."""
+    item = Sku(id="EXAMPLE-100", name="฿100 product costing ฿50", list_price=Decimal("100"), cost=Decimal("50"))
+    rows = []
+    for pct in (Decimal("0"), Decimal("20"), Decimal("30")):
+        cut = item.list_price * pct / 100
+        plan = PromoPlan(mechanics=(PriceCut(amount=cut),) if cut else ())
+        result = unit_economics(item, plan, profile, CampaignTerms())
+        rows.append(
+            {
+                "list_price": str(item.list_price),
+                "cost": str(item.cost),
+                "discount_pct": str(pct),
+                "unit_profit": str(result.unit_profit),
+            }
+        )
+    return rows

@@ -273,6 +273,30 @@ async def test_shop_endpoint_describes_the_invitation_and_every_assumption():
     assert shop["brand_rules"][0]["clause"] == "HydraLab reseller agreement, clause 4.2"
 
 
+async def test_the_first_screen_states_the_sellers_problem_with_numbers_the_engine_computes():
+    # README "The problem": a ฿100 product costing ฿50 at the shop's fees, at full price, 20% off and 30% off.
+    shop = (await get("/api/shops/glow-lab-bkk")).json()
+
+    assert [(e["discount_pct"], e["unit_profit"]) for e in shop["fee_example"]] == [
+        ("0", "21.11"),
+        ("20", "6.67"),
+        ("30", "-0.55"),
+    ]
+    assert {(e["list_price"], e["cost"]) for e in shop["fee_example"]} == {("100", "50")}
+
+
+async def test_the_first_screen_gets_the_recorded_runs_headline_from_the_recording_itself():
+    # Shown before anyone presses play, so every figure must be the recorded run's own: its run_done, its leaders.
+    summary = (await get("/api/arena/recorded")).json()
+
+    assert summary["margin_protected"] == "5434.46"
+    assert summary["verdicts"] == {"approve": 8, "revise": 1, "skip": 2, "escalate": 1}
+    assert summary["rival_changed"] == ["SS-50"]
+    assert (summary["route"], summary["model"], summary["products"]) == ("token-factory", "Gemma-4-31B-IT", 12)
+    assert (summary["calls_ok"], summary["calls_failed"], summary["elapsed_seconds"]) == (60, 0, 248.55)
+    assert summary["recorded_at"] == "2026-10-14T19:51:51+00:00"
+
+
 async def test_decided_sku_explains_its_numbers_with_a_waterfall_scenarios_and_evidence():
     events = await run(FakeModelServer())
 

@@ -185,6 +185,11 @@ def create_app(
         s = await settings()
         return {"route": s.route, "model": s.model}
 
+    @app.get("/api/arena/recorded")
+    async def recorded_run() -> dict:
+        """The recorded run's headline, for the first screen before anyone presses play."""
+        return _recorded_summary(RECORDED_RUN)
+
     @app.get("/api/shops/{shop_id}")
     async def shop(shop_id: Literal["glow-lab-bkk"]) -> dict:
         return describe_shop(load_shop(shop_id))
@@ -387,6 +392,29 @@ async def _replay(path: Path, emit: Emit, sleep: Callable[[float], Awaitable[Non
         await sleep((at - previous) * scale)
         previous = at
         await emit(event)
+
+
+def _recorded_summary(path: Path) -> dict:
+    """What a recorded run found, read from its own events: its run_started, leaders and run_done."""
+    events = [json.loads(line[6:]) for line in path.read_text().splitlines() if line.startswith("data: ")]
+    started = next(e for e in events if e["type"] == "run_started")
+    done = next(e for e in events if e["type"] == "run_done")
+    verdicts = {"approve": 0, "revise": 0, "skip": 0, "escalate": 0}
+    for r in done["results"]:
+        verdicts["skip" if r["skip"] else r["verdict"]] += 1
+    changed = [e["sku"] for e in events if e["type"] == "leader" and e["changed"]]
+    return {
+        "recorded_at": started["recorded_at"],
+        "route": started["route"],
+        "model": started["model"],
+        "products": len(done["results"]),
+        "margin_protected": done["margin_protected"],
+        "verdicts": verdicts,
+        "rival_changed": list(dict.fromkeys(changed)),
+        "calls_ok": done["telemetry"]["calls_ok"],
+        "calls_failed": done["telemetry"]["calls_failed"],
+        "elapsed_seconds": done["telemetry"]["elapsed_seconds"],
+    }
 
 
 def _address(http: Request) -> str:
