@@ -84,6 +84,10 @@ These are model-based estimates for a fictional shop; every figure comes from th
   ฿3,785.96 (70%) from SS-50's Revise, which rests on a labelled sample Seller override (elasticity −2.62 instead of
   the pooled −1.49). At the pooled fit, SS-50 stays an Approve
   ([q56-red-team.md](.scratch/marginarena/research/q56-red-team.md)).
+- **How much rests on the assumptions** ([evidence/sensitivity.md](evidence/sensitivity.md)): Margin Protected is
+  ฿12,787.08 if joining brings no extra traffic (×1.0) and ฿4,581.05 at ×3.0; without the AI Rivals' Counter-moves the
+  engine alone finds ฿2,038.53. Across all 12 products the Rivals found moves that lower the worst case the generic
+  stress test reported by ฿76,929.86 in total.
 - **No plan breaks a check.** Under the same Scenarios, joining as invited breaks a check on 2 products and matching
   the competitor on 3; MarginArena's plans break none ([evidence/policy-comparison.md](evidence/policy-comparison.md)).
 - **An AI Rival changed a decision.** In the recorded 12-product run, the Rivals' Counter-moves changed SS-50's leading
@@ -103,6 +107,7 @@ Every number in this README comes from the engine or from these files:
 | Four pricing policies under the same Scenarios, and Gemma's own arithmetic checked by the engine | [evidence/policy-comparison.md](evidence/policy-comparison.md) |
 | The Evolus Verdict workflow carrying out confirmed Verdicts | [evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md) |
 | The Evolus extractor reading the Campaign Invitation PDF | [evidence/evolus-invitation-extractor.md](evidence/evolus-invitation-extractor.md) |
+| How the Verdicts move with traffic lift, the SS-50 override and the AI Rivals | [evidence/sensitivity.md](evidence/sensitivity.md) |
 | Recorded Arena runs, as streamed | [evidence/runs/](evidence/runs/) |
 
 Why the engine and not the model computes the numbers: given the same facts and formulas, Gemma's own Campaign profit

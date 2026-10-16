@@ -1,0 +1,686 @@
+{
+ "meta": {
+  "measured": "2026-10-16T18:20:57+00:00",
+  "run": "evidence/runs/token-factory-sample-12sku.sse",
+  "red_team_cut_total": "76929.86",
+  "red_team_cut_skus": 12,
+  "red_team_gain_total": "3785.96",
+  "red_team_gain_skus": [
+   "SS-50"
+  ]
+ },
+ "variants": [
+  {
+   "name": "Recorded assumptions (traffic \u00d72.5, SS-50 override, AI Rivals and Strategists)",
+   "verdicts": {
+    "approve": 8,
+    "revise": 1,
+    "skip": 2,
+    "escalate": 1
+   },
+   "margin_protected": "5434.46",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "41139.00",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "43599.09",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "revise",
+     "kept": "67897.70",
+     "protected": "3785.96"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "11347.98",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "53782.92",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "3483.00",
+     "protected": "861.03"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "25472.70",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "20213.73",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "3092.99",
+     "protected": "787.47"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "24133.50",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "8902.95",
+     "protected": "0.00"
+    }
+   ]
+  },
+  {
+   "name": "Traffic lift \u00d71.0",
+   "verdicts": {
+    "approve": 6,
+    "revise": 1,
+    "skip": 5,
+    "escalate": 0
+   },
+   "margin_protected": "12787.08",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "16455.60",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "17383.56",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "revise",
+     "kept": "27176.07",
+     "protected": "1642.39"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "skip",
+     "kept": "6177.89",
+     "protected": "1657.15"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "skip",
+     "kept": "6239.50",
+     "protected": "3307.62"
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "21492.20",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "3483.00",
+     "protected": "2440.53"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "10163.35",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "8102.55",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "3092.99",
+     "protected": "2176.51"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "9653.40",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "skip",
+     "kept": "5085.63",
+     "protected": "1562.88"
+    }
+   ]
+  },
+  {
+   "name": "Traffic lift \u00d71.5",
+   "verdicts": {
+    "approve": 8,
+    "revise": 1,
+    "skip": 3,
+    "escalate": 0
+   },
+   "margin_protected": "7780.16",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "24683.40",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "26075.34",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "revise",
+     "kept": "40756.00",
+     "protected": "2316.71"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "6827.24",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "skip",
+     "kept": "6239.50",
+     "protected": "1841.68"
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "32185.88",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "3483.00",
+     "protected": "1903.50"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "15309.35",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "12111.18",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "3092.99",
+     "protected": "1718.27"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "14480.10",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "5316.15",
+     "protected": "0.00"
+    }
+   ]
+  },
+  {
+   "name": "Traffic lift \u00d72.0",
+   "verdicts": {
+    "approve": 8,
+    "revise": 1,
+    "skip": 2,
+    "escalate": 1
+   },
+   "margin_protected": "5789.78",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "32911.20",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "34907.31",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "revise",
+     "kept": "54352.14",
+     "protected": "3146.01"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "9041.48",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "42984.40",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "3483.00",
+     "protected": "1398.06"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "20455.35",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "16205.10",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "3092.99",
+     "protected": "1245.71"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "19306.80",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "7109.55",
+     "protected": "0.00"
+    }
+   ]
+  },
+  {
+   "name": "Traffic lift \u00d73.0",
+   "verdicts": {
+    "approve": 8,
+    "revise": 1,
+    "skip": 0,
+    "escalate": 3
+   },
+   "margin_protected": "4581.05",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "49366.80",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "52290.87",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "revise",
+     "kept": "81459.63",
+     "protected": "4581.05"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "13654.48",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "64476.60",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "30618.70",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "24307.65",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "28960.20",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "10696.35",
+     "protected": "0.00"
+    }
+   ]
+  },
+  {
+   "name": "SS-50 at the pooled elasticity (no Seller override)",
+   "verdicts": {
+    "approve": 9,
+    "revise": 0,
+    "skip": 2,
+    "escalate": 1
+   },
+   "margin_protected": "1648.50",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "41139.00",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "43599.09",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "approve",
+     "kept": "56201.85",
+     "protected": "0.00"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "11347.98",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "53782.92",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "3483.00",
+     "protected": "861.03"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "25472.70",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "20213.73",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "3092.99",
+     "protected": "787.47"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "24133.50",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "8902.95",
+     "protected": "0.00"
+    }
+   ]
+  },
+  {
+   "name": "Generic Counter-moves only (no AI Rivals)",
+   "verdicts": {
+    "approve": 9,
+    "revise": 0,
+    "skip": 2,
+    "escalate": 1
+   },
+   "margin_protected": "2038.53",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "43685.70",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "48085.17",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "approve",
+     "kept": "86314.94",
+     "protected": "0.00"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "13469.96",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "59863.64",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "4179.60",
+     "protected": "989.01"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "41168.00",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "37954.05",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "4028.08",
+     "protected": "1049.52"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "27136.78",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "9287.25",
+     "protected": "0.00"
+    }
+   ]
+  },
+  {
+   "name": "No AI at all (generic moves, default Plan Ideas)",
+   "verdicts": {
+    "approve": 9,
+    "revise": 0,
+    "skip": 2,
+    "escalate": 1
+   },
+   "margin_protected": "2038.53",
+   "skus": [
+    {
+     "sku": "HB-30",
+     "verdict": "approve",
+     "kept": "43685.70",
+     "protected": "0.00"
+    },
+    {
+     "sku": "NT-200",
+     "verdict": "approve",
+     "kept": "48085.17",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SS-50",
+     "verdict": "approve",
+     "kept": "86314.94",
+     "protected": "0.00"
+    },
+    {
+     "sku": "CN-50",
+     "verdict": "approve",
+     "kept": "13469.96",
+     "protected": "0.00"
+    },
+    {
+     "sku": "VC-30",
+     "verdict": "escalate",
+     "kept": null,
+     "protected": null
+    },
+    {
+     "sku": "AC-150",
+     "verdict": "approve",
+     "kept": "59863.64",
+     "protected": "0.00"
+    },
+    {
+     "sku": "RN-30",
+     "verdict": "skip",
+     "kept": "4179.60",
+     "protected": "989.01"
+    },
+    {
+     "sku": "CG-80",
+     "verdict": "approve",
+     "kept": "41168.00",
+     "protected": "0.00"
+    },
+    {
+     "sku": "LM-15",
+     "verdict": "approve",
+     "kept": "37954.05",
+     "protected": "0.00"
+    },
+    {
+     "sku": "SM-10",
+     "verdict": "skip",
+     "kept": "4028.08",
+     "protected": "1049.52"
+    },
+    {
+     "sku": "CM-100",
+     "verdict": "approve",
+     "kept": "27136.78",
+     "protected": "0.00"
+    },
+    {
+     "sku": "TK-4",
+     "verdict": "approve",
+     "kept": "9287.25",
+     "protected": "0.00"
+    }
+   ]
+  }
+ ]
+}
