@@ -1,4 +1,5 @@
-"""Golden fee cases from the marketplaces' own published worked examples.
+"""Golden fee cases: Lazada's published worked example, and a Shopee example worked by hand from Shopee's
+published rates (Shopee publishes no worked example).
 
 Sources: .scratch/marginarena/research/marketplace-fees.md, sections 2.1 and 4.
 """

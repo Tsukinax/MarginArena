@@ -24,3 +24,11 @@ def test_twenty_percent_off_leaves_6_67_per_unit():
 
     assert result.unit_profit == Decimal("6.67")
     assert result.margin == Decimal("0.0834")
+
+
+def test_thirty_percent_off_loses_0_55_per_unit():
+    # README's third figure: at ฿70 the fees come to ฿20.55, more than the ฿20 left after the ฿50 cost.
+    result = unit_economics(ITEM, PromoPlan(mechanics=(PriceCut(amount=Decimal("30")),)), SHOPEE, CampaignTerms())
+
+    assert result.unit_profit == Decimal("-0.55")
+    assert result.margin == Decimal("-0.0079")

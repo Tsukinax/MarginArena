@@ -1,7 +1,8 @@
 """Marketplace fees for one order of one unit.
 
 Each fee is computed excluding VAT, rounded to the satang, then VAT is added and
-rounded half up. This reproduces both marketplaces' published worked examples.
+rounded half up. This reproduces Lazada's published worked example and our Shopee example, worked by hand
+from Shopee's published rates (Shopee publishes none).
 """
 
 from decimal import ROUND_HALF_UP, Decimal
