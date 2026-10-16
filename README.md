@@ -86,6 +86,10 @@ These are model-based estimates for a fictional shop; every figure comes from th
   ฿3,785.96 (70%) from SS-50's Revise, which rests on a labelled sample Seller override (elasticity −2.62 instead of
   the pooled −1.49). At the pooled fit, SS-50 stays an Approve
   ([q56-red-team.md](.scratch/marginarena/research/q56-red-team.md)).
+- **SS-50's Revise trades average profit for a safer worst case.** Maximin keeps ฿3,785.96 more in the worst case, but
+  averaged over its Scenarios the plan earns ฿79,244.00 against ฿108,260.42 for joining as invited, and joining as
+  invited does better against several single Rival moves in its "How we decided" table. A Seller who prefers the
+  average can join as invited (`sku_decided` for SS-50 in `evidence/runs/token-factory-sample-12sku.sse`).
 - **How much rests on the assumptions** ([evidence/sensitivity.md](evidence/sensitivity.md)): Margin Protected is
   ฿12,787.08 if joining brings no extra traffic (×1.0) and ฿4,581.05 at ×3.0.
 - **The Verdicts do not depend on who plays the Rival.** With a rule-based Rival that always makes the deepest move
