@@ -33,3 +33,7 @@ web/dist/
 .scratch/marginarena/issues/10-act3-competitive-landscape.md
 docs/reports/
 docs/research_notes/
+
+# Video files for the submission (uploaded to lablab, not kept in git)
+.scratch/marginarena/pitch/*.mp4
+.scratch/marginarena/pitch/*.mov
