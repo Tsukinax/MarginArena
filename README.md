@@ -4,11 +4,21 @@
 for every invited product, AI Rivals red-team the leading plan, and each product ends in a Verdict: Approve, Revise
 (including Skip) or Escalate.
 
-Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call goes to
-Gemma-4-31B-IT through AMD Token Factory whenever Token Factory serves it. When it can't (Gemma had no workers for
-part of 15 Oct, and that night it left Token Factory's catalogue), the app uses DeepSeek-V4-Flash on the same route
-and names the model that answered. Every Arena run and explanation recorded in [`evidence/`](evidence/) was answered
-by Gemma, except the labelled fallback run `evidence/runs/token-factory-sample-4sku-deepseek-fallback.sse`.
+Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call runs on
+Gemma-4-31B-IT through **AMD Token Factory**; Evolus reads the Campaign Invitation and carries out the Verdicts.
+
+**Try it in one minute** at **https://marginarena.vercel.app** (no key, no sign-up):
+
+1. Press **Watch the recorded Arena**: a real 12-product run on AMD Token Factory, replayed in about 20 seconds.
+2. The Arena opens on **Daily Sunscreen**, where an AI Rival's Counter-move changed the leading plan in both rounds.
+3. Press **See the Verdicts**: 8 Approve, 1 Revise, 2 Skip, 1 Escalate. Open any product's **How we decided**, then
+   press **ไทย** for Gemma's explanation in Thai, checked number by number against the engine.
+4. Press **Review and confirm** to hand the Verdicts to the Evolus workflow.
+
+**What it found on the sample shop:** following the Verdicts keeps **฿5,434.46** more profit in the worst case than
+joining every product as invited, and none of its plans breaks a check ([details and caveats](#what-it-found-on-the-sample-shop)).
+
+![The Arena after the recorded run: AI Rivals' Counter-moves change the sunscreen's leading plan twice](docs/images/arena.png)
 
 ## The problem
 
@@ -76,9 +86,10 @@ These are model-based estimates for a fictional shop; every figure comes from th
   ([q56-red-team.md](.scratch/marginarena/research/q56-red-team.md)).
 - **No plan breaks a check.** Under the same Scenarios, joining as invited breaks a check on 2 products and matching
   the competitor on 3; MarginArena's plans break none ([evidence/policy-comparison.md](evidence/policy-comparison.md)).
-- **An AI Rival changed a decision.** Live on Token Factory, a Rival's Counter-move turned SS-50's Approve into a Revise
-  that keeps ฿3,728.85 more in the worst case
-  ([evidence/red-team-token-factory.md](evidence/red-team-token-factory.md)).
+- **An AI Rival changed a decision.** In the recorded 12-product run, the Rivals' Counter-moves changed SS-50's leading
+  plan in both rounds (the ฿3,785.96 above). It happened again in a separate live 4-product run on Token Factory,
+  where the Revise keeps ฿3,728.85 more in the worst case
+  ([evidence/red-team-token-factory.md](evidence/red-team-token-factory.md)). Both rest on the SS-50 override.
 
 ## Evidence
 
@@ -103,6 +114,10 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
   Gemma-4-31B-IT through **AMD Token Factory**, AMD's hosted model API. The organisers confirmed that Token Factory
   counts as the AMD component for ACT III ([ADR 0005](docs/adr/0005-token-factory-is-the-only-inference-route.md)).
   Token Factory does not say which GPUs serve it, so we make no claim about the hardware.
+- **Which model answered:** every Arena run and explanation recorded in [`evidence/`](evidence/) was answered by
+  Gemma-4-31B-IT, except the labelled fallback run `evidence/runs/token-factory-sample-4sku-deepseek-fallback.sse`.
+- **Scale on Token Factory:** each product gets 1 Strategist and 2 Rivals over 2 rounds, because the account allows 20
+  requests a minute.
 - **When Gemma is unavailable:** the app reads Token Factory's model catalogue before a run and starts on
   DeepSeek-V4-Flash when Gemma is not listed; if a call answers that Gemma has no workers or is not served, the rest
   of the run switches. The sidebar, the Arena header and each explanation name the model that answered. On 15 Oct at
