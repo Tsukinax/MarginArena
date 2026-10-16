@@ -291,7 +291,10 @@ export type WorkflowResult = {
   approval_request: string | null
 }
 
-export type Confirmation = { status: string | null; result: WorkflowResult | string | null }
+/** Evolus's trail of a run: each step's time in ms (steps numbered from 1), and the credits it used. */
+export type RunTrail = { step_ms: Record<string, number | null> | null; credits: number | null }
+
+export type Confirmation = { status: string | null; result: WorkflowResult | string | null } & Partial<RunTrail>
 
 /** The Verdict workflow's run on the recorded Arena's Verdicts (15 Oct), shown when a live run cannot start. */
 export type RecordedWorkflowRun = {
@@ -299,6 +302,7 @@ export type RecordedWorkflowRun = {
   completed_at: string
   seconds: number
   credits: number
+  step_ms: Record<string, number | null>
   result: WorkflowResult
   recorded: true
 }

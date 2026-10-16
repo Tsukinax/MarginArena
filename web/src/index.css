@@ -335,7 +335,8 @@ button:disabled {
   font-size: 13px;
 }
 
-.sku-table thead th.num {
+.sku-table thead th.num,
+.sku-table td.num {
   text-align: right;
 }
 
@@ -1264,4 +1265,37 @@ button:disabled {
 
 .group .flip-note {
   color: #b8255f;
+}
+
+/* Step 4: the Evolus workflow's own trail of the run */
+.trail {
+  list-style: decimal inside;
+  margin: 10px 0 18px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  max-width: 75ch;
+}
+
+.trail li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+}
+
+.trail li:first-child {
+  border-top: 0;
+}
+
+.trail li > span:first-child {
+  flex: 1;
+}
+
+.trail .trail-total {
+  list-style: none;
+  font-weight: 600;
+  background: var(--bg);
 }

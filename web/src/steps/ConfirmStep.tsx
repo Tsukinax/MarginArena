@@ -4,6 +4,7 @@ import {
   confirmVerdicts,
   getConfirmation,
   getRecordedConfirmation,
+  type RunTrail,
   type Shop,
   type SkuResult,
   type WorkflowResult,
@@ -18,9 +19,19 @@ type Run =
       state: 'done'
       executionId: string
       result: WorkflowResult
+      trail?: RunTrail
       recorded?: { liveError: string; completedAt: string; seconds: number; credits: number }
     }
   | { state: 'error'; message: string }
+
+/** The Verdict workflow's five steps, as infra/evolus/evolus_kit.py builds them. */
+const STEPS = [
+  'Split the Verdicts (script)',
+  'Write the bulk-upload file',
+  'Draft the approval request (Campaign Desk agent on AMD Token Factory)',
+  'Assemble the result (script)',
+  'Result',
+]
 
 const POLL_MS = 3000
 const MAX_POLLS = 60 // about 3 minutes
@@ -53,6 +64,7 @@ export default function ConfirmStep({ results, shop, recorded }: Props) {
           state: 'done',
           executionId: saved.execution_id,
           result: saved.result,
+          trail: { step_ms: saved.step_ms, credits: saved.credits },
           recorded: { liveError: message, completedAt: saved.completed_at, seconds: saved.seconds, credits: saved.credits },
         })
       } catch {
@@ -65,7 +77,7 @@ export default function ConfirmStep({ results, shop, recorded }: Props) {
         const c = await getConfirmation(executionId)
         setRun({ state: 'running', executionId, status: c.status })
         if (c.status === 'Completed' && c.result && typeof c.result === 'object') {
-          setRun({ state: 'done', executionId, result: c.result })
+          setRun({ state: 'done', executionId, result: c.result, trail: { step_ms: c.step_ms ?? null, credits: c.credits ?? null } })
           return
         }
         if (c.status === 'Failed') throw new Error(`The Evolus workflow failed (run ${executionId}).`)
@@ -139,6 +151,26 @@ export default function ConfirmStep({ results, shop, recorded }: Props) {
             </p>
           )}
           <p className="small">Run {run.executionId}. The file's columns are MarginArena's; Seller Centre's template is not public.</p>
+          {run.trail?.step_ms && (
+            <ol className="trail" aria-label="What the Evolus workflow did, step by step">
+              {STEPS.map((name, i) => (
+                <li key={name}>
+                  <span>{name}</span>
+                  <span className="num">
+                    {run.trail?.step_ms?.[String(i + 1)] == null
+                      ? '–'
+                      : `${(run.trail.step_ms[String(i + 1)] as number).toLocaleString('en-US')} ms`}
+                  </span>
+                </li>
+              ))}
+              <li className="trail-total">
+                <span>
+                  Evolus credits used{escalated.length > 0 && ` · waiting for a person: ${escalated.map((r) => r.sku).join(', ')}`}
+                </span>
+                <span className="num">{run.trail.credits ?? '–'}</span>
+              </li>
+            </ol>
+          )}
           <table className="sku-table">
             <thead>
               <tr>
