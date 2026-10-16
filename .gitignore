@@ -37,3 +37,6 @@ docs/research_notes/
 # Video files for the submission (uploaded to lablab, not kept in git)
 .scratch/marginarena/pitch/*.mp4
 .scratch/marginarena/pitch/*.mov
+
+# Pitch materials: the deck source, the video build and the submission files (uploaded to lablab, not product code)
+.scratch/marginarena/pitch/
