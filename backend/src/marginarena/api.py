@@ -47,6 +47,10 @@ SAMPLE_INVITATION = Path(__file__).resolve().parent / "sample" / "glow-lab-bkk-i
 # and the event workspace expires before judging may end, so these are shown, labelled as recorded.
 RECORDED_READING = Path(__file__).resolve().parent / "sample" / "recorded" / "evolus-invitation-reading.json"
 RECORDED_WORKFLOW = Path(__file__).resolve().parent / "sample" / "recorded" / "evolus-verdict-workflow.json"
+# Gemma's English and Thai explanations of the recorded run's 12 Verdicts (backend/scripts/record_explanations.py),
+# each keyed by the fingerprint of the exact Verdict it explains. Judges get them at once, labelled as recorded, even
+# while Token Factory is down; asking again with `live` calls the model.
+RECORDED_EXPLANATIONS = Path(__file__).resolve().parent / "sample" / "recorded" / "explanations-12sku.json"
 # Each server process limits the calls that spend shared quota: Token Factory allows 20 requests a minute per account,
 # and every Evolus call leaves an execution in the event workspace. The limits are per client address and, with the
 # _ALL ceilings, for everyone together. They hold per process: Vercel may run several. Recorded runs and readings are
@@ -75,6 +79,8 @@ class ExplainRequest(BaseModel):
     result: dict
     """One decided SKU, exactly as the Arena returned it."""
     language: Language = "th"
+    live: bool = False
+    """Ask the model even when an explanation recorded for this exact Verdict exists."""
 
 
 class ConfirmRequest(BaseModel):
@@ -152,6 +158,7 @@ def create_app(
     polls = Quota(POLLS_PER_HOUR)
     lease: dict = {"until": 0.0, "owner": None}  # while a live run holds Token Factory, another would stall both
     explained: dict[tuple[str, str], dict] = {}  # each signed Verdict is written once per language
+    recorded_explanations = _recorded_explanations(RECORDED_EXPLANATIONS)
     finished: dict[str, dict] = {}  # Evolus runs that completed or failed: their answer no longer changes
 
     def release(owner: object | None) -> None:
@@ -261,6 +268,9 @@ def create_app(
     @app.post("/api/explain")
     async def explain_verdict(request: ExplainRequest, http: Request) -> dict:
         check_signed(request.result)
+        saved = None if request.live else recorded_explanations.get((result_digest(request.result), request.language))
+        if saved is not None:
+            return {**saved, "recorded": True}
         written = (request.result["signature"], request.language)
         if written in explained:
             return explained[written]
@@ -473,8 +483,29 @@ def _confirmed(r: dict) -> dict:
     }
 
 
-def _signature(result: dict, key: bytes) -> str:
-    """HMAC of one decided SKU, over every field except the event type and the signature itself."""
+def _canonical(result: dict) -> bytes:
+    """One decided SKU as stable bytes: every field except the event type and the signature itself."""
     body = {k: v for k, v in result.items() if k not in ("type", "signature")}
-    message = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
-    return hmac.new(key, message.encode(), hashlib.sha256).hexdigest()
+    return json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str).encode()
+
+
+def _signature(result: dict, key: bytes) -> str:
+    """HMAC of one decided SKU, over the same fields as its fingerprint."""
+    return hmac.new(key, _canonical(result), hashlib.sha256).hexdigest()
+
+
+def result_digest(result: dict) -> str:
+    """The fingerprint of one decided SKU: a recorded explanation is served only for the exact Verdict it explains."""
+    return hashlib.sha256(_canonical(result)).hexdigest()
+
+
+def _recorded_explanations(path: Path) -> dict[tuple[str, str], dict]:
+    """Recorded explanations that passed the number check, by (fingerprint, language); none without the file."""
+    if not path.exists():
+        return {}
+    entries = json.loads(path.read_text())["explanations"]
+    return {
+        (e["digest"], e["language"]): {k: v for k, v in e.items() if k not in ("digest", "sku")}
+        for e in entries
+        if e.get("source") == "model"
+    }

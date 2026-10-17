@@ -12,7 +12,7 @@ import pytest
 
 from marginarena import api
 from marginarena.api import create_app
-from marginarena.explainer import MAX_DRAFTS
+from marginarena.explainer import MAX_DRAFTS, fact_sheet, unsupported_numbers
 from marginarena.llm import MAX_ATTEMPTS, LLMSettings
 
 SETTINGS = LLMSettings(route="token-factory", base_url="http://model.test/v1", api_key="test", model="Gemma-4-31B-IT")
@@ -249,3 +249,123 @@ async def test_each_language_is_written_once_and_only_model_calls_use_the_quota(
     assert codes == [200, 200, 200, 200]
     assert len(calls) == 2  # one Thai and one English draft; the repeats came from the cache
     assert refused.status_code == 429
+
+
+async def replayed_results() -> list[dict]:
+    """The recorded 12-SKU run's results, replayed and signed as the UI receives them; no model is involved."""
+    down = httpx.MockTransport(lambda _r: httpx.Response(500))
+    app = create_app(llm_settings=SETTINGS, llm_transport=down, sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        async with client.stream("POST", "/api/arena", json={"recorded": True}) as response:
+            events = [json.loads(line[6:]) async for line in response.aiter_lines() if line.startswith("data: ")]
+    assert events[-1]["type"] == "run_done"
+    return events[-1]["results"]
+
+
+def saved_explanation(result: dict, language: str, text: str) -> dict:
+    return {
+        "digest": api.result_digest(result),
+        "sku": result["sku"],
+        "language": language,
+        "text": text,
+        "source": "model",
+        "rejected": [],
+        "route": "token-factory",
+        "model": "Gemma-4-31B-IT",
+        "written_at": "2026-10-17T12:00:00+00:00",
+    }
+
+
+async def test_a_replayed_verdict_gets_its_recorded_explanation_without_calling_the_model(tmp_path, monkeypatch):
+    # Judges press ไทย on the recorded run, maybe weeks later while Token Factory is down. The explanation Gemma wrote
+    # for that exact Verdict is served at once, labelled as recorded, and the model server is never called.
+    sm10 = next(r for r in await replayed_results() if r["sku"] == "SM-10")
+    text = f"Skip: ไม่เข้าร่วมยังได้กำไร ฿{sm10['dont_join_total']} ในกรณีแย่ที่สุด"
+    path = tmp_path / "explanations.json"
+    path.write_text(json.dumps({"explanations": [saved_explanation(sm10, "th", text)]}, ensure_ascii=False))
+    monkeypatch.setattr(api, "RECORDED_EXPLANATIONS", path)
+    calls: list[httpx.Request] = []
+
+    def model(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return answer({"explanation": "a live draft"})
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(model), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        body = (await client.post("/api/explain", json={"result": sm10, "language": "th"})).json()
+
+    assert body["text"] == text
+    assert body["recorded"] is True
+    assert body["model"] == "Gemma-4-31B-IT" and body["source"] == "model"
+    assert body["written_at"] == "2026-10-17T12:00:00+00:00"
+    assert calls == []
+
+
+async def test_live_asks_the_model_even_when_a_recorded_explanation_exists(tmp_path, monkeypatch):
+    sm10 = next(r for r in await replayed_results() if r["sku"] == "SM-10")
+    path = tmp_path / "explanations.json"
+    saved = saved_explanation(sm10, "th", f"Skip: ฿{sm10['dont_join_total']}")
+    path.write_text(json.dumps({"explanations": [saved]}, ensure_ascii=False))
+    monkeypatch.setattr(api, "RECORDED_EXPLANATIONS", path)
+    live = f"Skip: ไม่เข้าร่วมได้ ฿{sm10['dont_join_total']}"
+    calls: list[httpx.Request] = []
+
+    def model(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return answer({"explanation": live})
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(model), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        asked = (await client.post("/api/explain", json={"result": sm10, "language": "th", "live": True})).json()
+        english = (await client.post("/api/explain", json={"result": sm10, "language": "en"})).json()
+
+    assert asked["text"] == live and not asked.get("recorded")
+    assert not english.get("recorded")  # nothing was recorded in English for it, so the model wrote one
+    assert len(calls) == 2
+
+
+async def test_a_changed_verdict_never_gets_the_recorded_explanation(tmp_path, monkeypatch):
+    # The fingerprint covers every field the signature covers: a Verdict from another run gets a live explanation.
+    results = await replayed_results()
+    sm10 = next(r for r in results if r["sku"] == "SM-10")
+    other = await decided("SM-10")
+    path = tmp_path / "explanations.json"
+    path.write_text(json.dumps({"explanations": [saved_explanation(sm10, "th", "recorded text")]}, ensure_ascii=False))
+    monkeypatch.setattr(api, "RECORDED_EXPLANATIONS", path)
+
+    body = await explain(other, "th", [f"Skip: ฿{other['dont_join_total']}"])
+
+    assert body["text"] != "recorded text" and not body.get("recorded")
+
+
+async def test_every_replayed_verdict_ships_a_recorded_gemma_explanation_in_both_languages():
+    # The shipped file (backend/scripts/record_explanations.py) must match the shipped recording, and every text in
+    # it must still pass the number check against that Verdict's facts.
+    results = await replayed_results()
+    shipped = json.loads(api.RECORDED_EXPLANATIONS.read_text())["explanations"]
+    saved = {(e["digest"], e["language"]): e for e in shipped}
+    for result in results:
+        for language in ("en", "th"):
+            entry = saved[(api.result_digest(result), language)]
+            assert entry["source"] == "model" and entry["model"] == "Gemma-4-31B-IT", (result["sku"], language)
+            assert unsupported_numbers(entry["text"], fact_sheet(result)) == [], (result["sku"], language)
+
+
+async def test_the_facts_keep_plans_searched_apart_from_moves_tested_and_reserve_margin_floor():
+    # Hand review of the recorded explanations (17 Oct) found Gemma writing "tested against 183 Promo Plans" and
+    # calling a 30.8% margin the "Margin Floor". The facts now say what each number is in separate sentences.
+    sm10 = next(r for r in await replayed_results() if r["sku"] == "SM-10")
+    seen: list[dict] = []
+
+    def model(request: httpx.Request) -> httpx.Response:
+        seen.append(json.loads(request.content))
+        return answer({"explanation": f"Skip: ฿{sm10['dont_join_total']}"})
+
+    app = create_app(llm_settings=SETTINGS, llm_transport=httpx.MockTransport(model), sleep=no_sleep)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        await client.post("/api/explain", json={"result": sm10, "language": "en", "live": True})
+    system, user = (m["content"] for m in seen[0]["messages"])
+
+    assert f"The engine compared {sm10['plans_searched']} Promo Plans" in user
+    assert "Promo Plans searched" not in user
+    assert "Margin Floor" in system and "never call any other percentage the Margin Floor" in system
