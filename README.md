@@ -15,9 +15,9 @@ Verdicts.
 1. Press **Watch the recorded Arena**: a real 12-product run on AMD Token Factory, replayed in about 20 seconds.
 2. The Arena opens on **Daily Sunscreen**, where an AI Rival's Counter-move changed the leading plan in both rounds.
 3. Press **See the Verdicts**: 8 Approve, 1 Revise, 2 Skip, 1 Escalate. Open any product's **How we decided**, then
-   press **ไทย** for Gemma's explanation in Thai, checked number by number against the engine. It is a live Token
-   Factory call: usually a few seconds, but it has hung for about 140 s before a numbers-only explanation; the
-   drawer's numbers and chart don't depend on it.
+   press **ไทย** for Gemma's explanation in Thai, checked number by number against the engine. For the recorded run it
+   is the explanation Gemma wrote for that exact Verdict on 17 Oct, read by a person and shown at once, labelled as
+   recorded; **Ask Gemma again (live)** calls Token Factory (usually seconds, but it has hung for about 140 s).
 4. Press **Review and confirm** to hand the Verdicts to the Evolus workflow.
 
 **What it found on the sample shop:** skipping two of the 12 products keeps **฿1,648.50** more profit in the worst case
@@ -166,6 +166,7 @@ come from the last two, with their sources:
 | Elasticity fit and its holdout against a naive baseline | [evidence/elasticity.md](evidence/elasticity.md) |
 | Red-teaming turning SS-50's Approve into a Revise, live on Token Factory (with the labelled override) | [evidence/red-team-token-factory.md](evidence/red-team-token-factory.md) |
 | Thai and English explanations checked number by number | [evidence/explainer-token-factory.md](evidence/explainer-token-factory.md) |
+| Gemma's explanations of the 12 replayed Verdicts, and the hand review that caught 5 wrong labels | [evidence/explainer-replay-12sku.md](evidence/explainer-replay-12sku.md) |
 | Four pricing policies under the same Scenarios, and Gemma's own arithmetic checked by the engine | [evidence/policy-comparison.md](evidence/policy-comparison.md) |
 | The Evolus Verdict workflow carrying out confirmed Verdicts | [evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md) |
 | The Evolus extractor reading the Campaign Invitation PDF | [evidence/evolus-invitation-extractor.md](evidence/evolus-invitation-extractor.md) |
