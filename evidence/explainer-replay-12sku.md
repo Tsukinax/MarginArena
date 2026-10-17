@@ -6,7 +6,7 @@ Reproduce: `uv run --project backend --env-file .env python backend/scripts/reco
 - **Asked:** 32 explanations (12 Verdicts × English and Thai), through `/api/explain` with `live`.
 - **Passed the number check on the first draft:** 32; **after one rewrite:** 0; **numbers-only template:** 0; **written by a model other than Gemma-4-31B-IT:** 0.
 - **Served by the app:** the 24 that Gemma-4-31B-IT wrote and that passed the check, each only for the exact Verdict it explains (`api.result_digest`), labelled as recorded. Any other request asks the model live.
-- **The check proves numbers, not labels:** a right number can still sit next to the wrong words, so a person reads every text. Asked again after that review: 8; no longer served: none. Every answer is below, in the order asked.
+- **The check proves numbers, not labels:** a right number can still sit next to the wrong words, so every text is reviewed against its Verdict's figures. Asked again after that review: 8; no longer served: none. Every answer is below, in the order asked.
 
 | SKU | Verdict | Language | Source | Rejected drafts | Model | Seconds |
 |---|---|---|---|---|---|---|

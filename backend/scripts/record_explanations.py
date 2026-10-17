@@ -12,9 +12,9 @@ passed the number check are kept for the app; every answer, kept or not, goes to
 Writes backend/src/marginarena/sample/recorded/explanations-12sku.json (what the app serves) and
 evidence/explainer-replay-12sku.json and .md (the report).
 
-The number check proves numbers, not labels, so every text is also read by a person. Ask again for the ones that
-put a number on the wrong label, keeping the rest: `--only SKU:lang,SKU:lang`. Stop serving one: `--drop SKU:lang`
-(the app then asks the model live for it). Both keep every earlier answer in the evidence.
+The number check proves numbers, not labels, so every text is also reviewed against its Verdict's figures. Ask
+again for the ones that put a number on the wrong label, keeping the rest: `--only SKU:lang,SKU:lang`. Stop serving
+one: `--drop SKU:lang` (the app then asks the model live for it). Both keep every earlier answer in the evidence.
 """
 
 from __future__ import annotations
@@ -136,8 +136,8 @@ def report(r: dict) -> str:
         f"- **Served by the app:** the {len(r['explanations'])} that {MODEL} wrote and that passed the check, each "
         "only for the exact Verdict it explains (`api.result_digest`), labelled as recorded. Any other request asks "
         "the model live.",
-        "- **The check proves numbers, not labels:** a right number can still sit next to the wrong words, so a "
-        "person reads every text. Asked again after that review: "
+        "- **The check proves numbers, not labels:** a right number can still sit next to the wrong words, so every "
+        "text is reviewed against its Verdict's figures. Asked again after that review: "
         f"{len(rows) - len({(a['sku'], a['language']) for a in rows})}; no longer served: "
         f"{', '.join(r.get('dropped', [])) or 'none'}. Every answer is below, in the order asked.",
         "",

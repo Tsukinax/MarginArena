@@ -37,4 +37,5 @@ Arena uses. Only that bundled sample is ever sent, because Token Factory may see
 failed with 502 on 15 Oct, so the extractor reads the PDF's own text; a scanned invitation would need OCR again. Two
 runs are recorded in `evidence/evolus-invitation-extractor.md`.
 
-API facts and quirks: `docs/api-guide/evolus-api.md`. Why the Arena bypasses Evolus: `docs/adr/0003`.
+API facts and quirks: the Evolus MCP endpoint `https://api.evolus.ai/mcp` (`tools/list`) documents every request body.
+Why the Arena bypasses Evolus: `docs/adr/0003-arena-bypasses-evolus.md`.

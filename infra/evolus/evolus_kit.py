@@ -13,7 +13,8 @@ Run from the repo root with the keys from .env:
           workspace's own models from "Your models") the Campaign Desk agent and the Verdict workflow; --fallback
           names the model the agent falls back to. Saves the IDs to .env. Ask the user before every run.
 
-With --model it also builds the Campaign Invitation extractor. API notes: docs/api-guide/evolus-api.md.
+With --model it also builds the Campaign Invitation extractor. Request bodies: the Evolus MCP endpoint
+https://api.evolus.ai/mcp (tools/list).
 """
 
 from __future__ import annotations

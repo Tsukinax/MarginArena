@@ -113,6 +113,9 @@ Inputs:
 | ฿50 (50% gross margin) | ฿21.11 | ฿6.67 | **3.2×** | **−฿0.54** |
 | ฿60 (40% gross margin) | ฿11.11 | **−฿3.33** | never | −฿10.54 |
 
+This table rounds once at the end. The engine rounds each fee to the satang before adding VAT, so for the first row it
+gives −฿0.55 at 30% off (`backend/tests/engine/test_unit_profit.py`), the figure used in the README and the pitch.
+
 Lazada's March 2026 Campaign lifted regional platform GMV by just over 3.5× [19]. A 20% discount on a 50%-margin SKU needs 3.2× just to break even on profit. So whether a Campaign pays depends on the SKU and the discount. A single platform-wide multiplier cannot answer it.
 
 ## 3. How often do Sellers report margin squeeze? 2026 fee rises and the reaction
