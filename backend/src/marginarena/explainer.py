@@ -116,6 +116,7 @@ def fact_sheet(r: dict) -> str:
             f"worst-case margin per unit {_pct(r['chosen_worst_margin'])}."
         )
     lines.append(f"Not joining: worst-case Campaign profit {_money(r['dont_join_total'])}.")
+    lines.append(f"The engine compared {r['plans_searched']} Promo Plans for this product before choosing.")
     if r["verdict"] != "escalate":
         lines.append(f"Margin Protected by following this Verdict: {_money(r['protected'])}.")
     w = r["waterfall"]
@@ -128,8 +129,7 @@ def fact_sheet(r: dict) -> str:
     lines.append(
         f"Hardest Counter-move: {hardest['rival']}, rival price {_money(hardest['effective_rival_price'])}; against "
         f"it, {w['plan']} keeps {_money(hardest['shown_worst'])} in the worst case across the elasticity band. "
-        f"Tested against {r['scenarios']} Counter-moves over {r['rounds_played']} rounds; "
-        f"{r['plans_searched']} Promo Plans searched."
+        f"The plan was tested against {r['scenarios']} Counter-moves over {r['rounds_played']} rounds."
     )
     if Decimal(r["red_team_cut"]) > 0:
         lines.append(
@@ -154,7 +154,8 @@ def _system(language: Language) -> str:
         "the plan was tested against. Use only numbers that appear in FACTS, written with digits, and say what each "
         "number measures by translating its label in FACTS. You may round a number, but never add, subtract, "
         "multiply or estimate a new one. Keep these words in English: Approve, Revise, Skip, Escalate, Promo Plan, "
-        "Margin Floor, Counter-move, Campaign. "
+        "Margin Floor, Counter-move, Campaign. The Margin Floor is only the Seller's minimum on the Margin Floor line: "
+        "never call any other percentage the Margin Floor. "
         'Reply with JSON only: {"explanation": "<your text>"}'
     )
 
