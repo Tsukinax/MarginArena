@@ -8,11 +8,11 @@ Blocked by: none
 
 How do we connect our own OpenAI-compatible vLLM endpoint as the model in an Evolus event workspace? For each building block (workflows, document extractors, AI Tools, knowledge libraries, MCP connectors, sub-agents, chat widget), what does it do, and which REST or OpenAI-compatible API drives it? Can an Evolus agent or workflow call our own engine over HTTP, MCP or an AI Tool? What are the limits (credits, requests per minute), and what do Evolus staff check when they judge a workspace?
 
-Findings: `.scratch/marginarena/research/evolus-integration.md`
+Findings: `.scratch/marginarena/research/evolus-integration.md` (kept locally, not in git: it names other teams' repos)
 
 ## Answer
 
-Full findings: [research/evolus-integration.md](../research/evolus-integration.md)
+Full findings: `research/evolus-integration.md` (kept locally, not in git)
 
 - **Connecting our model:**
   - Start vLLM on our droplet with `--api-key --enable-auto-tool-choice --tool-call-parser <parser>`.

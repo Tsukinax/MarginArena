@@ -16,7 +16,7 @@ Record the results; they are AMD evidence.
 
 ## Comments
 
-- 14 Oct: the droplet kit is merged (`infra/droplet/`, commit b63ad33; 27 tests). `kit.py prepare` has run: the SSH key is `~/.ssh/marginarena_droplet_ed25519`, and VLLM_API_KEY is in `.env`. The gate is `python3 infra/droplet/kit.py gate`, which writes `evidence/gate-gemma-tool-calling.{md,json}`. It is still blocked on the user creating the droplet (`infra/droplet/README.md`).
+- 14 Oct: the droplet kit is merged (`infra/droplet/`, commit 2a946ac; 27 tests). `kit.py prepare` has run: the SSH key is `~/.ssh/marginarena_droplet_ed25519`, and VLLM_API_KEY is in `.env`. The gate is `python3 infra/droplet/kit.py gate`, which writes `evidence/gate-gemma-tool-calling.{md,json}`. It is still blocked on the user creating the droplet (`infra/droplet/README.md`).
 - 15 Oct: deferred. Under ADR 0005 there is no droplet unless the user chooses a paid GPU session on Friday (Q57).
   Evolus "Your models" tested the Token Factory connection instead: Qwen3.8-27B passed answers, tool calling,
   streaming and reasoning; Gemma-4-31B-IT failed because Token Factory had no Gemma workers at the time (500

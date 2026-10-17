@@ -30,7 +30,7 @@ red team adds.
 
 - **The red team still finds real risk in A.** The recorded moves cut the worst case of the plan chosen against the
   generic moves by up to ฿27,468 (AC-150); NT-200 loses ฿16,262. The plan holds, but the Seller's worst case was too
-  rosy. Commit 303884e now reports this as `red_team_cut`.
+  rosy. Commit 352ffaf now reports this as `red_team_cut`.
 - **Decisions hinge on two unsourced assumptions:** k, and the weak edge of the elasticity band (−0.77), which
   penalises deeper cuts in the worst case.
 - **A per-SKU elasticity override changes nothing on its own** (C): the band comes from the shop's `CampaignTerms`, so
@@ -47,7 +47,7 @@ red team adds.
 
 ## Options for Q56
 
-1. Keep the assumptions; show the red team as risk discovery (done in 303884e). Honest, but the demo never shows the
+1. Keep the assumptions; show the red team as risk discovery (done in 352ffaf). Honest, but the demo never shows the
    AI changing a plan.
 2. Option 1, plus one labelled Seller override on a lookalike-heavy SKU (for example SS-50 sunscreen at the
    literature mean, with its own band), so the demo can show the AI turning an Approve into a Revise. Q51 already

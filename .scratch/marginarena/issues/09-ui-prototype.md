@@ -23,4 +23,4 @@ Chosen by the user on 14 Oct: **C as the backbone, with A's Arena and B's charts
   - The mock engine uses the real Shopee fee rate (27.82% + ฿1.07) and per-SKU elasticities from −1.1 to −2.9.
   - The demo shop gets 7 Approve, 2 Revise and 3 Escalate verdicts; ฿23,156 of margin protected; 432 LLM calls.
   - Waiting on the user to choose a variant.
-- 14 Oct: the prototype is captured on branch `prototype/arena-ui` (commit 349a06d) as a primary source, and main has none of its code. To view it again: `git switch prototype/arena-ui && npm --prefix web run prototype`.
+- 14 Oct: the prototype is captured on branch `prototype/arena-ui` (commit 7160146) as a primary source, and main has none of its code. To view it again: `git switch prototype/arena-ui && npm --prefix web run prototype`.

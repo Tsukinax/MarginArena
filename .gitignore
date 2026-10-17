@@ -30,6 +30,7 @@ web/dist/
 
 # Hackathon research that names or scores other ACT III teams, and the event notes it came from (kept locally only)
 .scratch/marginarena/research/act3-*.md
+.scratch/marginarena/research/evolus-integration.md
 .scratch/marginarena/issues/10-act3-competitive-landscape.md
 docs/reports/
 docs/research_notes/
