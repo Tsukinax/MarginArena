@@ -10,6 +10,7 @@ node_modules/
 # Local AI tooling and private brainstorming (not part of the product)
 .agents/
 .claude/
+CLAUDE.md
 skills-lock.json
 docs/chatai-context/
 # Notes for AI coding agents and our API notes (kept locally)
