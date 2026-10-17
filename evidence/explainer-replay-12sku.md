@@ -127,3 +127,10 @@ Every text was read against its Verdict's figures, because the number check prov
   superseded answers stay in the table and texts above. 21 of the 24 served texts were written with the earlier fact
   sheet and prompt.
 - No served text presents the Rivals' Counter-moves as risk only AI found.
+
+## Speed on the live site (18 Oct 2026, 03:54 ICT)
+
+- **Recorded explanation, served:** 5 requests to https://marginarena.vercel.app/api/explain (Thai; SM-10, SS-50,
+  RN-30, VC-30, HB-30 from the recorded run), timed with curl from Thailand: 0.16 to 0.19 s each, median 0.17 s.
+- **Asked live:** the 32 answers in the table above took 6.1 to 77.3 s each (median 13.45 s), measured by the script
+  on 17 Oct.

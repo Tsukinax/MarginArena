@@ -1,29 +1,46 @@
 # MarginArena
 
-**Check a marketplace Campaign Invitation before you join it.** A deterministic pricing engine costs every Promo Plan
-for every invited product, AI Rivals red-team the leading plan, and each product ends in a Verdict: Approve, Revise
-(including Skip) or Escalate.
+**Before a big sale like 11.11, Shopee asks sellers to discount chosen products. MarginArena checks every invited
+product first and tells the seller, in plain words: join, join with a better offer, skip, or let the owner decide.**
 
-Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every model call MarginArena
-makes goes to **AMD Token Factory**: Gemma-4-31B-IT answered every recorded Arena and explanation run except one
-labelled DeepSeek-V4-Flash fallback run. The app switches to that fallback only when Token Factory does not list Gemma,
-or answers that Gemma has no workers or is not served. Evolus reads the Campaign Invitation and carries out the
-Verdicts.
+Sellers often say yes without knowing whether a discount still makes money after Shopee's fees, or what competitors
+will do in reply. MarginArena works it out product by product: a pricing engine computes every number, AI plays the
+competitors to stress-test each plan and explains the result in Thai or English, and nothing happens until the seller
+confirms.
+
+### Impact at a glance
+
+On a fictional 12-product sample shop with Shopee Thailand's real fees (model-based estimates from the engine; no real
+seller has used it yet):
+
+| What we measured | Result |
+|---|---|
+| Profit kept by skipping 2 of the 12 products | **฿1,648.50** more in the worst case: **+32.8%** and **+34.2%** on those products |
+| With a labelled override on one sunscreen | **฿5,434.46** more across the 11 products it decided (+1.8%) |
+| Plans that break a check (the invited discount, the Margin Floor, a brand rule, earning less than not joining) | **0** of 11 with MarginArena; 2 joining as invited; 3 matching the competitor |
+| The AI doing the profit math itself | off by a median **61.69%**, so the engine computes every number |
+| Valid AI answers in the recorded run | **60 of 60** |
+| Thai explanation on the recorded run | **0.17 s** (recorded, number-checked, read by a person); asked live, 6.1 to 77.3 s |
+| Evolus workflow run | **0** credits; nothing is sent until the seller confirms |
+
+Sources: [evidence/sensitivity.md](evidence/sensitivity.md), [evidence/policy-comparison.md](evidence/policy-comparison.md),
+[evidence/explainer-replay-12sku.md](evidence/explainer-replay-12sku.md), [evidence/evolus-workspace-usage.md](evidence/evolus-workspace-usage.md),
+`evidence/runs/token-factory-sample-12sku.sse`.
+
+Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every model call goes to
+**AMD Token Factory** (Gemma-4-31B-IT, with a labelled fallback model for outages; see [AMD](#amd)). Evolus reads the
+Campaign Invitation and carries out the Verdicts.
 
 **Try it in one minute** at **https://marginarena.vercel.app** (no key, no sign-up):
 
 1. Press **Watch the recorded Arena**: a real 12-product run on AMD Token Factory, replayed in about 20 seconds.
-2. The Arena opens on **Daily Sunscreen**, where an AI Rival's Counter-move changed the leading plan in both rounds.
-3. Press **See the Verdicts**: 8 Approve, 1 Revise, 2 Skip, 1 Escalate. Open any product's **How we decided**, then
-   press **ไทย** for Gemma's explanation in Thai, checked number by number against the engine. For the recorded run it
-   is the explanation Gemma wrote for that exact Verdict on 17 Oct, read by a person and shown at once, labelled as
-   recorded; **Ask Gemma again (live)** calls Token Factory (usually seconds, but it has hung for about 140 s).
-4. Press **Review and confirm** to hand the Verdicts to the Evolus workflow.
-
-**What it found on the sample shop:** skipping two of the 12 products keeps **฿1,648.50** more profit in the worst case
-than joining them as invited (+32.8% and +34.2% on those products). With a labelled Seller override on one sunscreen,
-following all 11 decided Verdicts keeps **฿5,434.46** more, and none of its plans breaks a check
-([details and caveats](#what-it-found-on-the-sample-shop)).
+2. Watch the AI competitors (Rivals) answer each product's plan. On **Daily Sunscreen** their moves changed the plan
+   twice.
+3. Press **See the Verdicts**: 8 join as invited (Approve), 1 joins with a better plan (Revise), 2 skip, 1 is left for
+   the owner (Escalate). Open **How we decided** on any product, then press **ไทย** for the explanation in Thai; it
+   appears at once, and **Ask Gemma again (live)** asks the AI again.
+4. Press **Review and confirm**, then **Confirm and run the Evolus workflow**: it writes the upload file and drafts the
+   owner's approval request.
 
 ![The Arena after the recorded run: AI Rivals' Counter-moves change the sunscreen's leading plan twice](docs/images/arena.png)
 
