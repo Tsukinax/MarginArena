@@ -90,8 +90,8 @@ export default function App() {
           )}
         </div>
         <p className="rail-note">
-          AI explores what's open-ended: rival moves and plan ideas. Math solves what's closed: every number comes from
-          the pricing engine.
+          AI explores what's open-ended: rival moves and plan ideas. Math solves what's closed: every number a Verdict uses
+          comes from the pricing engine.
         </p>
         {step > 0 && (
           <button type="button" className="text-btn" onClick={restart}>

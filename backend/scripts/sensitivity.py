@@ -269,7 +269,7 @@ def write_report(variants: list[dict], meta: dict, stress: list[dict]) -> None:
         "",
         "## Reading it",
         "",
-        "- The traffic lift has no source for 11.11 and moves every Verdict; the Seller can change it.",
+        "- The traffic lift has no source for 11.11 and moves every Verdict; it is a labelled value in the sample shop file.",
         "- Rows without AI Rivals face fewer Scenarios, so joining as invited looks safer there: they show what the "
         "Seller would have believed without the red team, not a better outcome.",
         "",

@@ -207,6 +207,7 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
 
         <aside className="feed" aria-live="polite" aria-label="Commentary">
           <h2>Commentary</h2>
+          <p className="small">Rivals&apos; reasons are their own words. The engine prices each move from its numbers.</p>
           <ol>
             {events
               .map((e, n) => ({ e, n, text: commentary(e) }))
@@ -223,7 +224,7 @@ export default function ArenaStep({ events, phase, shop, onNext }: Props) {
       </div>
 
       <footer className="arena-foot">
-        {phase === 'running' && <p>The Arena is running. Every number comes from the pricing engine.</p>}
+        {phase === 'running' && <p>The Arena is running. Every number a Verdict uses comes from the pricing engine.</p>}
         {done && done.type === 'run_done' && (
           <>
             <p>

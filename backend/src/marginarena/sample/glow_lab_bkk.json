@@ -8,7 +8,7 @@
     "traffic_lift_source": "Lazada reported ~3.5x GMV in its March 2026 Birthday Campaign. GMV is units x price: dividing out the unit effect of an average 20% cut at elasticity -1.49 (x1.39) and the 20% lower price (x0.8) gives ~3.1x. The demo keeps 2.5x, which favours not joining; at 3.0x the two Skips become Escalates (evidence/sensitivity.md).",
     "cross_price_sensitivity": "1.0",
     "gift_value_ratio": "0.3",
-    "gift_value_ratio_note": "Conservative assumption (Q53): buyers value a free gift at 30% of its retail price, treated like a price cut of that size. No data supports a higher figure; the Seller can override it."
+    "gift_value_ratio_note": "Conservative assumption (Q53): buyers value a free gift at 30% of its retail price, treated like a price cut of that size. No data supports a higher figure; it is a labelled value in this sample file."
   },
   "fallback_demo_skus": ["NT-200", "SS-50", "VC-30", "SM-10"],
   "fallback_demo_note": "On the Token Factory fallback the Arena checks four products, chosen to show Approve, Escalate and Skip (Q55), plus SS-50, where an AI Rival can turn an Approve into a Revise (Q56). Every number is still computed live.",

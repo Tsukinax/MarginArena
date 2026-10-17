@@ -149,7 +149,7 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
         </dl>
 
         <div className="assumptions">
-          <h2>Assumptions (the Seller sets these)</h2>
+          <h2>Assumptions (set in the sample shop file)</h2>
           <ul>
             <li>Campaign traffic ×{shop.assumptions.traffic_lift} before any price effect</li>
             <li>Buyers value a free gift at {pct(shop.assumptions.gift_value_ratio)} of its retail price</li>

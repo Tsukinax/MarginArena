@@ -1,6 +1,6 @@
 {
  "meta": {
-  "measured": "2026-10-16T18:58:58+00:00",
+  "measured": "2026-10-17T10:36:44+00:00",
   "run": "evidence/runs/token-factory-sample-12sku.sse",
   "red_team_cut_total": "76929.86",
   "red_team_cut_skus": 12,

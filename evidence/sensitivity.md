@@ -2,7 +2,7 @@
 
 Reproduce: `uv run --project backend python backend/scripts/sensitivity.py`, which writes this file and `sensitivity.json`. Engine only: no model is called.
 
-- **Measured:** 2026-10-16T18:58:58+00:00, on the Plan Ideas and Counter-moves of `evidence/runs/token-factory-sample-12sku.sse`. The first row reproduces that run's 12 Verdicts and its Margin Protected exactly (the script stops if it does not).
+- **Measured:** 2026-10-17T10:36:44+00:00, on the Plan Ideas and Counter-moves of `evidence/runs/token-factory-sample-12sku.sse`. The first row reproduces that run's 12 Verdicts and its Margin Protected exactly (the script stops if it does not).
 - **One change per row.** Each row's Margin Protected compares following its Verdicts with joining as invited under that row's own Scenarios; escalated products are left out, as always.
 - These are model-based estimates for a fictional shop.
 
@@ -44,5 +44,5 @@ Reproduce: `uv run --project backend python backend/scripts/sensitivity.py`, whi
 
 ## Reading it
 
-- The traffic lift has no source for 11.11 and moves every Verdict; the Seller can change it.
+- The traffic lift has no source for 11.11 and moves every Verdict; it is a labelled value in the sample shop file.
 - Rows without AI Rivals face fewer Scenarios, so joining as invited looks safer there: they show what the Seller would have believed without the red team, not a better outcome.
