@@ -18,7 +18,9 @@ Result): 3, 18, 2,978, 1 and 0 ms.
 
 ## Every execution in the workspace
 
-**Verdict workflow:** 4 executions, all Completed, each with 5 steps.
+**Verdict workflow:** 4 executions, all Completed, each with 5 steps. (Seen in the workspace's "How it went" tab on
+18 Oct, about 04:30 ICT: 5 executions, 5 succeeded, 0 failed; the fifth ran on 17 Oct at 02:48 ICT, 6.1 s, after this
+reading.)
 
 | Execution | Requested (UTC) |
 |---|---|
