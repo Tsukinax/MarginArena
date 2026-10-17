@@ -9,12 +9,11 @@ node_modules/
 
 # Local AI tooling and private brainstorming (not part of the product)
 .agents/
-.claude/skills/
+.claude/
 skills-lock.json
 docs/chatai-context/
 .pytest_cache/
 backend/.data/
-.claude/worktrees/
 
 # The droplet startup script holds the vLLM API key (infra/droplet/kit.py prepare)
 infra/droplet/.generated/
