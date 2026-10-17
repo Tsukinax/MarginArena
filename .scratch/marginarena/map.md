@@ -17,13 +17,13 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
 
 - Domain: e-commerce promotion economics for marketplace Sellers. Terms live in `CONTEXT.md`; decisions live in `docs/adr/`.
 - Skills for every session: `grilling` and `domain-modeling`. Research tickets follow the method in `research`.
-- Tracker: local markdown (see `docs/agents/issue-tracker.md`). Research findings go in `.scratch/marginarena/research/` instead of `research/*` branches.
+- Tracker: local markdown (see `docs/agents/issue-tracker.md`, kept locally). Research findings go in `.scratch/marginarena/research/` instead of `research/*` branches.
 - Team: the user plus Claude. Claude writes all the code. The user submits on lablab.ai, records the video, and handles anything that needs their account.
 - Constraints:
   - AMD must run a meaningful, visible part of the product.
   - Commerce track: "Do not use a language model as the only forecasting method".
   - Evolus track: the event workspace (code AMDACT3); the main agent on our own vLLM endpoint on AMD Developer Cloud; at least 2 Evolus building blocks driven through the API; a containerized app; a public repo; a README that runs.
-- Event context: `docs/reports/` and `docs/research_notes/` (kept locally, not in the public repo). Token Factory API: `docs/api-guide/tokenfactory-guide.md`.
+- Event context: `docs/reports/` and `docs/research_notes/` (kept locally, not in the public repo). Token Factory API: `docs/api-guide/tokenfactory-guide.md` (kept locally).
 
 ## Destination reached
 
@@ -49,7 +49,7 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
 
 ## Not yet specified
 
-- The Seller Centre bulk-upload file format for Approve actions (research, needed before the workflow step that produces the file). The Evolus API facts are now in `docs/api-guide/evolus-api.md`, and the agent can call our engine through a Web API.
+- The Seller Centre bulk-upload file format for Approve actions (research, needed before the workflow step that produces the file). The Evolus API facts are now in `docs/api-guide/evolus-api.md` (kept locally), and the agent can call our engine through a Web API.
 - A competitor re-snapshot on 17 Oct, using the same lablab endpoints as ticket 10.
 
 ## Out of scope

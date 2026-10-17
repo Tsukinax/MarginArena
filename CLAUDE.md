@@ -80,7 +80,7 @@ Live checks against a real model or Evolus are scripts that write to `evidence/`
 
 - Product scope, user stories, priorities, schedule: `.scratch/marginarena/spec.md`
 - Why a design is the way it is: `docs/adr/`; every grilled decision, numbered Q1–Q61 (continue at Q62): `.scratch/marginarena/issues/01-charting-grill.md`
-- Open tickets and tracker conventions: `.scratch/marginarena/issues/`, `docs/agents/issue-tracker.md`
-- Token Factory and Evolus API facts and limits: `docs/api-guide/`
+- Open tickets and tracker conventions: `.scratch/marginarena/issues/`, `docs/agents/issue-tracker.md` (kept locally, not in git)
+- Token Factory and Evolus API facts and limits: `docs/api-guide/` (kept locally, not in git)
 - Fees, elasticity, model serving, competitors, market numbers: `.scratch/marginarena/research/`
 - Competition rules and judging: `docs/reports/` and `docs/research_notes/` (local only and gitignored, like the field analyses in `.scratch/marginarena/research/act3-*.md`: they name other teams)

@@ -165,7 +165,7 @@ The route is chosen per run by a health check and recorded on every result.
 
 **Explainer.** It writes the Verdict explanation in English or Thai from engine outputs. Every number in the text must match an engine number; otherwise the explanation is rejected and regenerated. If that fails twice, the numbers-only template is used.
 
-**Evolus integration** ([ADR 0003](../../docs/adr/0003-arena-bypasses-evolus.md), [API notes](../../docs/api-guide/evolus-api.md)). A provisioning script uses a User API Key for creation and the application key for runtime. It creates:
+**Evolus integration** ([ADR 0003](../../docs/adr/0003-arena-bypasses-evolus.md), API notes (`docs/api-guide/evolus-api.md`, kept locally)). A provisioning script uses a User API Key for creation and the application key for runtime. It creates:
 - a knowledge library (`language=en`) holding the fee rules and the fictional Glow Lab BKK brand agreement;
 - a JSON extractor for Campaign Invitations;
 - the Campaign Desk agent on `own/<alias>` (our vLLM) with the library attached;

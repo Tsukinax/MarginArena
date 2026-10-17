@@ -12,6 +12,9 @@ node_modules/
 .claude/
 skills-lock.json
 docs/chatai-context/
+# Notes for AI coding agents and our API notes (kept locally)
+docs/agents/
+docs/api-guide/
 .pytest_cache/
 backend/.data/
 

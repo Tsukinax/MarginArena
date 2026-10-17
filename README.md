@@ -37,6 +37,8 @@ Joining is opt-in, and the Seller has to decide product by product whether it ma
 - At those fees, a ฿100 product that costs ฿50 earns ฿21.11 at full price, ฿6.67 at 20% off, and loses ฿0.55 at 30% off.
 - Nobody knows in advance how many more units a discount sells, or what lookalike competitors will do in reply.
 
+![A ฿100 product at the invited 20% off: after the discount, commission, PRIME programme, payment and per-order fees and the ฿50 cost, ฿6.67 profit per unit is left (engine figures)](docs/images/margin-waterfall.png)
+
 ## Try it
 
 - **Live demo:** https://marginarena.vercel.app (the recorded run works at once; live runs and Gemma's explanations
@@ -73,21 +75,7 @@ Joining is opt-in, and the Seller has to decide product by product whether it ma
    explanation in English or Thai. An explanation citing any number the engine did not produce is rejected, and
    `/api/explain` only accepts results the server signed.
 
-```mermaid
-flowchart LR
-  pdf[Campaign Invitation PDF] -->|Evolus extractor| check[Each discount checked<br/>against the invitation data]
-  data[Invitation data, catalogue,<br/>Margin Floor, Brand Price Rules,<br/>Rival Snapshot] --> check
-  data --> engine
-  subgraph arena[Arena, per SKU]
-    strategists[Strategists: Plan Ideas<br/>Gemma on AMD Token Factory] --> engine[Engine: fees, demand,<br/>every Promo Plan, maximin]
-    engine --> leader[Leading Promo Plan]
-    leader --> rivals[Rivals: Counter-moves<br/>Gemma on AMD Token Factory]
-    rivals -->|new Scenarios| engine
-  end
-  leader --> verdict[Verdict: Approve,<br/>Revise or Escalate]
-  verdict --> explain[Explanation in English or Thai,<br/>every number checked]
-  verdict -->|the Seller confirms| workflow[Evolus Verdict workflow:<br/>bulk-upload file, approval request]
-```
+![How MarginArena decides: AI on AMD Token Factory proposes Plan Ideas and Counter-moves and explains each Verdict; the deterministic engine prices every Promo Plan and picks the best worst case; Evolus reads the invitation and carries out confirmed Verdicts; a person confirms and decides escalated products](docs/images/how-it-decides.png)
 
 ## What it found on the sample shop
 
