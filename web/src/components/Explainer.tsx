@@ -13,13 +13,13 @@ export default function Explainer({ result }: { result: SkuResult }) {
   const [writing, setWriting] = useState<Language | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const ask = async (lang: Language) => {
+  const ask = async (lang: Language, live = false) => {
     setLanguage(lang)
     setError(null)
-    if (answers[lang]) return
+    if (answers[lang] && !live) return
     setWriting(lang)
     try {
-      const answer = await explainVerdict(result, lang)
+      const answer = await explainVerdict(result, lang, live)
       setAnswers((prev) => ({ ...prev, [lang]: answer }))
     } catch (e) {
       setError((e as Error).message)
@@ -54,7 +54,8 @@ export default function Explainer({ result }: { result: SkuResult }) {
       {language === null && (
         <p className="explain-hint">
           Gemma writes a short explanation on AMD Token Factory, and the note under it names the model that answered.
-          Every number in it is checked against the pricing engine before you see it.
+          Every number in it is checked against the pricing engine before you see it. For the recorded run, the
+          explanation Gemma wrote for this exact Verdict appears at once.
         </p>
       )}
       {writing && <p className="explain-wait">Gemma is writing{writing === 'th' ? ' in Thai' : ''}…</p>}
@@ -64,19 +65,38 @@ export default function Explainer({ result }: { result: SkuResult }) {
           <p className="explain-text" lang={shown.language}>
             {shown.text}
           </p>
-          <Provenance answer={shown} />
+          <Provenance answer={shown} onLive={() => ask(shown.language, true)} />
         </>
       )}
     </section>
   )
 }
 
-function Provenance({ answer: a }: { answer: Explanation }) {
+function Provenance({ answer: a, onLive }: { answer: Explanation; onLive: () => void }) {
   const where = a.route === 'mi300x' ? 'our AMD Instinct MI300X' : 'AMD Token Factory'
   const drafts = a.rejected.filter((d) => d.text !== null)
+  const written = a.written_at
+    ? new Date(a.written_at).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'Asia/Bangkok',
+      })
+    : null
   return (
     <div className="explain-meta">
-      {a.source === 'model' ? (
+      {a.recorded ? (
+        <p>
+          <span className="explain-ok" aria-hidden>
+            ✓
+          </span>{' '}
+          Recorded{written && ` ${written}`}: written by {a.model} on {where} for this exact Verdict. Every number
+          matches the pricing engine.{' '}
+          <button type="button" className="text-btn" onClick={onLive}>
+            Ask Gemma again (live)
+          </button>
+        </p>
+      ) : a.source === 'model' ? (
         <p>
           <span className="explain-ok" aria-hidden>
             ✓

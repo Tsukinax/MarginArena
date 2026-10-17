@@ -184,6 +184,9 @@ export type Explanation = {
   rejected: { text: string | null; unsupported: string[] }[]
   route: string
   model: string
+  /** Written for this exact Verdict when the run was recorded (api.RECORDED_EXPLANATIONS), served without a model call. */
+  recorded?: boolean
+  written_at?: string
 }
 
 export async function getHealth(): Promise<{ route: string; model: string }> {
@@ -239,11 +242,11 @@ export async function runArena(
 }
 
 /** Explains one decided SKU. The backend rejects any draft that cites a number the engine never produced. */
-export async function explainVerdict(result: SkuResult, language: Language): Promise<Explanation> {
+export async function explainVerdict(result: SkuResult, language: Language, live = false): Promise<Explanation> {
   const r = await fetch('/api/explain', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ result, language }),
+    body: JSON.stringify({ result, language, live }),
   })
   if (!r.ok)
     throw new Error((await r.json().catch(() => null))?.detail ?? `The explanation could not be written (${r.status}).`)
