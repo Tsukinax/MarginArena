@@ -4,21 +4,26 @@
 for every invited product, AI Rivals red-team the leading plan, and each product ends in a Verdict: Approve, Revise
 (including Skip) or Escalate.
 
-Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every AI call goes to
-**AMD Token Factory**: Gemma-4-31B-IT answered every recorded Arena and explanation run except one labelled
-DeepSeek-V4-Flash fallback run, and that fallback answers only when Token Factory does not list Gemma. Evolus reads the Campaign Invitation
-and carries out the Verdicts.
+Built for the AMD Developer Hackathon ACT III (Reinvent Commerce; Evolus Business Agents). Every model call MarginArena
+makes goes to **AMD Token Factory**: Gemma-4-31B-IT answered every recorded Arena and explanation run except one
+labelled DeepSeek-V4-Flash fallback run. The app switches to that fallback only when Token Factory does not list Gemma,
+or answers that Gemma has no workers or is not served. Evolus reads the Campaign Invitation and carries out the
+Verdicts.
 
 **Try it in one minute** at **https://marginarena.vercel.app** (no key, no sign-up):
 
 1. Press **Watch the recorded Arena**: a real 12-product run on AMD Token Factory, replayed in about 20 seconds.
 2. The Arena opens on **Daily Sunscreen**, where an AI Rival's Counter-move changed the leading plan in both rounds.
 3. Press **See the Verdicts**: 8 Approve, 1 Revise, 2 Skip, 1 Escalate. Open any product's **How we decided**, then
-   press **ไทย** for Gemma's explanation in Thai, checked number by number against the engine.
+   press **ไทย** for Gemma's explanation in Thai, checked number by number against the engine. It is a live Token
+   Factory call: usually a few seconds, but it has hung for about 140 s before a numbers-only explanation; the
+   drawer's numbers and chart don't depend on it.
 4. Press **Review and confirm** to hand the Verdicts to the Evolus workflow.
 
-**What it found on the sample shop:** following the Verdicts keeps **฿5,434.46** more profit in the worst case than
-joining every product as invited, and none of its plans breaks a check ([details and caveats](#what-it-found-on-the-sample-shop)).
+**What it found on the sample shop:** skipping two of the 12 products keeps **฿1,648.50** more profit in the worst case
+than joining them as invited (+32.8% and +34.2% on those products). With a labelled Seller override on one sunscreen,
+following all 11 decided Verdicts keeps **฿5,434.46** more, and none of its plans breaks a check
+([details and caveats](#what-it-found-on-the-sample-shop)).
 
 ![The Arena after the recorded run: AI Rivals' Counter-moves change the sunscreen's leading plan twice](docs/images/arena.png)
 
@@ -37,9 +42,11 @@ Joining is opt-in, and the Seller has to decide product by product whether it ma
 - **Live demo:** https://marginarena.vercel.app (the recorded run works at once; live runs and Gemma's explanations
   call AMD Token Factory).
 - **On your machine:** `cp .env.example .env`, then `docker compose up --build` and open http://localhost:8008.
-  - **Watch all 12 products (recorded run)** replays a real Arena recorded on AMD Token Factory. It needs no key.
-  - **Run live** needs `TOKEN_FACTORY_API_KEY` in `.env`. It checks 4 of the 12 products, chosen to show every kind of
+  - **Watch the recorded Arena (about 20 s)** replays a real Arena recorded on AMD Token Factory. It needs no key.
+  - **Run 4 live on AMD Token Factory** needs `TOKEN_FACTORY_API_KEY` in `.env`. It checks 4 of the 12 products, chosen to show every kind of
     Verdict, because Token Factory allows 20 requests a minute per account. The sample shop is the only data it sends.
+- **Sample shop only:** the demo runs on a fictional shop. A Seller's own catalogue, invitation and Rival Snapshot can't
+  be uploaded yet (on the roadmap).
 
 ## How it decides
 
@@ -80,30 +87,34 @@ flowchart LR
 
 These are model-based estimates for a fictional shop; every figure comes from the engine.
 
-- **Margin Protected: ฿5,434.46.** Following the 12 Verdicts of the recorded run keeps ฿5,434.46 more profit in the
-  worst case than joining every product exactly as invited (the escalated product is left out:
-  `evidence/runs/token-factory-sample-12sku.sse`). Of it, ฿1,648.50 comes from skipping RN-30 and SM-10, and
-  ฿3,785.96 (70%) from SS-50's Revise, which rests on a labelled sample Seller override (elasticity −2.62 instead of
-  the pooled −1.49). At the pooled fit, SS-50 stays an Approve
-  ([q56-red-team.md](.scratch/marginarena/research/q56-red-team.md)).
+- **Two Skips: ฿1,648.50.** Skipping RN-30 and SM-10 keeps ฿1,648.50 more profit in the worst case than joining them
+  as invited. This needs no override.
+- **Margin Protected with the override: ฿5,434.46.** Following the 12 Verdicts of the recorded run keeps ฿5,434.46
+  more in the worst case than joining every product exactly as invited (the escalated product is left out:
+  `evidence/runs/token-factory-sample-12sku.sse`). ฿3,785.96 of it (70%) comes from SS-50's Revise, which rests on a
+  labelled sample Seller override (elasticity −2.62, the published mean, instead of our pooled −1.49). We added that
+  override deliberately, so the sample shows a Counter-move changing a plan on a product with many lookalike
+  listings: it is a demonstration, not a measured finding. At the pooled fit, SS-50 is an Approve
+  ([q56-red-team.md](.scratch/marginarena/research/q56-red-team.md), [evidence/sensitivity.md](evidence/sensitivity.md)).
 - **SS-50's Revise trades average profit for a safer worst case.** Maximin keeps ฿3,785.96 more in the worst case, but
-  averaged over its Scenarios the plan earns ฿79,244.00 against ฿108,260.42 for joining as invited, and joining as
-  invited does better against several single Rival moves in its "How we decided" table. A Seller who prefers the
+  averaged over its Scenarios the plan earns ฿79,244.00 against ฿108,260.42 for joining as invited. At the point
+  elasticity, joining as invited earns more against all 7 Counter-moves; the Revise does better only at the edge of
+  the elasticity band, against the 3 deepest undercuts (its "How we decided" table). A Seller who prefers the
   average can join as invited (`sku_decided` for SS-50 in `evidence/runs/token-factory-sample-12sku.sse`).
 - **How much rests on the assumptions** ([evidence/sensitivity.md](evidence/sensitivity.md)): Margin Protected is
   ฿12,787.08 if joining brings no extra traffic (×1.0) and ฿4,581.05 at ×3.0.
 - **The Verdicts do not depend on who plays the Rival.** With a rule-based Rival that always makes the deepest move
-  allowed, or with random moves inside the same bounds, the Verdicts are the same 8 Approve, 1 Revise, 2 Skip and
+  allowed, or with random moves inside the same bounds (both on the same Plan Ideas), the Verdicts are the same 8 Approve, 1 Revise, 2 Skip and
   1 Escalate (Margin Protected ฿4,005.56 and ฿4,113.36); with only the three generic moves, SS-50 stays an Approve
-  (฿2,038.53). Gemma's part is to propose plausible Counter-moves with a stated reason, not deeper ones: those two
+  (฿2,038.53). Gemma's part is to propose Counter-moves with a stated reason, not deeper ones: those two
   controls lower the worst cases further than Gemma's moves do (same file).
 - **In percentages** (worst-case profit kept over joining as invited, from the engine's figures in
   [evidence/policy-comparison.md](evidence/policy-comparison.md)): +32.8% on RN-30 and +34.2% on SM-10 by skipping
   them, +5.9% on SS-50 (with its override), and +1.8% across the 11 products MarginArena decided.
 - **No plan breaks a check.** Under the same Scenarios, joining as invited breaks a check on 2 products and matching
   the competitor on 3; MarginArena's plans break none ([evidence/policy-comparison.md](evidence/policy-comparison.md)).
-- **An AI Rival changed a decision.** In the recorded 12-product run, the Rivals' Counter-moves changed SS-50's leading
-  plan in both rounds (the ฿3,785.96 above). It happened again in a separate live 4-product run on Token Factory,
+- **Red-teaming changed a decision.** In the recorded 12-product run, the Rivals' Counter-moves changed SS-50's leading
+  plan in both rounds (the ฿3,785.96 above); a rule-based or random Rival changes it too. It happened again in a separate live 4-product run on Token Factory,
   where the Revise keeps ฿3,728.85 more in the worst case
   ([evidence/red-team-token-factory.md](evidence/red-team-token-factory.md)). Both rest on the SS-50 override.
 
@@ -122,7 +133,8 @@ All market figures are estimates or assumptions, with the arithmetic shown; sour
 - **Planned pricing (an assumption, not validated):** Free (1 Campaign a month, up to 10 products), Pro ฿390 a month,
   Agency ฿1,990 a month (several shops, the Evolus workflow), and Enterprise for Mall stores and brands.
 - **Market in Thailand (estimates):** if every one of the 1.2M shops paid Pro, ≈฿5.62B a year (a ceiling, since it
-  counts shops); for the 170,000 Campaign-active Sellers, ≈฿795.6M a year; at 5% of them (an assumption), ≈฿39.8M a
+  counts shops); for the about 170,000 Thai Sellers that Shopee says reached new customers in 9.9 (our proxy for Campaign-active
+  Sellers), ≈฿795.6M a year; at 5% of them (an assumption), ≈฿39.8M a
   year.
 - **What it is worth to one Seller (estimate):** on the sample shop, the two Skips alone keep ฿1,648.50 more in the
   worst case ([evidence/sensitivity.md](evidence/sensitivity.md)), about 4.2 months of Pro.
@@ -144,12 +156,13 @@ Built solo from Thailand for the AMD Developer Hackathon ACT III.
 
 ## Evidence
 
-Every number in this README comes from the engine or from these files:
+Every product and profit number in this README comes from the engine or from these files; the fee and market figures
+come from the last two, with their sources:
 
 | What | File |
 |---|---|
 | Elasticity fit and its holdout against a naive baseline | [evidence/elasticity.md](evidence/elasticity.md) |
-| An AI Rival turning SS-50's Approve into a Revise, live on Token Factory | [evidence/red-team-token-factory.md](evidence/red-team-token-factory.md) |
+| Red-teaming turning SS-50's Approve into a Revise, live on Token Factory (with the labelled override) | [evidence/red-team-token-factory.md](evidence/red-team-token-factory.md) |
 | Thai and English explanations checked number by number | [evidence/explainer-token-factory.md](evidence/explainer-token-factory.md) |
 | Four pricing policies under the same Scenarios, and Gemma's own arithmetic checked by the engine | [evidence/policy-comparison.md](evidence/policy-comparison.md) |
 | The Evolus Verdict workflow carrying out confirmed Verdicts | [evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md) |
@@ -157,6 +170,8 @@ Every number in this README comes from the engine or from these files:
 | Every Evolus execution in the workspace, and two live runs from the live site on 17 Oct | [evidence/evolus-workspace-usage.md](evidence/evolus-workspace-usage.md) |
 | How the Verdicts move with traffic lift, the SS-50 override and the AI Rivals | [evidence/sensitivity.md](evidence/sensitivity.md) |
 | Recorded Arena runs, as streamed | [evidence/runs/](evidence/runs/) |
+| Shopee and Lazada fees (sourced research) | [.scratch/marginarena/research/marketplace-fees.md](.scratch/marginarena/research/marketplace-fees.md) |
+| Thai Seller market estimates (sourced research) | [.scratch/marginarena/research/thai-seller-market.md](.scratch/marginarena/research/thai-seller-market.md) |
 
 Why the engine and not the model computes the numbers: given the same facts and formulas, Gemma's own Campaign profit
 estimates were off by a median 61.69% from the engine's, with 1 of 11 answers within 5% (`evidence/policy-comparison.md`).
@@ -187,6 +202,11 @@ estimates were off by a median 61.69% from the engine's, with 1 of 11 answers wi
   | `token-factory-sample-3sku.sse` | Gemma-4-31B-IT | 3 | 15 | 0 | 0 | 1 | 1,258 | 86.41 s |
   | `token-factory-sample-3sku-maximin.sse` | Gemma-4-31B-IT | 3 | 15 | 0 | 0 | 7 | 1,259 | 118.75 s |
   | `token-factory-live-site-4sku.sse` (the live site, 17 Oct) | Gemma-4-31B-IT | 4 | 20 | 0 | 0 | 0 | 1,860 | 79.84 s |
+  | `token-factory-live-site-sin1-4sku.sse` (the live site from Singapore, 17 Oct) | Gemma-4-31B-IT | 4 | 20 | 0 | 0 | 0 | 1,748 | 102.5 s |
+  | `token-factory-sample-4sku-deepseek-fallback.sse` (fallback, 15 Oct) | DeepSeek-V4-Flash | 4 | 20 | 0 | 0 | 0 | 2,081 | 95.9 s |
+
+  The two 3-SKU streams were recorded on 14 Oct with earlier engine versions, so their Verdicts and Margin Protected
+  differ from the replay.
 
   Wall time mostly reflects our own pacing (15 requests a minute, under Token Factory's limit of 20 per account), not
   the model's speed. The replay plays the 12-SKU run back in about 20 seconds.
@@ -214,7 +234,8 @@ MarginArena hands the Verdicts to an Evolus workflow, which carries them out: it
 writes the bulk-upload file, and has the Campaign Desk agent draft the shop owner's approval request for escalated
 products, using the engine's figures; the knowledge library with the fee rules and the brand agreement is attached
 to the agent. The agent runs on our own model
-connection (Gemma-4-31B-IT on AMD Token Factory), so the run uses no Evolus credits
+connection to AMD Token Factory (Gemma-4-31B-IT, with a Qwen3.8-27B fallback; Evolus does not record which answered),
+so the run uses no Evolus credits
 ([evidence/evolus-verdict-workflow.md](evidence/evolus-verdict-workflow.md)). Nothing is sent or registered.
 
 The Arena's own calls go straight to Token Factory rather than through an Evolus agent. Each one is a short JSON
@@ -226,6 +247,12 @@ confirms. The Evolus runs don't report whether Gemma or its Qwen fallback answer
 
 `infra/evolus/evolus_kit.py` builds all of it from code: `plan` only reads, and `apply` creates what is missing,
 finding each resource by name first. See [infra/evolus/README.md](infra/evolus/README.md).
+
+**What an Evolus reviewer will find in our workspace:** the workflow "MarginArena Verdict" (5 steps); the agent
+"MarginArena Campaign Desk" with the knowledge library "MarginArena Campaign Desk library" (the 2 documents in
+`infra/evolus/library/`); the extractor agent "MarginArena Invitation Reader" with the output structure "Campaign
+Invitation"; and the model connection "tf-gemma on AMD" under Your models. Every execution so far is listed in
+[evidence/evolus-workspace-usage.md](evidence/evolus-workspace-usage.md).
 
 ## Assumptions and limits
 
@@ -241,10 +268,11 @@ finding each resource by name first. See [infra/evolus/README.md](infra/evolus/R
   times price, so taking out the 20% lower price as well (×0.8) gives about ×3.1 (our arithmetic). We kept ×2.5, which
   makes not joining look better: at ×3.0, Margin Protected is ฿4,581.05 and the two Skips become Escalates
   ([evidence/sensitivity.md](evidence/sensitivity.md)). No source measures the lift for 11.11, it moves every Verdict,
-  and the Seller can change it.
+  and it is a labelled value in the sample shop file.
 - **Two assumptions have no source:** when a Rival ends up cheaper, the Seller keeps (Rival price ÷ our price)^1.0 of
   its buyers, and each Counter-move lasts the whole Campaign, which overstates a short flash sale.
-- **A gift is valued at 30% of its retail price** by buyers. This is an assumption the Seller can change.
+- **A gift is valued at 30% of its retail price** by buyers. This is an assumption, a labelled value in the sample shop
+  file.
 - **Fees:** Shopee does not publish the base of its PRIME programme fee, so we assume the commission base. The rates
   are the FMCG category's, for a Seller that is not VAT-registered. Every buyer is assumed to claim the shop voucher.
 - **The explanation check proves numbers, not labels.** Each shown explanation sits next to the engine's own figures.

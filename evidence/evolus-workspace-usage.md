@@ -27,9 +27,12 @@ Result): 3, 18, 2,978, 1 and 0 ms.
 | `11f866c6…` | 2026-10-15 09:57:05 |
 | `4d903564-7cc8-f111-bf5b-000d3aae6dc8` (the recorded run the app shows) | 2026-10-15 09:40:01 |
 
-**Invitation extractor:** 9 executions, 5 Completed and 4 Failed. The 4 failures are on 15 Oct (10:00:37, 10:00:51,
-16:23:06 and 16:23:06 UTC), from the period when the platform OCR answered HTTP 502 (`evidence/evolus-invitation-extractor.md`);
-every run since OCR was turned off has completed.
+**Invitation extractor:** 9 executions, 5 Completed and 4 Failed, all 4 failures on 15 Oct. The two at 10:00:37 and
+10:00:51 UTC came while the platform OCR answered HTTP 502 (`evidence/evolus-invitation-extractor.md`). The two at
+16:23:06 UTC came after runs with OCR off had completed (10:05:49 and 10:44:10 UTC) and are unexplained; around then
+Token Factory stopped listing Gemma-4-31B-IT (README, "When Gemma is unavailable"), but the records do not say why
+they failed. The live run on 16 Oct 19:40 UTC (above) completed. (Corrected 17 Oct, 18:40 ICT: this paragraph first
+put all 4 failures in the OCR period.)
 
 ## Limits
 

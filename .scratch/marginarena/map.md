@@ -1,5 +1,8 @@
 # Map: MarginArena
 
+> Planning document from 14-17 Oct, kept for the record. Where it differs from README.md, `docs/adr/` (ADR 0005: Token
+> Factory only, no MI300X) or `evidence/`, those win.
+
 Label: wayfinder:map
 
 ## Destination
@@ -14,7 +17,7 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
 
 - Domain: e-commerce promotion economics for marketplace Sellers. Terms live in `CONTEXT.md`; decisions live in `docs/adr/`.
 - Skills for every session: `grilling` and `domain-modeling`. Research tickets follow the method in `research`.
-- Tracker: local markdown (see `docs/agents/issue-tracker.md`). There is no git remote yet. Research findings go in `.scratch/marginarena/research/` instead of `research/*` branches.
+- Tracker: local markdown (see `docs/agents/issue-tracker.md`). Research findings go in `.scratch/marginarena/research/` instead of `research/*` branches.
 - Team: the user plus Claude. Claude writes all the code. The user submits on lablab.ai, records the video, and handles anything that needs their account.
 - Constraints:
   - AMD must run a meaningful, visible part of the product.
@@ -34,13 +37,13 @@ A build-ready `spec.md` for the MarginArena MVP, with every decision made, so th
 - [04 Model serving on MI300X](issues/04-model-serving-mi300x.md): Gemma-4-31B-IT on vLLM 0.31 ROCm (gemma4 parsers), gated by a day-1 tool-calling test with Qwen3.6-27B as the fallback; vLLM is localhost-only behind HTTPS Caddy on an sslip.io name; $100 buys 38.6 h, so we rebuild from a script; Token Factory is the dev and app fallback; judging-window uptime is settled in ADR 0002.
 - [03 Marketplace fees](issues/03-marketplace-fees.md): Shopee Non-Mall PRIME pays 27.82% + ฿1.07 and LazMall 30.50%, charged on the price after the Seller's own discounts; Campaigns cost the Seller through price/discount bands, required programmes and co-funding, not extra fees; invitations live only in Seller Centre and the bands are inputs; joining is opt-in, so the Verdict comes before the Seller confirms; the demo Seller is a skincare shop; Lazada's ฿623.93 example is a golden test.
 - [09 UI prototype](issues/09-ui-prototype.md): Variant C's guided flow is the backbone, with Variant A's live Arena as the Checking step and Variant B's waterfall and heat grid inside the "How we decided" drawer.
-- 10 ACT III field (ticket kept locally, not in the public repo, because it scores other teams): 12 entries so far, only 2 in Commerce; nobody does promotion pricing, SEA sellers, adversarial agents, Evolus for commerce, or self-served Gemma on MI300X; lead with the Arena, the MI300X benchmark and Evolus carrying out the Verdict, not with "the LLM never invents numbers"; commit in small steps; re-snapshot on 17 Oct.
+- 10 ACT III field: a snapshot of other entries, kept locally and not in the public repo.
 - [11 Thai seller market](issues/11-thai-seller-market.md): ฿1.14T GMV; 1.2M Shopee TH Sellers, 170k of them in 9.9; over half of sales come from mega Campaigns; fees take 22–40% and average net profit is 2.3%; regulators are acting on platform fees; no existing tool costs a Campaign Invitation before the Seller commits.
 - [Q57 / ADR 0005](../../docs/adr/0005-token-factory-is-the-only-inference-route.md): the submission runs on AMD Token Factory only, after the organisers confirmed in Discord that it counts as the AMD component and for the Google prize; no $100 credit, no droplet; the AMD mentor also confirmed it meets the Evolus track's own-endpoint rule.
 - [Q58](issues/01-charting-grill.md): when Token Factory's Gemma has no workers, live runs and the Evolus agent fall back to Qwen3.8-27B on the same route, and the app names the model that answered.
 - [Q59](issues/01-charting-grill.md) (15 Oct, night): Token Factory dropped Gemma-4-31B-IT from its catalogue for about 20 hours (back by 16 Oct 20:48 ICT) and Qwen3.8-27B spent its token budget thinking, so DeepSeek-V4-Flash is the fallback and the app reads the catalogue before a run.
 - [Q60](issues/01-charting-grill.md) (17 Oct): no cloud GPU; the organisers said standalone GPUs are not needed in ACT III. Token Factory only; a live 4-SKU run on the live site answered 20 of 20 Gemma calls in 79.84 s.
-- Field analysis (15 Oct, 22:50 ICT, kept locally, not in the public repo): 26 entries; best odds in the Evolus track, then Vibe Generation; lead the pitch with the Seller's money problem and disclose that 70% of Margin Protected is SS-50's override-driven Revise (README now does). The same night the demo was hardened (limits, recorded Evolus fallbacks) after a 56-agent review.
+- Field analysis (15 Oct, kept locally, not in the public repo): it led us to open the pitch with the Seller's money problem and to disclose that 70% of Margin Protected is SS-50's override-driven Revise (README now does). The same night the demo was hardened (limits, recorded Evolus fallbacks) after a 56-agent review.
 - 17 Oct, submission day: [Q61](issues/01-charting-grill.md) discloses that SS-50's Revise trades average profit (฿79,244.00 vs ฿108,260.42) for a safer worst case, in the README and deck. Engine-only controls ([evidence/sensitivity.md](../../evidence/sensitivity.md)) show the Verdicts hold with a deepest-move rule-based Rival or random Rivals, so the public text presents Gemma's part as the language work, not as risk only AI found. The API moved to Vercel `sin1` after Token Factory's chat calls hung from `hkg1`. The first screen states the problem and the recorded headline; Confirm shows the Evolus run's trail. The pitch (video script, deck, cover, lablab texts, Q&A card, an emergency MP4) is in `pitch/`, gitignored. Git history was rewritten to drop the research that scored other teams.
 - [Q56 red-team research](research/q56-red-team.md): under today's assumptions the AI Rivals' Counter-moves cut worst cases but change no decision; every SKU now shows that cut, and SS-50 gets a labelled Seller override (elasticity −2.62 with its own band) so the demo can show a Rival turning an Approve into a Revise (Q56, option 2).
 

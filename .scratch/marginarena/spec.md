@@ -2,6 +2,9 @@
 
 Status: ready-for-agent
 
+> Planning document from 14-15 Oct, kept for the record. Where it differs from README.md, `docs/adr/` or `evidence/`,
+> those win.
+
 Note (15 Oct 2026): the submission runs on AMD Token Factory only ([ADR 0005](../../docs/adr/0005-token-factory-is-the-only-inference-route.md)). Every item below that depends on our own MI300X (the vLLM route, GPU benchmarks, the AMD Evidence panel's GPU fields, the recorded MI300X run) was not built, and the measured figures live in `evidence/`, not here.
 Map: [map.md](map.md) · Glossary: [CONTEXT.md](../../CONTEXT.md) · ADRs: [docs/adr](../../docs/adr/)
 Deadline: complete submission by **Sat 17 Oct 2026 24:00 ICT**, frozen by **Sun 18 Oct 2026 17:00 ICT** (10:00 UTC), on lablab.ai.

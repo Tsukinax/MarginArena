@@ -1,5 +1,10 @@
 # Research: when do the AI Rivals' Counter-moves change a decision? (input to Q56)
 
+> **Note, 17 Oct 2026.** This is the 14 Oct record of how Q56 was decided, kept as written. Option 2 was chosen: the
+> SS-50 override was added so the sample shows a Counter-move changing a plan. It is a demonstration, not a measured
+> finding. At the pooled fit SS-50 is an Approve and Margin Protected is ฿1,648.50, and rule-based or random Rivals give
+> the same Verdicts as Gemma's Rivals ([evidence/sensitivity.md](../../../evidence/sensitivity.md)).
+
 Run 14 Oct 2026 with the engine only, no LLM: `uv run --project backend python .scratch/marginarena/research/q56_red_team.py`.
 
 ## Why
