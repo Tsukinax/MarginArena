@@ -63,6 +63,10 @@ Joining is opt-in, and the Seller has to decide product by product whether it ma
    - the engine searches every numeric Promo Plan those ideas allow, within the invitation and the Brand Price Rules;
    - each round, Rivals (Gemma) propose Counter-moves against the leading plan, and the engine re-selects over every
      Scenario found so far.
+   - In the recorded run, each product had 1 Strategist proposing Plan Ideas and 2 Rivals red-teaming the leading
+     plan over 2 rounds (48 Counter-moves across the 12 products); the engine searched 1,745 Promo Plans in all and
+     tested each against every Scenario (`evidence/runs/token-factory-sample-12sku.sse`). The code defines 3 Strategist
+     and 6 Rival personas for a larger route that was not used.
 3. **The plan with the best worst case wins** (maximin), provided it keeps the Seller's Margin Floor, earns at least
    as much as not joining, and respects every Brand Price Rule.
 4. **Every Verdict explains itself**: a waterfall, the Counter-moves it was tested against, Evidence Links, and a short
