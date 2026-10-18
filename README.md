@@ -1,4 +1,4 @@
-# MarginArena
+# MarginArena AI
 
 **Before a marketplace Campaign like 11.11, Shopee asks Sellers to discount chosen products. MarginArena checks every
 invited product first and says, in plain words: join, join with a better plan, skip, or let the owner decide.**
