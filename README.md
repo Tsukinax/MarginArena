@@ -1,4 +1,4 @@
-# MarginArena AI
+# MarginArenaAI
 
 [![MarginArena demo video (4:25)](docs/images/video-thumbnail.jpg)](https://youtu.be/dhfFiJWZxjM)
 
