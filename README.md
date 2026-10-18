@@ -2,8 +2,7 @@
 
 https://github.com/user-attachments/assets/e30c20c0-974d-43f7-8dd0-c14bf3560b75
 
-▶ **Demo video (4:25).** Can't play it here, or want it sharper? [Watch it in HD on YouTube](https://youtu.be/dhfFiJWZxjM).
-Narration: AI voice by ElevenLabs.
+▶ **Demo video [Watch it on YouTube](https://youtu.be/dhfFiJWZxjM).
 
 **Before a marketplace Campaign like 11.11, Shopee asks Sellers to discount chosen products. MarginArena checks every
 invited product first and says, in plain words: join, join with a better plan, skip, or let the owner decide.**
@@ -139,8 +138,7 @@ carries out the Verdicts once the Seller confirms ([ADR 0003](docs/adr/0003-aren
 
 ## AMD
 
-- **Every model call the app makes goes to AMD Token Factory,** AMD's hosted model API (the AMD component, per an AMD
-  mentor on 14 Oct 2026). No hardware claim: Token Factory does not name its GPUs, and we used none of our own.
+- **Every model call the app makes goes to AMD Token Factory,** AMD's hosted model API 
 - **Gemma-4-31B-IT** plays the Strategist and the Rivals, wrote the 24 served explanations and answered every
   recorded Arena run and explanation in `evidence/` but one labelled DeepSeek-V4-Flash fallback run
   ([all 7 runs](docs/details.md#recorded-runs-on-token-factory)).
