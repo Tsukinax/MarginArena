@@ -2,7 +2,7 @@
 
 https://github.com/user-attachments/assets/e30c20c0-974d-43f7-8dd0-c14bf3560b75
 
-▶ **[Demo video](https://youtu.be/dhfFiJWZxjM).
+▶ [Demo video](https://youtu.be/dhfFiJWZxjM).
 
 **Before a marketplace Campaign like 11.11, Shopee asks Sellers to discount chosen products. MarginArena checks every
 invited product first and says, in plain words: join, join with a better plan, skip, or let the owner decide.**
