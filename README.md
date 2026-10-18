@@ -3,8 +3,8 @@
 **Before a marketplace Campaign like 11.11, Shopee asks Sellers to discount chosen products. MarginArena checks every
 invited product first and says, in plain words: join, join with a better plan, skip, or let the owner decide.**
 
-**[Live demo](https://marginarena.vercel.app)** (no key, no sign-up) · [Run it locally](#run-it-locally) ·
-[Evidence](#evidence) · [Details](docs/details.md)
+**[Live demo](https://marginarena.vercel.app)** (no key, no sign-up) · **[Demo video (4:25)](https://youtu.be/dhfFiJWZxjM)** ·
+[Run it locally](#run-it-locally) · [Evidence](#evidence) · [Details](docs/details.md)
 
 At Shopee Thailand's fees, a ฿100 product that costs ฿50 earns ฿21.11 at full price, ฿6.67 at 20% off and loses ฿0.55
 at 30% off. MarginArena's engine prices every Promo Plan, AI Rivals (Gemma-4-31B-IT on AMD Token Factory) try to break
@@ -37,9 +37,10 @@ At https://marginarena.vercel.app (the first load can take a few seconds):
 4. **Review and confirm**, then **Confirm and run the Evolus workflow**: it writes the upload file and drafts the
    approval request, sending nothing.
 
-![The Arena after the recorded run](docs/images/arena.png)
+[![Watch the MarginArena demo video (4:25) on YouTube](docs/images/video-thumbnail.jpg)](https://youtu.be/dhfFiJWZxjM)
 
-*The two Skips alone keep ฿1,648.50; the ฿5,434.46 shown adds ฿3,785.96 from Daily Sunscreen's override-based Revise.*
+*The demo video (4:25): the problem, the live site's recorded Arena and Verdicts, the Evolus workspace, and the
+business case. Narration: AI voice by ElevenLabs.*
 
 ## The problem
 
