@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { baht, pct, usd, type SkuResult } from '../api'
+import { baht, pct, usd, type Shop, type SkuResult } from '../api'
 import HowWeDecided from '../components/HowWeDecided'
 
-type Props = { results: SkuResult[]; marginProtected: string; onNext: () => void }
+type Props = { results: SkuResult[]; marginProtected: string; shop: Shop | null; onNext: () => void }
 
 const GROUPS = [
   {
@@ -31,8 +31,10 @@ const GROUPS = [
   },
 ]
 
-export default function VerdictsStep({ results, marginProtected, onNext }: Props) {
+export default function VerdictsStep({ results, marginProtected, shop, onNext }: Props) {
   const [open, setOpen] = useState<SkuResult | null>(null)
+  // Products whose share of Margin Protected rests on a labelled Seller override, named next to the total.
+  const overridden = results.filter((r) => shop?.elasticity_overrides[r.sku] && Number(r.protected) > 0)
   const needYou = results.filter((r) => r.verdict === 'escalate').length
 
   return (
@@ -44,6 +46,8 @@ export default function VerdictsStep({ results, marginProtected, onNext }: Props
       <p className="lead">
         Following these Verdicts keeps <b>{baht(marginProtected)}</b> ({usd(marginProtected)}) more profit in the worst
         case than joining as invited, counted over the products MarginArena decided.
+        {overridden.length > 0 &&
+          ` Part of it comes from ${overridden.map((r) => r.name).join(' and ')}, which rests on a labelled Seller override.`}
       </p>
 
       {GROUPS.map((g) => {

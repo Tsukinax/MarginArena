@@ -108,7 +108,7 @@ export default function ConfirmStep({ results, shop, recorded }: Props) {
           <b>
             {skipped.length} {skipped.length === 1 ? 'product stays' : 'products stay'} out of the Campaign
           </b>{' '}
-          at full price, because joining would cost profit even before rivals react.
+          at full price, because not joining keeps more profit in the worst case and on average.
         </li>
         <li>
           <b>

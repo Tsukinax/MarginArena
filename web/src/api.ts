@@ -42,6 +42,9 @@ export type RecordedSummary = {
   model: string
   products: number
   margin_protected: string
+  /** The Skips, and the part of Margin Protected they keep (the engine's per-SKU figures, summed by the backend). */
+  skipped: string[]
+  margin_protected_by_skips: string
   verdicts: { approve: number; revise: number; skip: number; escalate: number }
   /** Products whose leading plan a Rival's Counter-move changed. */
   rival_changed: string[]

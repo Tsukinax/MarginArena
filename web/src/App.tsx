@@ -12,6 +12,7 @@ export default function App() {
   const [step, setStep] = useState(0)
   const [shop, setShop] = useState<Shop | null>(null)
   const [route, setRoute] = useState<{ route: string; model: string } | null>(null)
+  const [healthChecked, setHealthChecked] = useState(false)
   const [events, setEvents] = useState<ArenaEvent[]>([])
   const [phase, setPhase] = useState<Phase>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -20,7 +21,9 @@ export default function App() {
 
   useEffect(() => {
     getShop().then(setShop, (e: Error) => setError(e.message))
-    getHealth().then(setRoute, () => setRoute(null))
+    getHealth()
+      .then(setRoute, () => setRoute(null))
+      .finally(() => setHealthChecked(true))
   }, [])
 
   const done = useMemo(() => events.find((e) => e.type === 'run_done'), [events])
@@ -86,7 +89,7 @@ export default function App() {
               </span>
             </>
           ) : (
-            <span>Backend not reachable</span>
+            <span>{healthChecked ? 'Backend not reachable' : 'Checking AMD Token Factory…'}</span>
           )}
         </div>
         <p className="rail-note">
@@ -111,7 +114,7 @@ export default function App() {
           <ArenaStep events={events} phase={phase} shop={shop} onNext={() => setStep(2)} />
         )}
         {step === 2 && done && done.type === 'run_done' && (
-          <VerdictsStep results={results} marginProtected={done.margin_protected} onNext={() => setStep(3)} />
+          <VerdictsStep results={results} marginProtected={done.margin_protected} shop={shop} onNext={() => setStep(3)} />
         )}
         {step === 3 && <ConfirmStep results={results} shop={shop} recorded={recorded} />}
       </main>

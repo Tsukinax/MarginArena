@@ -420,12 +420,16 @@ def _recorded_summary(path: Path) -> dict:
     for r in done["results"]:
         verdicts["skip" if r["skip"] else r["verdict"]] += 1
     changed = [e["sku"] for e in events if e["type"] == "leader" and e["changed"]]
+    skips = [r for r in done["results"] if r["skip"]]
     return {
         "recorded_at": started["recorded_at"],
         "route": started["route"],
         "model": started["model"],
         "products": len(done["results"]),
         "margin_protected": done["margin_protected"],
+        # The part of Margin Protected that the Skips keep, from the engine's own per-SKU figures.
+        "skipped": [r["sku"] for r in skips],
+        "margin_protected_by_skips": str(sum((Decimal(r["protected"]) for r in skips), Decimal("0.00"))),
         "verdicts": verdicts,
         "rival_changed": list(dict.fromkeys(changed)),
         "calls_ok": done["telemetry"]["calls_ok"],

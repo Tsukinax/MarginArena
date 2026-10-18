@@ -290,6 +290,10 @@ async def test_the_first_screen_gets_the_recorded_runs_headline_from_the_recordi
     summary = (await get("/api/arena/recorded")).json()
 
     assert summary["margin_protected"] == "5434.46"
+    # The two Skips lead the first screen: they need no Seller override (evidence/sensitivity.md).
+    # RN-30 protects 861.03 and SM-10 787.47 in the recorded run_done: 861.03 + 787.47 = 1648.50.
+    assert summary["skipped"] == ["RN-30", "SM-10"]
+    assert summary["margin_protected_by_skips"] == "1648.50"
     assert summary["verdicts"] == {"approve": 8, "revise": 1, "skip": 2, "escalate": 1}
     assert summary["rival_changed"] == ["SS-50"]
     assert (summary["route"], summary["model"], summary["products"]) == ("token-factory", "Gemma-4-31B-IT", 12)

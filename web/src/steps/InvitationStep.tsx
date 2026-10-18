@@ -49,11 +49,13 @@ export default function InvitationStep({ shop, route, onStart }: Props) {
         )}
         {summary && v && (
           <div className="hero-result">
-            <p className="hero-number">{baht(summary.margin_protected)}</p>
+            <p className="hero-number">{bahtExact(summary.margin_protected_by_skips)}</p>
             <p className="hero-what">
-              more profit in the worst case for this sample shop when it follows MarginArena's Verdicts instead of
-              joining as invited: {v.approve} Approve, {v.revise} Revise, {v.skip} Skip, and {v.escalate} Escalate
-              left to a person. Most of it comes from the sunscreen's Revise, which rests on a labelled Seller override.
+              more profit in the worst case for this sample shop by skipping{' '}
+              {summary.skipped.map((id) => shop.invited.find((s) => s.id === id)?.name ?? id).join(' and ')} instead
+              of joining them as invited. All {summary.products} Verdicts ({v.approve} Approve, {v.revise} Revise, {v.skip} Skip,{' '}
+              {v.escalate} Escalate left to a person) keep {bahtExact(summary.margin_protected)}; the rest comes from
+              the sunscreen's Revise, which rests on a labelled Seller override.
               <small>
                 Recorded{' '}
                 {new Date(summary.recorded_at).toLocaleDateString('en-GB', {
