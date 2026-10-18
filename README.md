@@ -1,6 +1,6 @@
 # MarginArena AI
 
-https://github.com/user-attachments/assets/e30c20c0-974d-43f7-8dd0-c14bf3560b75
+[![MarginArena demo video (4:25)](docs/images/video-thumbnail.jpg)](https://youtu.be/dhfFiJWZxjM)
 
 ▶ [Demo video](https://youtu.be/dhfFiJWZxjM).
 
@@ -138,7 +138,7 @@ carries out the Verdicts once the Seller confirms ([ADR 0003](docs/adr/0003-aren
 
 ## AMD
 
-- **Every model call the app makes goes to AMD Token Factory,** AMD's hosted model API 
+- **Every model call the app makes goes to AMD Token Factory,** AMD's hosted model API.
 - **Gemma-4-31B-IT** plays the Strategist and the Rivals, wrote the 24 served explanations and answered every
   recorded Arena run and explanation in `evidence/` but one labelled DeepSeek-V4-Flash fallback run
   ([all 7 runs](docs/details.md#recorded-runs-on-token-factory)).
