@@ -10,6 +10,8 @@ invited product first and says, in plain words: join, join with a better plan, s
 **[Live demo](https://marginarena.vercel.app)** (no key, no sign-up) · [Run it locally](#run-it-locally) ·
 [Evidence](#evidence) · [Details](docs/details.md)
 
+## What it does
+
 **At Shopee Thailand's fees**, a ฿100 product that costs ฿50 earns ฿21.11 at full price, ฿6.67 at 20% off and loses ฿0.55
 at 30% off. MarginArena's engine prices every Promo Plan, AI Rivals (Gemma-4-31B-IT on AMD Token Factory) try to break
 the best one, and the best worst case wins. Evolus carries out only what the Seller confirms.
@@ -17,8 +19,10 @@ the best one, and the best worst case wins. Evolus carries out only what the Sel
 **For** a Thai Shopee Seller of beauty and everyday goods (Non-Mall, in the PRIME programme) deciding, product by
 product, whether to accept a Campaign Invitation.
 
-**Impact on a fictional 12-product shop** (engine estimates; no real Seller has used it yet). *Worst case* means the
-lowest profit across every Counter-move and demand assumption tested.
+## Impact
+
+On a fictional 12-product shop (engine estimates; no real Seller has used it yet). *Worst case* means the lowest
+profit across every Counter-move and demand assumption tested.
 
 | What we measured | Result |
 |---|---|
