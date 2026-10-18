@@ -4,29 +4,50 @@
 
 ▶ [Demo video](https://youtu.be/dhfFiJWZxjM).
 
-**Before a marketplace Campaign like 11.11, Shopee asks Sellers to discount chosen products. MarginArena checks every invited product first and decides whether each product is worth including in the campaign, then recommends a clear action: join, join with a better plan, skip, or let the owner decide.(More sales don't always mean more profit.)**
+> **More sales don't always mean more profit.**
+
+**Before a marketplace Campaign like 11.11, Shopee asks Sellers to discount chosen products. MarginArena checks every
+invited product first, decides whether each one is worth including in the Campaign, and recommends a clear action:
+join, join with a better plan, skip, or let the owner decide.**
 
 **[Live demo](https://marginarena.vercel.app)** (no key, no sign-up) · [Run it locally](#run-it-locally) ·
 [Evidence](#evidence) · [Details](docs/details.md)
 
 ## What it does
 
-**MarginArena helps Thai Shopee Sellers decide**, product by product, whether to join a Campaign Invitation and on what terms.
+**MarginArena helps Thai Shopee Sellers decide**, product by product, whether to join a Campaign Invitation and on what
+terms.
 
-Take a product listed at ฿100 that costs ฿50. At Shopee Thailand’s fees for a Non-Mall PRIME Seller (27.82% of the price plus ฿1.07 per order), it earns ฿21.11 per unit at full price, only ฿6.67 at 20% off, and loses ฿0.55 at 30% off. A deeper discount may bring more buyers, but whether it raises total profit depends on demand, costs, fees, stock and what competitors do.
+### The question every Seller faces
+
+Take a product listed at ฿100 that costs ฿50. At Shopee Thailand's fees for a Non-Mall PRIME Seller (27.82% of the price
+plus ฿1.07 per order), it earns ฿21.11 per unit at full price, only ฿6.67 at 20% off, and loses ฿0.55 at 30% off. A
+deeper discount may bring more buyers, but whether it raises total profit depends on demand, costs, fees, stock and
+what competitors do.
+
+### How MarginArena answers it
 
 MarginArena works this out before the Seller commits:
 
-● A deterministic engine computes the fees, the extra demand each discount brings and the Campaign profit of every possible Promo Plan.
-● AI Rivals (Gemma on AMD Token Factory) play competing sellers and propose Counter-moves; every plan is tested against each one under a range of demand assumptions.
-● The plan with the best worst case wins, provided it keeps the Seller’s Margin Floor, follows the brand’s pricing rules and beats not joining.
-● Each product gets a Verdict: join as invited (Approve), join with a better plan (Revise), skip, or escalate to the owner, with a short explanation in Thai or English.
-● Once the Seller confirms, an Evolus workflow prepares the upload file and the owner’s approval request. Nothing is sent automatically.
+1. **Price every plan.** A deterministic engine computes the fees, the extra demand each discount brings and the
+   Campaign profit of every Promo Plan the invitation allows.
+2. **Red-team it.** AI Rivals (Gemma on AMD Token Factory) play competing sellers and propose Counter-moves; every plan
+   is tested against each one under a range of demand assumptions.
+3. **Keep the safest plan.** The plan with the best worst case wins, provided it keeps the Seller's Margin Floor, follows
+   the brand's pricing rules and earns at least as much as not joining.
+4. **Give a Verdict.** Each product gets one: join as invited (Approve), join with a better plan (Revise), skip, or
+   escalate to the owner, with a short explanation in Thai or English.
+5. **Act only after the Seller confirms.** An Evolus workflow then prepares the upload file and the owner's approval
+   request. Nothing is sent automatically.
 
-On a fictional 12-product sample shop, skipping two products keeps ฿1,648.50 more profit in the worst case (+32.8% and +34.2% on those products).
+### Who it's for
 
-**For** a Thai Shopee Seller of beauty and everyday goods (Non-Mall, in the PRIME programme) deciding, product by
-product, whether to accept a Campaign Invitation.(Not limited to one category: fees are data, so another category, a Mall Seller or Lazada needs only its own fee rates and, ideally, its own demand data. The demo’s rate (16.05% commission) is the one 862 of Shopee Thailand’s 1,437 Non-Mall categories pay.)
+A Thai Shopee Seller of beauty and everyday goods (Non-Mall, in the PRIME programme) deciding, product by product,
+whether to accept a Campaign Invitation.
+
+It is not limited to one category: fees are data, so another category, a Mall Seller or Lazada needs only its own fee
+rates and, ideally, its own demand data. The demo's rate (16.05% commission, incl. VAT) is the one 862 of Shopee
+Thailand's 1,437 Non-Mall categories pay.
 
 ## Impact
 
