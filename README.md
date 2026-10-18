@@ -48,14 +48,17 @@ MarginArena works this out before the Seller commits:
 5. **Act only after the Seller confirms.** An Evolus workflow then prepares the upload file and the owner's approval
    request. Nothing is sent automatically.
 
-### Who it's for
+### Target Users and Scope
 
-A Thai Shopee Seller of beauty and everyday goods (Non-Mall, in the PRIME programme) deciding, product by product,
+**Current focus:** A Thai Shopee Seller of beauty and everyday goods (Non-Mall, in the PRIME programme) deciding, product by product,
 whether to accept a Campaign Invitation.
 
-It is not limited to one category: fees are data, so another category, a Mall Seller or Lazada needs only its own fee
+**Designed to expand:** It is not limited to one category: fees are data, so another category, a Mall Seller or Lazada needs only its own fee
 rates and, ideally, its own demand data. The demo's rate (16.05% commission, incl. VAT) is the one 862 of Shopee
 Thailand's 1,437 Non-Mall categories pay.
+
+“The shop is fictional, but the fees, the demand data and the engine are real. The number shows how the decision works. 
+Our next step is a 12.12 pilot with real Thai Sellers to measure it on real sales.”
 
 ## Impact
 
