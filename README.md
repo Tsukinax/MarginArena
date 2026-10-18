@@ -1,4 +1,4 @@
-# MarginArenaAI
+# MarginArena AI
 
 [![MarginArena demo video (4:25)](docs/images/video-thumbnail.jpg)](https://youtu.be/dhfFiJWZxjM)
 
@@ -10,8 +10,16 @@
 invited product first, decides whether each one is worth including in the Campaign, and recommends a clear action:
 join, join with a better plan, skip, or let the owner decide.**
 
-**[Live demo](https://marginarena.vercel.app)** (no key, no sign-up) · [Run it locally](#run-it-locally) ·
-[Evidence](#evidence) · [Details](docs/details.md)
+**[Live demo](https://marginarena.vercel.app)** · [Video (4:25)](https://youtu.be/dhfFiJWZxjM) ·
+[Pitch deck (PDF)](docs/pitch/MarginArena-deck.pdf) ·
+[lablab submission](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-iii/infinite-curve/marginarena-the-ai-campaign-war) ·
+[Results](#impact) · [Run it locally](#run-it-locally)
+
+[![live demo](https://img.shields.io/website?url=https%3A%2F%2Fmarginarena.vercel.app&label=live%20demo&up_message=online&down_message=offline)](https://marginarena.vercel.app)
+[![inference: AMD Token Factory](https://img.shields.io/badge/inference-AMD%20Token%20Factory-ED1C24)](#amd)
+[![model: Gemma-4-31B-IT](https://img.shields.io/badge/model-Gemma--4--31B--IT-4285F4)](#amd)
+[![AMD Hackathon ACT III: Reinvent Commerce · Evolus](https://img.shields.io/badge/AMD%20Hackathon%20ACT%20III-Reinvent%20Commerce%20%C2%B7%20Evolus-5B4FD8)](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-iii/infinite-curve/marginarena-the-ai-campaign-war)
+[![license: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
 ## What it does
 
