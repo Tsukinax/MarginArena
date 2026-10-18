@@ -1,10 +1,15 @@
 # MarginArena AI
 
+https://github.com/user-attachments/assets/e30c20c0-974d-43f7-8dd0-c14bf3560b75
+
+▶ **Demo video (4:25).** Can't play it here, or want it sharper? [Watch it in HD on YouTube](https://youtu.be/dhfFiJWZxjM).
+Narration: AI voice by ElevenLabs.
+
 **Before a marketplace Campaign like 11.11, Shopee asks Sellers to discount chosen products. MarginArena checks every
 invited product first and says, in plain words: join, join with a better plan, skip, or let the owner decide.**
 
-**[Live demo](https://marginarena.vercel.app)** (no key, no sign-up) · **[Demo video (4:25)](https://youtu.be/dhfFiJWZxjM)** ·
-[Run it locally](#run-it-locally) · [Evidence](#evidence) · [Details](docs/details.md)
+**[Live demo](https://marginarena.vercel.app)** (no key, no sign-up) · [Run it locally](#run-it-locally) ·
+[Evidence](#evidence) · [Details](docs/details.md)
 
 At Shopee Thailand's fees, a ฿100 product that costs ฿50 earns ฿21.11 at full price, ฿6.67 at 20% off and loses ฿0.55
 at 30% off. MarginArena's engine prices every Promo Plan, AI Rivals (Gemma-4-31B-IT on AMD Token Factory) try to break
@@ -36,11 +41,6 @@ At https://marginarena.vercel.app (the first load can take a few seconds):
    decides). Open **How we decided**, then **ไทย** for Thai.
 4. **Review and confirm**, then **Confirm and run the Evolus workflow**: it writes the upload file and drafts the
    approval request, sending nothing.
-
-[![Watch the MarginArena demo video (4:25) on YouTube](docs/images/video-thumbnail.jpg)](https://youtu.be/dhfFiJWZxjM)
-
-*The demo video (4:25): the problem, the live site's recorded Arena and Verdicts, the Evolus workspace, and the
-business case. Narration: AI voice by ElevenLabs.*
 
 ## The problem
 
